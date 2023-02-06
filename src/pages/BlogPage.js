@@ -10,9 +10,9 @@ import POSTS from '../_mock/blog';
 // ----------------------------------------------------------------------
 
 const SORT_OPTIONS = [
-  { value: 'latest', label: 'Latest' },
-  { value: 'popular', label: 'Popular' },
-  { value: 'oldest', label: 'Oldest' },
+  { value: 'latest', label: 'Mới nhất' },
+  { value: 'popular', label: 'Phổ biến' },
+  { value: 'oldest', label: 'Cũ nhất' },
 ];
 
 // ----------------------------------------------------------------------
@@ -27,10 +27,10 @@ export default function BlogPage() {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Chuyến đi
+            Tất cả chuyến đi
           </Typography>
           <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-            Tạo chuyến đi
+            Tạo chuyến đi mới
           </Button>
         </Stack>
 

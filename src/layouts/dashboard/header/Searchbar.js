@@ -67,7 +67,7 @@ export default function Searchbar() {
               sx={{ mr: 1, fontWeight: 'fontWeightBold' }}
             />
             <Button variant="contained" onClick={handleClose}>
-              Search
+              Tìm kiếm
             </Button>
           </StyledSearchbar>
         </Slide>

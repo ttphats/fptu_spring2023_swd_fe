@@ -34,11 +34,11 @@ import USERLIST from '../_mock/user';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Name', alignRight: false },
-  { id: 'company', label: 'Company', alignRight: false },
-  { id: 'role', label: 'Role', alignRight: false },
-  { id: 'isVerified', label: 'Verified', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
+  { id: 'name', label: 'Tên', alignRight: false },
+  { id: 'company', label: 'Công ty', alignRight: false },
+  { id: 'role', label: 'Vai trò', alignRight: false },
+  { id: 'isVerified', label: 'Đã xác thực', alignRight: false },
+  { id: 'status', label: 'Trạng thái', alignRight: false },
   { id: '' },
 ];
 
@@ -155,10 +155,10 @@ export default function UserPage() {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            User
+            Người dùng
           </Typography>
           <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-            New User
+            Tạo người dùng mới
           </Button>
         </Stack>
 
@@ -232,13 +232,13 @@ export default function UserPage() {
                           }}
                         >
                           <Typography variant="h6" paragraph>
-                            Not found
+                            Không tìm thấy kết quả
                           </Typography>
 
                           <Typography variant="body2">
-                            No results found for &nbsp;
+                            Không tìm thấy kết quả cho &nbsp;
                             <strong>&quot;{filterName}&quot;</strong>.
-                            <br /> Try checking for typos or using complete words.
+                            <br /> Vui lòng thử lại.
                           </Typography>
                         </Paper>
                       </TableCell>
@@ -281,12 +281,12 @@ export default function UserPage() {
       >
         <MenuItem>
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Edit
+          Sửa
         </MenuItem>
 
         <MenuItem sx={{ color: 'error.main' }}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-          Delete
+          Xoá
         </MenuItem>
       </Popover>
     </>

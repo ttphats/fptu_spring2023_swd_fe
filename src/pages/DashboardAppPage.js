@@ -36,25 +36,25 @@ export default function DashboardAppPage() {
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Weekly Sales" total={714000} icon={'ant-design:android-filled'} />
+            <AppWidgetSummary title="Tổng thu nhập" total={714000} icon={'ant-design:android-filled'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="New Users" total={1352831} color="info" icon={'ant-design:apple-filled'} />
+            <AppWidgetSummary title="Người dùng mới" total={1352831} color="info" icon={'ant-design:apple-filled'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Item Orders" total={1723315} color="warning" icon={'ant-design:windows-filled'} />
+            <AppWidgetSummary title="Phiếu giảm giá hiện có" total={1723315} color="warning" icon={'ant-design:windows-filled'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Bug Reports" total={234} color="error" icon={'ant-design:bug-filled'} />
+            <AppWidgetSummary title="Báo cáo lỗi" total={234} color="error" icon={'ant-design:bug-filled'} />
           </Grid>
 
           <Grid item xs={12} md={6} lg={8}>
             <AppWebsiteVisits
-              title="Website Visits"
-              subheader="(+43%) than last year"
+              title="Lượt truy cập trang"
+              subheader="(+43%) so với tháng trước"
               chartLabels={[
                 '01/01/2003',
                 '02/01/2003',
@@ -93,7 +93,7 @@ export default function DashboardAppPage() {
 
           <Grid item xs={12} md={6} lg={4}>
             <AppCurrentVisits
-              title="Current Visits"
+              title="Lượt truy cập hiện tại"
               chartData={[
                 { label: 'America', value: 4344 },
                 { label: 'Asia', value: 5435 },
@@ -111,8 +111,8 @@ export default function DashboardAppPage() {
 
           <Grid item xs={12} md={6} lg={8}>
             <AppConversionRates
-              title="Conversion Rates"
-              subheader="(+43%) than last year"
+              title="Tỷ lệ chuyển đổi"
+              subheader="(+43%) so với tháng trước"
               chartData={[
                 { label: 'Italy', value: 400 },
                 { label: 'Japan', value: 430 },
@@ -130,8 +130,8 @@ export default function DashboardAppPage() {
 
           <Grid item xs={12} md={6} lg={4}>
             <AppCurrentSubject
-              title="Current Subject"
-              chartLabels={['English', 'History', 'Physics', 'Geography', 'Chinese', 'Math']}
+              title="Tỷ lệ người dùng"
+              chartLabels={['Bắc', 'Trung', 'Nam', 'Đông Nam Bộ', 'Tây Nam Bộ', 'Tây Nguyên']}
               chartData={[
                 { name: 'Series 1', data: [80, 50, 30, 40, 100, 20] },
                 { name: 'Series 2', data: [20, 30, 40, 80, 20, 80] },
@@ -143,7 +143,7 @@ export default function DashboardAppPage() {
 
           <Grid item xs={12} md={6} lg={8}>
             <AppNewsUpdate
-              title="News Update"
+              title="Tin tức mới"
               list={[...Array(5)].map((_, index) => ({
                 id: faker.datatype.uuid(),
                 title: faker.name.jobTitle(),
@@ -156,7 +156,7 @@ export default function DashboardAppPage() {
 
           <Grid item xs={12} md={6} lg={4}>
             <AppOrderTimeline
-              title="Order Timeline"
+              title="Lịch trình báo cáo"
               list={[...Array(5)].map((_, index) => ({
                 id: faker.datatype.uuid(),
                 title: [
@@ -174,7 +174,7 @@ export default function DashboardAppPage() {
 
           <Grid item xs={12} md={6} lg={4}>
             <AppTrafficBySite
-              title="Traffic by Site"
+              title="Lượt truy cập mạng xã hội"
               list={[
                 {
                   name: 'FaceBook',
@@ -202,7 +202,7 @@ export default function DashboardAppPage() {
 
           <Grid item xs={12} md={6} lg={8}>
             <AppTasks
-              title="Tasks"
+              title="Công việc cần làm"
               list={[
                 { id: '1', label: 'Create FireStone Logo' },
                 { id: '2', label: 'Add SCSS and JS files if required' },
