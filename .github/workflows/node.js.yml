@@ -27,6 +27,6 @@ jobs:
         cache: 'npm'
         cache-dependency-path: "/home/hainam/actions-runner-fe/_work/fptu_spring2023_swd_fe/fptu_spring2023_swd_fe/package-lock.json"
     - run: npm ci
-    - run: npm run build --if-present
+    - run: CI=false npm run build --if-present
     - name: Restart pm2 service
       run: pm2 restart cocphuot
