@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
 //
@@ -33,7 +33,14 @@ const Main = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function DashboardLayout() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if(!localStorage.getItem("token-info")){
+      navigate('/login');
+    }
+  })
 
   return (
     <StyledRoot>
