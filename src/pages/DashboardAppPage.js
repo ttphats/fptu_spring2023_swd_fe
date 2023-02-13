@@ -4,6 +4,7 @@ import { faker } from '@faker-js/faker';
 import { useTheme } from '@mui/material/styles';
 import { Grid, Container, Typography } from '@mui/material';
 // components
+import loginApi from '../api/loginApi';
 import Iconify from '../components/iconify';
 // sections
 import {
@@ -22,13 +23,11 @@ import {
 
 export default function DashboardAppPage() {
   const theme = useTheme();
-
   return (
     <>
       <Helmet>
         <title> Cóc Phượt </title>
       </Helmet>
-
       <Container maxWidth="xl">
         <Typography variant="h4" sx={{ mb: 5 }}>
           Xin chào Hải Nam
