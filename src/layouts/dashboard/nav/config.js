@@ -17,14 +17,14 @@ const navConfig = [
     icon: icon('ic_user'),
   },
   {
-    title: 'Phiếu giảm giá',
-    path: '/dashboard/voucher',
-    icon: icon('ic_voucher'),
-  },
-  {
     title: 'Chuyến đi',
     path: '/dashboard/blog',
     icon: icon('ic_trip'),
+  },
+  {
+    title: 'Phiếu giảm giá',
+    path: '/dashboard/voucher',
+    icon: icon('ic_voucher'),
   },
   {
     title: 'Đăng xuất',
