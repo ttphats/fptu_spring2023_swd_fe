@@ -10,6 +10,7 @@ import account from '../../../_mock/account';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
 // components
+import loginApi from '../../../api/loginApi';
 import Logo from '../../../components/logo';
 import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
@@ -37,17 +38,27 @@ Nav.propTypes = {
 
 export default function Nav({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
-  const [name, setName] = useState('');
+  const [name, setName] = useState();
 
   const isDesktop = useResponsive('up', 'lg');
 
   useEffect(() => {
-    try {
-      setName(firebase.auth().currentUser.displayName);
-    } catch (error) {
-      setName(account.displayName);
-    }
+    const fetchUser = async () => {
+      try {
+        const response = await loginApi.getUser();
+        setName(response.data.fullname);
+      } catch (error) {
+        console.log('Fail to fetch Api: ', error);
+      }
+    };
+    fetchUser();
   }, []);
+
+  useEffect(() => {
+    if (firebase.auth().currentUser) {
+      setName(firebase.auth().currentUser.displayName);
+    }
+  });
 
   useEffect(() => {
     if (openNav) {

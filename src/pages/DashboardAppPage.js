@@ -6,7 +6,7 @@ import firebase from 'firebase/compat/app';
 import { useTheme } from '@mui/material/styles';
 import { Grid, Container, Typography } from '@mui/material';
 // components
-import account from '../_mock/account';
+import loginApi from '../api/loginApi';
 import Iconify from '../components/iconify';
 // sections
 import {
@@ -25,15 +25,25 @@ import {
 
 export default function DashboardAppPage() {
   const theme = useTheme();
-  const [name, setName] = useState('');
+  const [name, setName] = useState();
 
   useEffect(() => {
-    try {
-      setName(firebase.auth().currentUser.displayName);
-    } catch (error) {
-      setName(account.displayName);
-    }
+    const fetchUser = async () => {
+      try {
+        const response = await loginApi.getUser();
+        setName(response.data.fullname);
+      } catch (error) {
+        console.log('Fail to fetch Api: ', error);
+      }
+    };
+    fetchUser();
   }, []);
+
+  useEffect(() => {
+    if (firebase.auth().currentUser) {
+      setName(firebase.auth().currentUser.displayName);
+    }
+  });
   return (
     <>
       <Helmet>
