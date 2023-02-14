@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { faker } from '@faker-js/faker';
+import firebase from 'firebase/compat/app';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import { Grid, Container, Typography } from '@mui/material';
@@ -29,7 +30,7 @@ export default function DashboardAppPage() {
       </Helmet>
       <Container maxWidth="xl">
         <Typography variant="h4" sx={{ mb: 5 }}>
-          Xin chào Hải Nam
+          Xin chào {firebase.auth().currentUser.displayName}
         </Typography>
 
         <Grid container spacing={3}>
