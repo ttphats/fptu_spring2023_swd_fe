@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { NavLink as RouterLink } from 'react-router-dom';
+import firebase from 'firebase/compat/app';
 // @mui
 import { Box, List, ListItemText } from '@mui/material';
 //
@@ -34,6 +35,7 @@ function NavItem({item}) {
     console.log('remove', title);
     if(title === 'Đăng xuất'){
       localStorage.removeItem('token-info')
+      firebase.auth().signOut();
     }
   }
 
