@@ -23,6 +23,7 @@ firebase.initializeApp(firebaseConfig);
 
 export default function App() {
   const navigate = useNavigate();
+  
   useEffect(() => {
     if(!localStorage.getItem('token-info')){
       navigate('/login', { replace: true });
@@ -56,7 +57,6 @@ export default function App() {
     });
     return () => unregisterAuthObserver();
   }, []);
-
   return (
     <ThemeProvider>
       <ScrollToTop />

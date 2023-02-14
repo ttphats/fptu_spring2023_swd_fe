@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import firebase from "firebase/compat/app";
+import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 // @mui
 import { alpha } from '@mui/material/styles';
@@ -30,6 +30,18 @@ const MENU_OPTIONS = [
 export default function AccountPopover() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(null);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    try {
+      setName(firebase.auth().currentUser.displayName);
+      setEmail(firebase.auth().currentUser.email);
+    } catch (error) {
+      setName(account.displayName);
+      setEmail(account.email);
+    }
+  }, []);
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -42,7 +54,7 @@ export default function AccountPopover() {
   const logout = () => {
     localStorage.removeItem('token-info');
     firebase.auth().signOut();
-    navigate('/login')
+    navigate('/login');
   };
 
   return (
@@ -88,10 +100,10 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+            {name}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+            {email}
           </Typography>
         </Box>
 

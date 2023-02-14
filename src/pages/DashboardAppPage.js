@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { faker } from '@faker-js/faker';
 import firebase from 'firebase/compat/app';
@@ -5,6 +6,7 @@ import firebase from 'firebase/compat/app';
 import { useTheme } from '@mui/material/styles';
 import { Grid, Container, Typography } from '@mui/material';
 // components
+import account from '../_mock/account';
 import Iconify from '../components/iconify';
 // sections
 import {
@@ -23,6 +25,15 @@ import {
 
 export default function DashboardAppPage() {
   const theme = useTheme();
+  const [name, setName] = useState('');
+
+  useEffect(() => {
+    try {
+      setName(firebase.auth().currentUser.displayName);
+    } catch (error) {
+      setName(account.displayName);
+    }
+  }, []);
   return (
     <>
       <Helmet>
@@ -30,7 +41,7 @@ export default function DashboardAppPage() {
       </Helmet>
       <Container maxWidth="xl">
         <Typography variant="h4" sx={{ mb: 5 }}>
-          Xin chào {firebase.auth().currentUser.displayName}
+          Xin chào {name}
         </Typography>
 
         <Grid container spacing={3}>
@@ -43,7 +54,12 @@ export default function DashboardAppPage() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Phiếu giảm giá hiện có" total={1723315} color="warning" icon={'ant-design:windows-filled'} />
+            <AppWidgetSummary
+              title="Phiếu giảm giá hiện có"
+              total={1723315}
+              color="warning"
+              icon={'ant-design:windows-filled'}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
