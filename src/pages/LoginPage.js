@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import firebase from 'firebase/compat/app';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
@@ -51,6 +53,14 @@ const uiConfig = {
 
 export default function LoginPage() {
   const mdUp = useResponsive('up', 'md');
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if(localStorage.getItem('token-info')){
+      navigate('/dashboard', { replace: true });
+    }
+  })
 
   return (
     <>
