@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // firebase
-import firebase from "firebase/compat/app";
+import firebase from "./firebase";
 import 'firebase/compat/auth';
 // routes
 import Router from './routes';
@@ -13,14 +13,6 @@ import { StyledChart } from './components/chart';
 import ScrollToTop from './components/scroll-to-top';
 
 // ----------------------------------------------------------------------
-
-const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-};
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-
 export default function App() {
   const navigate = useNavigate();
   
