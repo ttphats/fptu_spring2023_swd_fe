@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import firebase from 'firebase/compat/app';
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
@@ -39,6 +40,7 @@ export default function AccountPopover() {
 
   const logout = () => {
     localStorage.removeItem('token-info');
+    firebase.auth().signOut();
     navigate('/login')
   };
 

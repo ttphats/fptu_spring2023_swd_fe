@@ -3,12 +3,11 @@ import firebase from 'firebase/compat/app';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 // @mui
 import { styled } from '@mui/material/styles';
-import { Link, Container, Typography, Divider, Stack, Button } from '@mui/material';
+import { Link, Container, Typography, Divider } from '@mui/material';
 // hooks
 import useResponsive from '../hooks/useResponsive';
 // components
 import Logo from '../components/logo';
-import Iconify from '../components/iconify';
 // sections
 import { LoginForm } from '../sections/auth/login';
 
