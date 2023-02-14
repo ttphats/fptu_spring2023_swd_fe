@@ -1,8 +1,9 @@
+import firebase from 'firebase/compat/app';
 // ----------------------------------------------------------------------
 
 const account = {
-  displayName: 'Hồ Hải Nam',
-  email: 'hainam@gmail.com',
+  displayName: firebase.auth().currentUser.displayName,
+  email: firebase.auth().currentUser.email,
   photoURL: '/assets/images/avatars/avatar_default.jpg',
 };
 
