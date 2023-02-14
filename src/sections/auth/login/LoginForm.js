@@ -56,11 +56,12 @@ export default function LoginForm() {
     <>
       <StyledSnackbar message={isLoginMessage.message} open={open} severity={severity} />
       <Stack spacing={3}>
-        <TextField name="email" label="Email" onChange={(e) => setEmail(e.target.value)} />
+        <TextField name="email" label="Email" required onChange={(e) => setEmail(e.target.value)} />
 
         <TextField
           name="password"
           label="Mật khẩu"
+          required
           type={showPassword ? 'text' : 'password'}
           onChange={(e) => setPassword(e.target.value)}
           InputProps={{

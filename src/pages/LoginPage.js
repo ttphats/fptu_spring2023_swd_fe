@@ -41,7 +41,6 @@ const StyledContent = styled('div')(({ theme }) => ({
 
 // Configure FirebaseUI.
 const uiConfig = {
-  // Popup signin flow rather than redirect flow.
   signInFlow: 'popup',
   signInSuccessUrl: '/dashboard',
   // We will display Google and Facebook as auth providers.
