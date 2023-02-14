@@ -39,7 +39,7 @@ export default function LoginForm() {
         setPassword('');
         navigate('/dashboard', { replace: true });
       } catch (error) {
-        if (error.response.status === 401) {
+        if (error.response.status !== 202) {
           setIsLoginMessage({
             message: error?.response?.data?.message,
           });

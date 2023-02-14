@@ -1,4 +1,6 @@
 import { Helmet } from 'react-helmet-async';
+import firebase from 'firebase/compat/app';
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 // @mui
 import { styled } from '@mui/material/styles';
 import { Link, Container, Typography, Divider, Stack, Button } from '@mui/material';
@@ -37,6 +39,15 @@ const StyledContent = styled('div')(({ theme }) => ({
   flexDirection: 'column',
   padding: theme.spacing(12, 0),
 }));
+
+// Configure FirebaseUI.
+const uiConfig = {
+  // Popup signin flow rather than redirect flow.
+  signInFlow: 'popup',
+  signInSuccessUrl: '/dashboard',
+  // We will display Google and Facebook as auth providers.
+  signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
+};
 
 // ----------------------------------------------------------------------
 
@@ -78,15 +89,11 @@ export default function LoginPage() {
               <Link variant="subtitle2">Đăng ký ngay</Link>
             </Typography>
 
-            <Stack direction="row" spacing={2}>
-              <Button fullWidth size="large" color="inherit" variant="outlined">
-                <Iconify icon="eva:google-fill" color="#DF3E30" width={22} height={22} />
-              </Button>
-
-              <Button fullWidth size="large" color="inherit" variant="outlined">
-                <Iconify icon="eva:facebook-fill" color="#1877F2" width={22} height={22} />
-              </Button>
-            </Stack>
+            <StyledFirebaseAuth
+              uiCallback={(ui) => ui.disableAutoSignIn()}
+              uiConfig={uiConfig}
+              firebaseAuth={firebase.auth()}
+            />
 
             <Divider sx={{ my: 3 }}>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
