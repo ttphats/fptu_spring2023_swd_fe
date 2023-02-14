@@ -7,6 +7,7 @@ import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
 // mocks_
 import account from '../../../_mock/account';
+import loginApi from '../../../api/loginApi';
 
 // ----------------------------------------------------------------------
 
@@ -30,18 +31,28 @@ const MENU_OPTIONS = [
 export default function AccountPopover() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(null);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState();
+  const [email, setEmail] = useState();
 
   useEffect(() => {
-    try {
+    const fetchUser = async () => {
+      try {
+        const response = await loginApi.getUser();
+        setName(response.data.fullname);
+        setEmail(response.data.email);
+      } catch (error) {
+        console.log('Fail to fetch Api: ', error);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    if (firebase.auth().currentUser) {
       setName(firebase.auth().currentUser.displayName);
       setEmail(firebase.auth().currentUser.email);
-    } catch (error) {
-      setName(account.displayName);
-      setEmail(account.email);
     }
-  }, []);
+  });
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
