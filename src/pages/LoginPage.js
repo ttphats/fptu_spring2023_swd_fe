@@ -75,7 +75,7 @@ export default function LoginPage() {
 
             <Typography variant="body2" sx={{ mb: 5 }}>
               Bạn chưa có tài khoản? {''}
-              <Link variant="subtitle2">Bắt đầu</Link>
+              <Link href="/register" variant="subtitle2">Bắt đầu</Link>
             </Typography>
 
             <Stack direction="row" spacing={2}>
