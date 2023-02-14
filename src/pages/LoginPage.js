@@ -60,7 +60,7 @@ export default function LoginPage() {
     if(localStorage.getItem('token-info')){
       navigate('/dashboard', { replace: true });
     }
-  })
+  },[])
 
   return (
     <>

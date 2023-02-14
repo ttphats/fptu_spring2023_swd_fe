@@ -14,12 +14,7 @@ import ScrollToTop from './components/scroll-to-top';
 // ----------------------------------------------------------------------
 export default function App() {
   const navigate = useNavigate();
-  
-  useEffect(() => {
-    if(!localStorage.getItem('token-info')){
-      navigate('/login', { replace: true });
-    }
-  })
+
   // Handle firebase auth changed
   useEffect(() => {
     const unregisterAuthObserver = firebase.auth().onAuthStateChanged(async (user) => {
