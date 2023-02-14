@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import firebase from 'firebase/compat/app';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/material';
@@ -36,8 +37,17 @@ Nav.propTypes = {
 
 export default function Nav({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
+  const [name, setName] = useState('');
 
   const isDesktop = useResponsive('up', 'lg');
+
+  useEffect(() => {
+    try {
+      setName(firebase.auth().currentUser.displayName);
+    } catch (error) {
+      setName(account.displayName);
+    }
+  }, []);
 
   useEffect(() => {
     if (openNav) {
@@ -64,7 +74,7 @@ export default function Nav({ openNav, onCloseNav }) {
 
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {account.displayName}
+                {name}
               </Typography>
 
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
