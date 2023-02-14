@@ -38,7 +38,7 @@ export default function DashboardLayout() {
 
   useEffect(() => {
     if(!localStorage.getItem("token-info")){
-      navigate('/login');
+      navigate('/login', { replace: true });
     }
   })
 
