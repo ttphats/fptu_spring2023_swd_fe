@@ -34,25 +34,21 @@ export default function AccountPopover() {
   const [name, setName] = useState();
   const [email, setEmail] = useState();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await loginApi.getUser();
-        setName(response.data.fullname);
-        setEmail(response.data.email);
-      } catch (error) {
-        console.log('Fail to fetch Api: ', error);
-      }
-    };
-    fetchUser();
-  }, []);
+  const fetchUser = async () => {
+    try {
+      const response = await loginApi.getUser();
+      setName(response.data.fullname);
+      setEmail(response.data.email);
+    } catch (error) {
+      console.log('Fail to fetch Api: ', error);
+    }
+  };
 
   useEffect(() => {
-    if (firebase.auth().currentUser) {
-      setName(firebase.auth().currentUser.displayName);
-      setEmail(firebase.auth().currentUser.email);
+    if(localStorage.getItem('access-token')) {
+    fetchUser();
     }
-  });
+  }, [localStorage.getItem('access-token')]);
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -63,7 +59,7 @@ export default function AccountPopover() {
   };
 
   const logout = () => {
-    localStorage.removeItem('token-info');
+    localStorage.removeItem('access-token');
     firebase.auth().signOut();
     navigate('/login');
   };

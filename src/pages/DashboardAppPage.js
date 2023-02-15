@@ -27,23 +27,21 @@ export default function DashboardAppPage() {
   const theme = useTheme();
   const [name, setName] = useState();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await loginApi.getUser();
-        setName(response.data.fullname);
-      } catch (error) {
-        console.log('Fail to fetch Api: ', error);
-      }
-    };
-    fetchUser();
-  }, []);
+  const fetchUser = async () => {
+    try {
+      const response = await loginApi.getUser();
+      setName(response.data.fullname);
+    } catch (error) {
+      console.log('Fail to fetch Api: ', error);
+    }
+  };
 
   useEffect(() => {
-    if (firebase.auth().currentUser) {
-      setName(firebase.auth().currentUser.displayName);
+    if(localStorage.getItem('access-token')) {
+    fetchUser();
     }
-  });
+  }, [localStorage.getItem('access-token')]);
+
   return (
     <>
       <Helmet>
