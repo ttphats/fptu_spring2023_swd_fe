@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // firebase
 import firebase from "./firebase";
@@ -10,11 +10,23 @@ import ThemeProvider from './theme';
 // components
 import { StyledChart } from './components/chart';
 import ScrollToTop from './components/scroll-to-top';
+import loginApi from './api/loginApi';
 
 // ----------------------------------------------------------------------
 export default function App() {
   const navigate = useNavigate();
-
+  const [tokenId, setTokenId] = useState();
+  const fetchLogin = async () => {
+    try {
+      console.log('tokenId', tokenId)
+      const response = await loginApi.getLoginPublic(tokenId);
+      console.log(response.data.accessToken);
+      localStorage.setItem('token-info', response.data.accessToken);
+      navigate('/dashboard', { replace: true });
+    } catch (error) {
+      console.log('Fail to fetch Api: ', error.response);
+    }
+  };
   // Handle firebase auth changed
   useEffect(() => {
     const unregisterAuthObserver = firebase.auth().onAuthStateChanged(async (user) => {
@@ -23,13 +35,19 @@ export default function App() {
         navigate('/login', { replace: true });
         return;
       }
-      const token = await user.getIdToken();
-      console.log(token)
-      localStorage.setItem('token-info', token);
-      navigate('/dashboard', { replace: true });
+      const tokenId = await user.getIdToken();
+      console.log(tokenId)
+      setTokenId(tokenId);
     });
     return () => unregisterAuthObserver();
   }, []);
+
+  useEffect(() => {
+if (tokenId) {
+
+  fetchLogin();
+}
+  },[tokenId])
   return (
     <ThemeProvider>
       <ScrollToTop />
