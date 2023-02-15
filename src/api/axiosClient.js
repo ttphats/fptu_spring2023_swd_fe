@@ -9,10 +9,6 @@ const axiosClient = axios.create({
     'content-type': 'application/json',
     Authorization: `Bearer ${localStorage.getItem('token-info')}`,
   },
-  paramsSerializer: {
-    serialize: (params) => queryString.stringify(params),
-    indexes: false,
-  },
 });
 axiosClient.interceptors.request.use(
   
