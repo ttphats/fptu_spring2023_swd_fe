@@ -57,7 +57,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(localStorage.getItem('token-info')){
+    if(localStorage.getItem('access-token')){
       navigate('/dashboard', { replace: true });
     }
   },[])
