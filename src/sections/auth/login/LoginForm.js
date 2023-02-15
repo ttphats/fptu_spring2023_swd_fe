@@ -34,7 +34,7 @@ export default function LoginForm() {
       try {
         const response = await loginApi.getLogin(userData);
         console.log(response.data.accessToken);
-        localStorage.setItem('token-info', response.data.accessToken);
+        localStorage.setItem('access-token', response.data.accessToken);
         setEmail('');
         setPassword('');
         navigate('/dashboard', { replace: true });
@@ -55,40 +55,42 @@ export default function LoginForm() {
   return (
     <>
       <StyledSnackbar message={isLoginMessage.message} open={open} severity={severity} />
-      <Stack spacing={3}>
-        <TextField name="email" label="Email" required onChange={(e) => setEmail(e.target.value)} />
+      <form>
+        <Stack spacing={3}>
+          <TextField name="email" label="Email" required onChange={(e) => setEmail(e.target.value)} />
 
-        <TextField
-          name="password"
-          label="Mật khẩu"
-          required
-          type={showPassword ? 'text' : 'password'}
-          onChange={(e) => setPassword(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                  <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Stack>
-
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
-        <Stack direction="row" alignItems="center">
-          <Checkbox name="remember" label="Remember me" />
-          <Typography>Ghi nhớ đăng nhập</Typography>
+          <TextField
+            name="password"
+            label="Mật khẩu"
+            required
+            type={showPassword ? 'text' : 'password'}
+            onChange={(e) => setPassword(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                    <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
         </Stack>
-        <Link variant="subtitle2" underline="hover">
-          Quên mật khẩu?
-        </Link>
-      </Stack>
 
-      <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}>
-        Đăng nhập
-      </LoadingButton>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
+          <Stack direction="row" alignItems="center">
+            <Checkbox name="remember" label="Remember me" />
+            <Typography>Ghi nhớ đăng nhập</Typography>
+          </Stack>
+          <Link variant="subtitle2" underline="hover">
+            Quên mật khẩu?
+          </Link>
+        </Stack>
+
+        <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}>
+          Đăng nhập
+        </LoadingButton>
+      </form>
     </>
   );
 }

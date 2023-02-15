@@ -7,13 +7,13 @@ const axiosClient = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
   headers: {
     'content-type': 'application/json',
-    Authorization: `Bearer ${localStorage.getItem('token-info')}`,
+    Authorization: `Bearer ${localStorage.getItem('access-token')}`,
   },
 });
 axiosClient.interceptors.request.use(
   
   async (config) => {
-    const token = await localStorage.getItem('token-info');
+    const token = await localStorage.getItem('access-token');
     config.headers.Authorization = token ? `Bearer ${token}` : '';
     return config;
   },
