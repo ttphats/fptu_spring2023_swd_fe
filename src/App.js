@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // firebase
-import firebase from "./firebase";
+import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
+import { fetchNotify } from './firebase-message';
 // routes
 import Router from './routes';
 // theme
@@ -16,9 +17,10 @@ import loginApi from './api/loginApi';
 export default function App() {
   const navigate = useNavigate();
   const [tokenId, setTokenId] = useState();
+
   const fetchLogin = async () => {
     try {
-      console.log('tokenId', tokenId)
+      console.log('tokenId', tokenId);
       const response = await loginApi.getLoginPublic(tokenId);
       localStorage.setItem('access-token', response.data.accessToken);
       localStorage.setItem('refesh-token', response.data.refreshToken);
@@ -41,16 +43,27 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-if (tokenId) {
-
-  fetchLogin();
-}
-  },[tokenId])
+    if (tokenId) {
+      fetchLogin();
+    }
+  }, [tokenId]);
+  // Handle get message push notify
+  useEffect(() => {
+    if (localStorage.getItem('access-token')) {
+      fetchNotify();
+      firebase.messaging().onMessage((data) => {
+        new Notification(data.notification.title, {
+          body: data.notification.body,
+          image: data.notification.image,
+        });
+      });
+    }
+  }, []);
   return (
     <ThemeProvider>
       <ScrollToTop />
       <StyledChart />
-      <Router/>
+      <Router />
     </ThemeProvider>
   );
 }
