@@ -10,6 +10,9 @@ import Page404 from './pages/Page404';
 import VoucherPage from './pages/VoucherPage';
 import DashboardAppPage from './pages/DashboardAppPage';
 import RegisterPage from './pages/RegisterPage';
+import ForgotPassword from './pages/ForgotPassword';
+import OTPAuthenticationPage from './pages/OTPAuthenticationPage';
+
 
 // ----------------------------------------------------------------------
 
@@ -33,6 +36,14 @@ export default function Router() {
     {
       path: 'register',
       element: <RegisterPage />
+    },
+    {
+      path: 'forgotpassword',
+      element: <ForgotPassword />
+    },
+    {
+      path: 'otpauthentication',
+      element: <OTPAuthenticationPage />
     },
     {
       element: <SimpleLayout />,
