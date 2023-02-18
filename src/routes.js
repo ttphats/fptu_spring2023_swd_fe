@@ -10,6 +10,7 @@ import Page404 from './pages/Page404';
 import VoucherPage from './pages/VoucherPage';
 import DashboardAppPage from './pages/DashboardAppPage';
 import RegisterPage from './pages/RegisterPage';
+import UserProfilePage from './pages/UserProfilePage';
 
 // ----------------------------------------------------------------------
 
@@ -33,6 +34,10 @@ export default function Router() {
     {
       path: 'register',
       element: <RegisterPage />
+    },
+    {
+      path: 'user-profile',
+      element: <UserProfilePage />
     },
     {
       element: <SimpleLayout />,
