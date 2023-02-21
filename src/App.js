@@ -27,6 +27,7 @@ export default function App() {
       const response = unwrapResult(await dispatch(userLoginPublic(tokenId)));;
       const actionResult = dispatch(getMe());
       const currentUser = unwrapResult(actionResult);
+      navigate('/dashboard', { replace: true });
     } catch (error) {
       console.log('Fail to fetch Api: ', error.response);
     }

@@ -27,7 +27,14 @@ export default function Router() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="*" element={<Navigate to="/404" replace />} />
-        <Route path="/user-profile" element={<UserProfilePage />} />
+        <Route
+          path="/user-profile"
+          element={
+            <ProtectedRoute isAuthenticated={user.isAuthenticated}>
+              <UserProfilePage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/dashboard"
           element={
