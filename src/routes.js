@@ -50,7 +50,7 @@ export default function Router() {
           <Route path="blog" element={<BlogPage />} />
         </Route>
         <Route element={<SimpleLayout />}>
-          <Route element={<Navigate to="/404" replace />} index="true" />
+          <Route element={<Navigate to="/dashboard/app" replace />} index="true" />
           <Route path="404" element={<Page404 />} />
           <Route path="*" element={<Navigate to="/404" replace />} />
         </Route>
