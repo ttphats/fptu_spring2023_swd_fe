@@ -60,7 +60,7 @@ export default function LoginPage() {
     if(localStorage.getItem('access-token')){
       navigate('/dashboard', { replace: true });
     }
-  },[])
+  },[navigate])
 
   return (
     <>
