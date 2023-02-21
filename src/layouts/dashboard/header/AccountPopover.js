@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
+import { useSelector } from 'react-redux';
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
 // mocks_
 import account from '../../../_mock/account';
-import loginApi from '../../../api/loginApi';
 
 // ----------------------------------------------------------------------
 
@@ -30,25 +30,17 @@ const MENU_OPTIONS = [
 
 export default function AccountPopover() {
   const navigate = useNavigate();
+  const userInfo = useSelector((state) => state.user)  
   const [open, setOpen] = useState(null);
   const [name, setName] = useState();
   const [email, setEmail] = useState();
 
-  const fetchUser = async () => {
-    try {
-      const response = await loginApi.getUser();
-      setName(response.data.fullname);
-      setEmail(response.data.email);
-    } catch (error) {
-      console.log('Fail to fetch Api: ', error);
-    }
-  };
-
   useEffect(() => {
-    if(localStorage.getItem('access-token')) {
-    fetchUser();
+    if(userInfo) {
+      setName(userInfo.current.fullname);
+      setEmail(userInfo.current.email);
     }
-  }, [localStorage.getItem('access-token')]);
+  });
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);

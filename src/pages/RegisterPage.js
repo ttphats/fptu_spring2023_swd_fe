@@ -51,7 +51,7 @@ export default function RegisterPage() {
             <StyledRoot>
                 <Logo
                     sx={{
-                        position: 'fixed',
+                        position: 'absolute',
                         top: { xs: 16, sm: 24, md: 40 },
                         left: { xs: 16, sm: 24, md: 40 },
                     }}
@@ -62,7 +62,7 @@ export default function RegisterPage() {
                         <Typography variant="h3" sx={{ px: 5, mt: 10, mb: 5 }}>
                             Chào mừng bạn mới
                         </Typography>
-                        <img src="/assets/illustrations/illustration_login.png" alt="login" />
+                        <img src="/assets/illustrations/travel_illustration_login.png" alt="login" />
                     </StyledSection>
                 )}
 

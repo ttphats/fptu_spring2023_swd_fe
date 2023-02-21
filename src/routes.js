@@ -1,4 +1,6 @@
-import { Navigate, useRoutes } from 'react-router-dom';
+import { Navigate, Routes, Route } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+
 // layouts
 import DashboardLayout from './layouts/dashboard';
 import SimpleLayout from './layouts/simple';
@@ -11,47 +13,41 @@ import VoucherPage from './pages/VoucherPage';
 import DashboardAppPage from './pages/DashboardAppPage';
 import RegisterPage from './pages/RegisterPage';
 import UserProfilePage from './pages/UserProfilePage';
+import ProtectedRoute from './utils/ProtectedRoute';
 
 // ----------------------------------------------------------------------
 
 export default function Router() {
-  const routes = useRoutes([
-    {
-      path: '/dashboard',
-      element: <DashboardLayout />,
-      children: [
-        { element: <Navigate to="/dashboard/app" />, index: true },
-        { path: 'app', element: <DashboardAppPage /> },
-        { path: 'user', element: <UserPage /> },
-        { path: 'voucher', element: <VoucherPage /> },
-        { path: 'blog', element: <BlogPage /> },
-      ],
-    },
-    {
-      path: 'login',
-      element: <LoginPage />,
-    },
-    {
-      path: 'register',
-      element: <RegisterPage />
-    },
-    {
-      path: 'user-profile',
-      element: <UserProfilePage />
-    },
-    {
-      element: <SimpleLayout />,
-      children: [
-        { element: <Navigate to="/dashboard/app" />, index: true },
-        { path: '404', element: <Page404 /> },
-        { path: '*', element: <Navigate to="/404" /> },
-      ],
-    },
-    {
-      path: '*',
-      element: <Navigate to="/404" replace />,
-    },
-  ]);
+  const user = useSelector((state) => state.user);
+  console.log('user', user.loading);
 
-  return routes;
+  return (
+    <>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="*" element={<Navigate to="/404" replace />} />
+        <Route path="/user-profile" element={<UserProfilePage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute isAuthenticated={user.isAuthenticated}>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route element={<Navigate to="/dashboard/app" replace />} index="true" />
+          <Route path="app" element={<DashboardAppPage />} />
+          <Route path="user" element={<UserPage />} />
+          <Route path="voucher" element={<VoucherPage />} />
+          <Route path="blog" element={<BlogPage />} />
+        </Route>
+        <Route element={<SimpleLayout />}>
+          <Route element={<Navigate to="/404" replace />} index="true" />
+          <Route path="404" element={<Page404 />} />
+          <Route path="*" element={<Navigate to="/404" replace />} />
+        </Route>
+      </Routes>
+    </>
+  );
 }

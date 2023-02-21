@@ -1,19 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { unwrapResult } from '@reduxjs/toolkit';
 // @mui
 import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-
 // components
 import StyledSnackbar from '../../../components/snackbar';
-import loginApi from '../../../api/loginApi';
 import Iconify from '../../../components/iconify';
+import { userLogin } from './authSlice';
+import { getMe } from '../../../redux/Slice/userSlice';
 
 // ----------------------------------------------------------------------
 
 export default function LoginForm() {
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -21,32 +23,26 @@ export default function LoginForm() {
   const [severity, setSeverity] = useState('');
   const [open, setOpen] = useState(false);
 
-  const handleClick = (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
     console.log(email, password);
     setIsLoginMessage({});
     setOpen(false);
-    const userData = {
-      email,
-      password,
-    };
+
     const fetchLogin = async () => {
       try {
-        const response = await loginApi.getLogin(userData);
-        console.log(response.data.accessToken);
-        localStorage.setItem('access-token', response.data.accessToken);
+        await dispatch(userLogin({ email, password }));
+        await unwrapResult(await dispatch(getMe()));
         setEmail('');
         setPassword('');
         navigate('/dashboard', { replace: true });
       } catch (error) {
-        if (error.response.status !== 202) {
-          setIsLoginMessage({
-            message: error?.response?.data?.message,
-          });
-          setSeverity('error');
-          setOpen(true);
-        }
-        console.log('Fail to fetch Api: ', error.response);
+        console.log(error);
+        setIsLoginMessage({
+          message: error,
+        });
+        setSeverity('error');
+        setOpen(true);
       }
     };
     fetchLogin();
@@ -87,7 +83,7 @@ export default function LoginForm() {
           </Link>
         </Stack>
 
-        <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}>
+        <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleLogin}>
           Đăng nhập
         </LoadingButton>
       </form>

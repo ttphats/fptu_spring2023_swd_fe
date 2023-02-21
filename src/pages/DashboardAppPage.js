@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { faker } from '@faker-js/faker';
-import firebase from 'firebase/compat/app';
+import { useSelector } from 'react-redux';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import { Grid, Container, Typography } from '@mui/material';
 // components
-import loginApi from '../api/loginApi';
 import Iconify from '../components/iconify';
 // sections
 import {
@@ -25,22 +24,14 @@ import {
 
 export default function DashboardAppPage() {
   const theme = useTheme();
+  const userInfo = useSelector((state) => state.user)
   const [name, setName] = useState();
 
-  const fetchUser = async () => {
-    try {
-      const response = await loginApi.getUser();
-      setName(response.data.fullname);
-    } catch (error) {
-      console.log('Fail to fetch Api: ', error);
-    }
-  };
-
   useEffect(() => {
-    if(localStorage.getItem('access-token')) {
-    fetchUser();
+    if (localStorage.getItem('access-token')) {
+      setName(userInfo.current.fullname);
     }
-  }, [localStorage.getItem('access-token')]);
+  }, [localStorage.getItem('access-token'), userInfo]);
 
   return (
     <>

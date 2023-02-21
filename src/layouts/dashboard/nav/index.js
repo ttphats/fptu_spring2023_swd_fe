@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import firebase from 'firebase/compat/app';
+import { useDispatch, useSelector } from 'react-redux';
+import { unwrapResult } from '@reduxjs/toolkit';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/material';
@@ -10,7 +11,7 @@ import account from '../../../_mock/account';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
 // components
-import loginApi from '../../../api/loginApi';
+import { getMe } from '../../../redux/Slice/userSlice';
 import Logo from '../../../components/logo';
 import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
@@ -37,25 +38,17 @@ Nav.propTypes = {
 };
 
 export default function Nav({ openNav, onCloseNav }) {
+  const userInfo = useSelector((state) => state.user)
   const { pathname } = useLocation();
   const [name, setName] = useState();
 
   const isDesktop = useResponsive('up', 'lg');
 
-  const fetchUser = async () => {
-    try {
-      const response = await loginApi.getUser();
-      setName(response.data.fullname);
-    } catch (error) {
-      console.log('Fail to fetch Api: ', error);
-    }
-  };
-
   useEffect(() => {
     if(localStorage.getItem('access-token')) {
-    fetchUser();
+      setName(userInfo.current.fullname);
     }
-  }, [localStorage.getItem('access-token')]);
+  }, [localStorage.getItem('access-token'), userInfo]);
 
   useEffect(() => {
     if (openNav) {
