@@ -1,5 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { Helmet } from 'react-helmet-async';
 import firebase from 'firebase/compat/app';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
@@ -12,6 +14,8 @@ import useResponsive from '../hooks/useResponsive';
 import Logo from '../components/logo';
 // sections
 import { LoginForm } from '../sections/auth/login';
+import { userLoginPublic } from '../sections/auth/login/authSlice';
+import { getMe } from '../redux/Slice/userSlice';
 
 // ----------------------------------------------------------------------
 
@@ -48,19 +52,35 @@ const uiConfig = {
   // We will display Google and Facebook as auth providers.
   signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
 };
-
 // ----------------------------------------------------------------------
 
 export default function LoginPage() {
   const mdUp = useResponsive('up', 'md');
-
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [accessToken, setAccessToken] = useState();
 
   useEffect(() => {
+    const unregisterAuthObserver = firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        return;
+      }
+      const tokenId = await user.getIdToken();
+      console.log('Token: ', tokenId);
+      unwrapResult(await dispatch(userLoginPublic(tokenId)));
+      unwrapResult(await dispatch(getMe()));
+      setAccessToken(tokenId);
+      navigate('/dashboard');
+      firebase.auth().signOut();
+    });
+    return () => unregisterAuthObserver();
+  }, []);
+
+  useEffect(()=> {
     if(localStorage.getItem('access-token')){
-      navigate('/dashboard', { replace: true });
+        navigate('/dashboard');
     }
-  },[navigate])
+  },[])
 
   return (
     <>
@@ -94,7 +114,9 @@ export default function LoginPage() {
 
             <Typography variant="body2" sx={{ mb: 5 }}>
               Bạn chưa có tài khoản? {''}
-              <Link href="/register" variant="subtitle2">Đăng ký ngay</Link>
+              <Link href="/register" variant="subtitle2">
+                Đăng ký ngay
+              </Link>
             </Typography>
 
             <StyledFirebaseAuth

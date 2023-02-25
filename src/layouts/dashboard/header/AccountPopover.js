@@ -52,7 +52,6 @@ export default function AccountPopover() {
 
   const logout = () => {
     localStorage.removeItem('access-token');
-    firebase.auth().signOut();
     navigate('/login');
   };
 
@@ -75,7 +74,7 @@ export default function AccountPopover() {
           }),
         }}
       >
-        <Avatar src={account.photoURL} alt="photoURL" />
+        <Avatar src={userInfo.current.avatarUrl} alt="photoURL" />
       </IconButton>
 
       <Popover

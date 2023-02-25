@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { unwrapResult } from '@reduxjs/toolkit';
+import { useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
 //
 import Header from './header';
 import Nav from './nav';
+import { getMe } from '../../redux/Slice/userSlice';
 
 // ----------------------------------------------------------------------
 
@@ -34,6 +37,12 @@ const Main = styled('div')(({ theme }) => ({
 
 export default function DashboardLayout() {
   const [open, setOpen] = useState(false);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (localStorage.getItem('access-token')) {
+      unwrapResult(dispatch(getMe()));
+    }
+  }, [localStorage.getItem('access-token')]);
   return (
     <StyledRoot>
       <Header onOpenNav={() => setOpen(true)} />

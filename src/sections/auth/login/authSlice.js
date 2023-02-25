@@ -30,7 +30,6 @@ export const userLoginPublic = createAsyncThunk('auth/loginPublic', async (token
   }
 });
 
-
 const userToken = localStorage.getItem('access-token') ? localStorage.getItem('access-token') : null;
 
 const initialState = {

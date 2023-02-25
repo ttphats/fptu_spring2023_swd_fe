@@ -20,7 +20,6 @@ const userSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(getMe.pending, (state) => {
       state.loading = true;
-      state.isAuthenticated = true;
     });
     builder.addCase(getMe.rejected, (state, action) => {
       state.loading = false;
