@@ -14,6 +14,8 @@ import DashboardAppPage from './pages/DashboardAppPage';
 import RegisterPage from './pages/RegisterPage';
 import UserProfilePage from './pages/UserProfilePage';
 import ProtectedRoute from './utils/ProtectedRoute';
+import ForgotPassword from './pages/ForgotPassword';
+import OTPAuthenticationPage from './pages/OTPAuthenticationPage';
 
 // ----------------------------------------------------------------------
 
@@ -26,6 +28,8 @@ export default function Router() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgotpassword" element={<ForgotPassword />} />
+        <Route path="/otpauthentication" element={<OTPAuthenticationPage />} />
         <Route path="*" element={<Navigate to="/404" replace />} />
         <Route
           path="/user-profile"
