@@ -1,9 +1,12 @@
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { faker } from '@faker-js/faker';
+import firebase from 'firebase/compat/app';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import { Grid, Container, Typography } from '@mui/material';
 // components
+import loginApi from '../api/loginApi';
 import Iconify from '../components/iconify';
 // sections
 import {
@@ -22,16 +25,31 @@ import {
 
 export default function DashboardAppPage() {
   const theme = useTheme();
+  const [name, setName] = useState();
+
+  const fetchUser = async () => {
+    try {
+      const response = await loginApi.getUser();
+      setName(response.data.fullname);
+    } catch (error) {
+      console.log('Fail to fetch Api: ', error);
+    }
+  };
+
+  useEffect(() => {
+    if(localStorage.getItem('access-token')) {
+    fetchUser();
+    }
+  }, [localStorage.getItem('access-token')]);
 
   return (
     <>
       <Helmet>
         <title> Cóc Phượt </title>
       </Helmet>
-
       <Container maxWidth="xl">
         <Typography variant="h4" sx={{ mb: 5 }}>
-          Xin chào Hải Nam
+          Xin chào {name}
         </Typography>
 
         <Grid container spacing={3}>
@@ -44,7 +62,12 @@ export default function DashboardAppPage() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Phiếu giảm giá hiện có" total={1723315} color="warning" icon={'ant-design:windows-filled'} />
+            <AppWidgetSummary
+              title="Phiếu giảm giá hiện có"
+              total={1723315}
+              color="warning"
+              icon={'ant-design:windows-filled'}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>

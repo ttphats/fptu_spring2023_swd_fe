@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import firebase from 'firebase/compat/app';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/material';
@@ -9,6 +10,7 @@ import account from '../../../_mock/account';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
 // components
+import loginApi from '../../../api/loginApi';
 import Logo from '../../../components/logo';
 import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
@@ -36,8 +38,24 @@ Nav.propTypes = {
 
 export default function Nav({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
+  const [name, setName] = useState();
 
   const isDesktop = useResponsive('up', 'lg');
+
+  const fetchUser = async () => {
+    try {
+      const response = await loginApi.getUser();
+      setName(response.data.fullname);
+    } catch (error) {
+      console.log('Fail to fetch Api: ', error);
+    }
+  };
+
+  useEffect(() => {
+    if(localStorage.getItem('access-token')) {
+    fetchUser();
+    }
+  }, [localStorage.getItem('access-token')]);
 
   useEffect(() => {
     if (openNav) {
@@ -64,7 +82,7 @@ export default function Nav({ openNav, onCloseNav }) {
 
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {account.displayName}
+                {name}
               </Typography>
 
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>

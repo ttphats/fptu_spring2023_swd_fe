@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
 // mocks_
 import account from '../../../_mock/account';
+import loginApi from '../../../api/loginApi';
 
 // ----------------------------------------------------------------------
 
@@ -25,7 +29,26 @@ const MENU_OPTIONS = [
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(null);
+  const [name, setName] = useState();
+  const [email, setEmail] = useState();
+
+  const fetchUser = async () => {
+    try {
+      const response = await loginApi.getUser();
+      setName(response.data.fullname);
+      setEmail(response.data.email);
+    } catch (error) {
+      console.log('Fail to fetch Api: ', error);
+    }
+  };
+
+  useEffect(() => {
+    if(localStorage.getItem('access-token')) {
+    fetchUser();
+    }
+  }, [localStorage.getItem('access-token')]);
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -33,6 +56,12 @@ export default function AccountPopover() {
 
   const handleClose = () => {
     setOpen(null);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('access-token');
+    firebase.auth().signOut();
+    navigate('/login');
   };
 
   return (
@@ -78,10 +107,10 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+            {name}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+            {email}
           </Typography>
         </Box>
 
@@ -97,7 +126,7 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <MenuItem onClick={handleClose} sx={{ m: 1 }}>
+        <MenuItem onClick={logout} sx={{ m: 1 }}>
           Đăng xuất
         </MenuItem>
       </Popover>
