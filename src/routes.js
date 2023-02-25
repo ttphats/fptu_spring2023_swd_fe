@@ -18,8 +18,8 @@ import ProtectedRoute from './utils/ProtectedRoute';
 // ----------------------------------------------------------------------
 
 export default function Router() {
-  const user = useSelector((state) => state.user);
-  console.log('user', user.loading);
+  const loginInfo = useSelector((state) => state.auth.loginInfo);
+  console.log('loginInfo', loginInfo);
 
   return (
     <>
@@ -30,7 +30,7 @@ export default function Router() {
         <Route
           path="/user-profile"
           element={
-            <ProtectedRoute isAuthenticated={user.isAuthenticated}>
+            <ProtectedRoute loginInfo={loginInfo}>
               <UserProfilePage />
             </ProtectedRoute>
           }
@@ -38,7 +38,7 @@ export default function Router() {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute isAuthenticated={user.isAuthenticated}>
+            <ProtectedRoute loginInfo={loginInfo}>
               <DashboardLayout />
             </ProtectedRoute>
           }

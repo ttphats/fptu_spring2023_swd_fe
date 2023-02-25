@@ -1,4 +1,5 @@
 import React, { useState, createRef } from 'react';
+import { useSelector } from 'react-redux';
 // @mui
 import AvatarEdit from 'react-avatar-edit';
 import { Avatar } from '@mui/material';
@@ -11,6 +12,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import userProfileApi from '../../api/userProfileApi';
 
 const UploadImage = () => {
+  const userInfo = useSelector((state) => state.user);
   const [image, setImage] = useState([]);
   const [imageCrop, setImageCrop] = useState(false);
   const [dialog, setDialog] = useState(false);
@@ -56,7 +58,7 @@ const UploadImage = () => {
     <>
       <Avatar
         alt=""
-        src={profileImageShow.length ? profileImageShow[profileImageShow.length - 1] : image}
+        src={profileImageShow.length ? profileImageShow[profileImageShow.length - 1] : userInfo.current.avatarUrl}
         sx={{ width: 200, height: 200 }}
         onClick={handleClickOpen}
       />
