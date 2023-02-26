@@ -11,7 +11,7 @@ import Iconify from '../../../components/iconify';
 export default function RegisterForm() {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
-    const [username, setUsername] = useState('');
+    const [userName, setUserName] = useState('');
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -21,12 +21,12 @@ export default function RegisterForm() {
     const handleClick = async () => {
         const data = {
             email,
-            userName: username,
+            userName,
             phone,
             password,
             confirmPassword,
         };
-
+    
         try {
             const response = await fetch('https://hqtbe.site/api/v1/users/register', {
                 method: 'POST',
@@ -35,14 +35,14 @@ export default function RegisterForm() {
                 },
                 body: JSON.stringify(data),
             });
-
+    
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
+    
             const responseData = await response.json();
             console.log(responseData);
-            navigate('/otpauthentication', { replace: true });
+            navigate('/otpauthentication', { state: { email } }); // pass email value as a prop
         } catch (error) {
             console.error(error);
         }
@@ -52,7 +52,7 @@ export default function RegisterForm() {
         <>
             <Stack spacing={3}>
                 <TextField name="fullname" label="Full Name" />
-                <TextField name="username" label="Username" value={username} onChange={(event) => setUsername(event.target.value)} />
+                <TextField name="username" label="Username" value={userName} onChange={(event) => setUserName(event.target.value)} />
                 <TextField name="phone" label="Phone Number" value={phone} onChange={(event) => setPhone(event.target.value)} />
                 <TextField name="email" label="Email address" value={email} onChange={(event) => setEmail(event.target.value)} />
 
