@@ -78,7 +78,7 @@ export default function LoginForm() {
             <Checkbox name="remember" label="Remember me" />
             <Typography>Ghi nhớ đăng nhập</Typography>
           </Stack>
-          <Link variant="subtitle2" underline="hover">
+          <Link href="/forgotpassword" variant="subtitle2" underline="hover">
             Quên mật khẩu?
           </Link>
         </Stack>
