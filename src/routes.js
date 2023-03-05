@@ -18,6 +18,8 @@ import UserProfilePage from './pages/UserProfilePage';
 import ProtectedRoute from './utils/ProtectedRoute';
 import ForgotPassword from './pages/ForgotPassword';
 import OTPAuthenticationPage from './pages/OTPAuthenticationPage';
+import OTPForgotPasswordPage from './pages/OTPForgotPasswordPage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
 import CreateTripPage from './pages/CreateTripPage';
 
 // ----------------------------------------------------------------------
@@ -33,6 +35,8 @@ export default function Router() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
         <Route path="/otpauthentication" element={<OTPAuthenticationPage />} />
+        <Route path="/otpforgotpassword" element={<OTPForgotPasswordPage/>} />
+        <Route path="/changepassword" element={<ChangePasswordPage />} />
         <Route path="*" element={<Navigate to="/404" replace />} />
         <Route
           path="/user-profile"
