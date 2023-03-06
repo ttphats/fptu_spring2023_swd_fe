@@ -59,7 +59,7 @@ const UploadImage = () => {
       <Avatar
         alt=""
         src={profileImageShow.length ? profileImageShow[profileImageShow.length - 1] : userInfo.current.avatarUrl}
-        sx={{ width: 200, height: 200 }}
+        sx={{ width: 150, height: 150 }}
         onClick={handleClickOpen}
       />
       <Dialog

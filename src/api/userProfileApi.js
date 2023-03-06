@@ -9,6 +9,10 @@ const userProfileApi = {
       }
   })
   },
+  updateUserProfile: (data) => {
+    const url = '/users/profile';
+    return axiosClient.put(url, JSON.stringify(data))
+  }
 };
 
 export default userProfileApi;
