@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import { useSelector } from 'react-redux';
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
 // mocks_
-import account from '../../../_mock/account';
 
 // ----------------------------------------------------------------------
 
@@ -30,13 +28,13 @@ const MENU_OPTIONS = [
 
 export default function AccountPopover() {
   const navigate = useNavigate();
-  const userInfo = useSelector((state) => state.user)  
+  const userInfo = useSelector((state) => state.user);
   const [open, setOpen] = useState(null);
   const [name, setName] = useState();
   const [email, setEmail] = useState();
 
   useEffect(() => {
-    if(userInfo) {
+    if (userInfo) {
       setName(userInfo.current.fullname);
       setEmail(userInfo.current.email);
     }
@@ -47,7 +45,7 @@ export default function AccountPopover() {
   };
 
   const handleClose = () => {
-    setOpen(null);
+    setOpen(false);
   };
 
   const logout = () => {
@@ -108,11 +106,10 @@ export default function AccountPopover() {
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Stack sx={{ p: 1 }}>
-          {MENU_OPTIONS.map((option) => (
-            <MenuItem key={option.label} onClick={handleClose}>
-              {option.label}
-            </MenuItem>
-          ))}
+          <MenuItem onClick={handleClose}>Trang chủ</MenuItem>
+          <MenuItem onClick={() => navigate('/user-profile')}>Thông tin cá nhân</MenuItem>
+          <MenuItem onClick={handleClose}>Cài đặt</MenuItem>
+
         </Stack>
 
         <Divider sx={{ borderStyle: 'dashed' }} />

@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { unwrapResult } from '@reduxjs/toolkit';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/material';
@@ -11,7 +10,6 @@ import account from '../../../_mock/account';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
 // components
-import { getMe } from '../../../redux/Slice/userSlice';
 import Logo from '../../../components/logo';
 import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
@@ -38,14 +36,19 @@ Nav.propTypes = {
 };
 
 export default function Nav({ openNav, onCloseNav }) {
-  const userInfo = useSelector((state) => state.user)
+  const userInfo = useSelector((state) => state.user);
   const { pathname } = useLocation();
   const [name, setName] = useState();
 
   const isDesktop = useResponsive('up', 'lg');
 
+  const navigate = useNavigate();
+  const routeChange = () => {
+    navigate('/user-profile');
+  };
+
   useEffect(() => {
-    if(localStorage.getItem('access-token')) {
+    if (localStorage.getItem('access-token')) {
       setName(userInfo.current.fullname);
     }
   }, [localStorage.getItem('access-token'), userInfo]);
@@ -69,9 +72,9 @@ export default function Nav({ openNav, onCloseNav }) {
       </Box>
 
       <Box sx={{ mb: 5, mx: 2.5 }}>
-        <Link underline="none">
+        <Link component="button" variant="body2" underline="none" onClick={routeChange}>
           <StyledAccount>
-            <Avatar src={account.photoURL} alt="photoURL" />
+            <Avatar src={userInfo.current.avatarUrl} alt="photoURL" />
 
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>

@@ -22,7 +22,7 @@ export default function App() {
     if (localStorage.getItem('access-token')) {
       unwrapResult(dispatch(getMe()));
     }
-  }, [localStorage.getItem('access-token')]);
+  }, []);
   // Handle get message push notify
   useEffect(() => {
     if (localStorage.getItem('access-token')) {
