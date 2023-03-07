@@ -51,7 +51,7 @@ export default function ForgotPasswordForm() {
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     error={!isEmailValid()}
-                    helperText={!isEmailValid() ? 'Email không hợp lệ. Vui lòng nhập lại.' : ''}
+                    helperText={!isEmailValid() ? 'Vui lòng nhập địa chỉ email hợp lệ.' : ''}
                 />
             </Stack>
             <br />

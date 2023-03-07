@@ -8,7 +8,6 @@ import { Stack, TextField, Button } from '@mui/material';
 export default function OTPForgotPasswordForm() {
     const navigate = useNavigate();
     const location = useLocation();
-    const email = location.state.email;
     const [values, setValues] = useState(['', '', '', '']);
     const boxes = [useRef(null), useRef(null), useRef(null), useRef(null)];
 
@@ -24,26 +23,10 @@ export default function OTPForgotPasswordForm() {
         }
     };
 
-    const handleClick = async () => {
-        try {
-            const otp = values.join('');
-            const data = { otp, email };
-            const response = await fetch('https://hqtbe.site/api/v1/users/password/forgot/otp/verify', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            navigate('/login');
-        } catch (error) {
-            console.error(error);
-        }
+    const handleClick = () => {
+        const otp = values.join('');
+        const email = location.state.email; // Replace with the actual email
+        navigate('/changepassword', { state: { email, otp } });
     };
 
     return (
