@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { unwrapResult } from '@reduxjs/toolkit';
 // @mui
 import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox, Typography } from '@mui/material';
@@ -22,6 +22,8 @@ export default function LoginForm() {
   const [isLoginMessage, setIsLoginMessage] = useState({ message: '' });
   const [severity, setSeverity] = useState('');
   const [open, setOpen] = useState(false);
+  const currentUser = useSelector((state) => state.user.current);
+
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -32,10 +34,16 @@ export default function LoginForm() {
     const fetchLogin = async () => {
       try {
         await dispatch(userLogin({ email, password }));
-        await unwrapResult(await dispatch(getMe()));
+        const user = await unwrapResult(await dispatch(getMe()));
+        console.log('current user: ', user.role)
+        if(user.role === "ADMIN"){
+          navigate('/dashboard');
+        }
+        if(user.role === "USER"){
+          navigate('/home');
+        }
         setEmail('');
         setPassword('');
-        navigate('/dashboard', { replace: true });
       } catch (error) {
         console.log(error);
         setIsLoginMessage({
@@ -78,7 +86,7 @@ export default function LoginForm() {
             <Checkbox name="remember" label="Remember me" />
             <Typography>Ghi nhớ đăng nhập</Typography>
           </Stack>
-          <Link href="/forgotpassword" variant="subtitle2" underline="hover">
+          <Link variant="subtitle2" underline="hover">
             Quên mật khẩu?
           </Link>
         </Stack>

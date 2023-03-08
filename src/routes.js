@@ -2,7 +2,9 @@ import { Navigate, Routes, Route } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 // layouts
-import DashboardLayout from './layouts/dashboard';
+import DashboardLayout from './layouts/dashboard/DashboardLayout';
+import HomeLayout from './layouts/dashboard/HomeLayout';
+
 import SimpleLayout from './layouts/simple';
 //
 import BlogPage from './pages/BlogPage';
@@ -53,8 +55,20 @@ export default function Router() {
           <Route path="voucher" element={<VoucherPage />} />
           <Route path="blog" element={<BlogPage />} />
         </Route>
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute loginInfo={loginInfo}>
+              <HomeLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route element={<Navigate to="/home/blog" replace />} index="true" />
+          <Route path="voucher" element={<VoucherPage />} />
+          <Route path="blog" element={<BlogPage />} />
+        </Route>
         <Route element={<SimpleLayout />}>
-          <Route element={<Navigate to="/dashboard/app" replace />} index="true" />
+          <Route element={<Navigate to="/home" replace />} index="true" />
           <Route path="404" element={<Page404 />} />
           <Route path="*" element={<Navigate to="/404" replace />} />
         </Route>

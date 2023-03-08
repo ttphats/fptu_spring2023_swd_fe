@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Helmet } from 'react-helmet-async';
 import firebase from 'firebase/compat/app';
@@ -16,6 +16,7 @@ import Logo from '../components/logo';
 import { LoginForm } from '../sections/auth/login';
 import { userLoginPublic } from '../sections/auth/login/authSlice';
 import { getMe } from '../redux/Slice/userSlice';
+
 
 // ----------------------------------------------------------------------
 
@@ -48,7 +49,7 @@ const StyledContent = styled('div')(({ theme }) => ({
 // Configure FirebaseUI.
 const uiConfig = {
   signInFlow: 'popup',
-  signInSuccessUrl: '/dashboard',
+  signInSuccessUrl: '/',
   // We will display Google and Facebook as auth providers.
   signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
 };
@@ -59,6 +60,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [accessToken, setAccessToken] = useState();
+  const currentUser = useSelector((state) => state.user.current);
 
   useEffect(() => {
     const unregisterAuthObserver = firebase.auth().onAuthStateChanged(async (user) => {
@@ -70,7 +72,7 @@ export default function LoginPage() {
       unwrapResult(await dispatch(userLoginPublic(tokenId)));
       unwrapResult(await dispatch(getMe()));
       setAccessToken(tokenId);
-      navigate('/dashboard');
+      navigate('/');
       firebase.auth().signOut();
     });
     return () => unregisterAuthObserver();
@@ -78,7 +80,13 @@ export default function LoginPage() {
 
   useEffect(()=> {
     if(localStorage.getItem('access-token')){
+      console.log(currentUser.role === "USER");
+      if(currentUser.role === "ADMIN"){
         navigate('/dashboard');
+      } else
+      if(currentUser.role === "USER"){
+        navigate('/home');
+      }
     }
   },[])
 

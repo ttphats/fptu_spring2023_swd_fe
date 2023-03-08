@@ -10,7 +10,7 @@ const loginApi = {
     return axiosClient.get(`${url}?idToken=${idToken}`);
   },
   getUser: () => {
-    const url = '/users/users/information';
+    const url = '/users/access-token/information';
     return axiosClient.get(url);
   },
 };
