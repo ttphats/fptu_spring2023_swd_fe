@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { faker } from '@faker-js/faker';
 import { useSelector } from 'react-redux';
@@ -24,12 +25,16 @@ import {
 
 export default function DashboardAppPage() {
   const theme = useTheme();
+  const navigate = useNavigate();
   const userInfo = useSelector((state) => state.user)
   const [name, setName] = useState();
 
   useEffect(() => {
     if (localStorage.getItem('access-token')) {
       setName(userInfo.current.fullname);
+    }
+    if(userInfo.current.role !== "ADMIN"){
+      navigate('/home');
     }
   }, [localStorage.getItem('access-token'), userInfo]);
 
