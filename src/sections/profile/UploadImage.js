@@ -25,6 +25,7 @@ const UploadImage = () => {
     const formData = new FormData();
     formData.append('image', file);
     if (file) {
+      console.log("image upload format: ". formData)
       userProfileApi.updateImageUrl(formData);
     }
   };

@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
 // @mui
 import { Grid, Button, Container, Stack, Typography } from '@mui/material';
 // components
@@ -18,6 +19,7 @@ const SORT_OPTIONS = [
 // ----------------------------------------------------------------------
 
 export default function BlogPage() {
+  const navigate = useNavigate();
   return (
     <>
       <Helmet>
@@ -29,7 +31,7 @@ export default function BlogPage() {
           <Typography variant="h4" gutterBottom>
             Tất cả chuyến đi
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
+          <Button onClick={() => navigate('/trip')} variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
             Tạo chuyến đi mới
           </Button>
         </Stack>
