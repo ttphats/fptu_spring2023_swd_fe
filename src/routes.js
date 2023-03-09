@@ -18,6 +18,7 @@ import UserProfilePage from './pages/UserProfilePage';
 import ProtectedRoute from './utils/ProtectedRoute';
 import ForgotPassword from './pages/ForgotPassword';
 import OTPAuthenticationPage from './pages/OTPAuthenticationPage';
+import CreateTripPage from './pages/CreateTripPage';
 
 // ----------------------------------------------------------------------
 
@@ -38,6 +39,14 @@ export default function Router() {
           element={
             <ProtectedRoute loginInfo={loginInfo}>
               <UserProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trip"
+          element={
+            <ProtectedRoute loginInfo={loginInfo}>
+              <CreateTripPage />
             </ProtectedRoute>
           }
         />

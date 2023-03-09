@@ -81,6 +81,7 @@ export default function LoginPage() {
   useEffect(()=> {
     if(localStorage.getItem('access-token')){
       console.log(currentUser.role === "USER");
+      navigate('/');
       if(currentUser.role === "ADMIN"){
         navigate('/dashboard');
       } else
