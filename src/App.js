@@ -22,19 +22,7 @@ export default function App() {
     if (localStorage.getItem('access-token')) {
       unwrapResult(dispatch(getMe()));
     }
-  }, []);
-  // Handle get message push notify
-  useEffect(() => {
-    if (localStorage.getItem('access-token')) {
-      fetchNotify();
-      firebase.messaging().onMessage((data) => {
-        new Notification(data.notification.title, {
-          body: data.notification.body,
-          image: data.notification.image,
-        });
-      });
-    }
-  }, []);
+  }, [localStorage.getItem('access-token')]);
   return (
     <ThemeProvider>
       <ScrollToTop />
