@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 // @mui
@@ -7,6 +8,7 @@ import Iconify from '../components/iconify';
 import { BlogPostCard, BlogPostsSort, BlogPostsSearch } from '../sections/@dashboard/blog';
 // mock
 import POSTS from '../_mock/blog';
+import tripApi from '../api/tripApi';
 
 // ----------------------------------------------------------------------
 
@@ -20,6 +22,19 @@ const SORT_OPTIONS = [
 
 export default function BlogPage() {
   const navigate = useNavigate();
+  const [trips, setTrips] = useState([]);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await tripApi.getAllTrips();
+        setTrips(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchData();
+  }, []);
+
   return (
     <>
       <Helmet>
@@ -42,7 +57,7 @@ export default function BlogPage() {
         </Stack>
 
         <Grid container spacing={3}>
-          {POSTS.map((post, index) => (
+          {trips.map((post, index) => (
             <BlogPostCard key={post.id} post={post} index={index} />
           ))}
         </Grid>

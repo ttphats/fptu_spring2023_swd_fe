@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
-import { NavLink as RouterLink, useNavigate } from 'react-router-dom';
+import { NavLink as RouterLink } from 'react-router-dom';
+import firebase from 'firebase/compat/app';
 // @mui
 import { Box, List, ListItemText } from '@mui/material';
 //
@@ -12,7 +13,6 @@ NavSection.propTypes = {
 };
 
 export default function NavSection({ data = [], ...other }) {
-
   return (
     <Box {...other}>
       <List disablePadding sx={{ p: 1 }}>
@@ -30,12 +30,12 @@ NavItem.propTypes = {
 
 function NavItem({item}) {
   const { title, path, icon, info } = item;
-  const navigate = useNavigate();
 
   const handleLogout = () => {
+    console.log('remove', title);
     if(title === 'Đăng xuất'){
       localStorage.removeItem('access-token')
-      navigate('/login');
+      firebase.auth().signOut();
     }
   }
 
