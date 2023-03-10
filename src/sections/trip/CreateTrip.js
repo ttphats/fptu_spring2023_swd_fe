@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Form, Formik } from 'formik';
+import { useFormik } from 'formik';
 import CurrencyTextField from '@unicef/material-ui-currency-textfield';
 import { Container, Typography, InputLabel, TextField } from '@material-ui/core';
 import Select from '@mui/material/Select';
@@ -9,7 +9,6 @@ import InputAdornment from '@mui/material/InputAdornment';
 import FormControl from '@mui/material/FormControl';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { LoadingButton } from '@mui/lab';
 import IconButton from '@mui/material/IconButton';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
@@ -89,9 +88,7 @@ const CreateTrip = () => {
   const currentUser = useSelector((state) => state.user.current);
   const [activeStep, setActiveStep] = useState(0);
   const [fileUpload, setFileUpLoad] = useState();
-  // Date
-  const [startDate, setStartDate] = useState();
-  const [endDate, setEndDate] = useState();
+
   // Address for display
   const [startProvinceDisplay, setStartProvinceDisplay] = useState([0]);
   const [startDistrictDisplay, setStartDistrictDisplay] = useState([0]);
@@ -103,33 +100,15 @@ const CreateTrip = () => {
   const [startLocationTypeDisplay, setStartLocationTypeDisplay] = useState([0]);
   const [endLocationTypeDisplay, setEndLocationTypeDisplay] = useState([0]);
 
-  // Trip
-  const [description, setDescription] = useState();
-  const [deposit, setDeposit] = useState();
-  const [maxMember, setMaxMember] = useState();
-  const [minMember, setMinMember] = useState();
-  const [voucherIds, setVoucherIds] = useState();
-
   // Start location
-  const [startLocationName, setStartLocationName] = useState();
-  const [startLocationPhone, setStartLocationPhone] = useState();
-  const [startAddressNum, setStartAddressNum] = useState();
   const [startProivince, setStartProvince] = useState();
   const [startDistrict, setStartDistrict] = useState();
   const [startWard, setStartWard] = useState();
-  const [startLocationType, setStartLocationType] = useState();
-  const [startLocationDescription, setStartLocationDescription] = useState();
 
   // End location
-
-  const [endLocationName, setEndLocationName] = useState();
-  const [endLocationPhone, setEndLocationPhone] = useState();
-  const [endAddressNum, setEndAddressNum] = useState();
   const [endProivince, setEndProvince] = useState();
   const [endDistrict, setEndDistrict] = useState();
   const [endWard, setEndWard] = useState();
-  const [endLocationType, setEndLocationType] = useState();
-  const [endLocationDescription, setEndLocationDescription] = useState();
 
   const [open, setOpen] = useState(false);
   const { vertical, horizontal } = {
@@ -137,47 +116,47 @@ const CreateTrip = () => {
     horizontal: 'right',
   };
 
-  const startLocation = {
-    name: startLocationName,
-    addressNum: startAddressNum,
-    ward: startWard,
-    district: startDistrict,
-    province: startProivince,
-    type: startLocationType,
-    description: startLocationDescription,
-    phoneNum: startLocationPhone,
-  };
-
-  const endLocation = {
-    name: endLocationName,
-    addressNum: endAddressNum,
-    ward: endWard,
-    district: endDistrict,
-    province: endProivince,
-    type: endLocationType,
-    description: endLocationDescription,
-    phoneNum: endLocationPhone,
-  };
-
-  const formCreateObject = {
-    startDate,
-    endDate,
-    startLocation,
-    endLocation,
-    description,
-    deposit,
-    maxMember,
-    minMember,
-    voucherIds,
-  };
+  const formik = useFormik({
+    initialValues: {
+      startDate: null,
+      endDate: null,
+      startLocation: {
+        name: '',
+        addressNum: '',
+        ward: '',
+        district: '',
+        province: '',
+        type: '',
+        description: '',
+        phoneNum: '',
+      },
+      endLocation: {
+        name: '',
+        addressNum: '',
+        ward: '',
+        district: '',
+        province: '',
+        type: '',
+        description: '',
+        phoneNum: '',
+      },
+      description: '',
+      deposit: 0,
+      maxMember: 0,
+      minMember: 0,
+      voucherIds: [],
+    },
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const form = formik.values;
     try {
-      const json = JSON.stringify(formCreateObject);
+      const json = JSON.stringify(form);
       const blob = new Blob([json], {
         type: 'application/json',
       });
+
       const formData = new FormData();
       formData.append('images', fileUpload);
       formData.append('createTripRequestForm', blob);
@@ -192,8 +171,6 @@ const CreateTrip = () => {
   // Upload file image
   const onFileInputChange = (e) => {
     const file = e.target?.files?.[0];
-    console.log('file', file);
-
     if (file) {
       setFileUpLoad(file);
     }
@@ -211,16 +188,16 @@ const CreateTrip = () => {
     }
   };
 
-  const handleStartProvinceChange = async (event) => {
+  const handleStartProvinceChange = async (event, value) => {
     setStartWard('');
     setStartDistrict('');
     setStartDistrictDisplay([]);
     setStartWardDisplay([]);
+    formik.setFieldValue('startLocation.province', event.target.value);
 
     startProvinceDisplay.forEach(async (province) => {
       if (event.target.value === province.name) {
         const response = await addressApi.getDistrict(province.code);
-        console.log('district: ', response.data);
         setStartDistrictDisplay(response.data);
       }
     });
@@ -229,6 +206,8 @@ const CreateTrip = () => {
   };
 
   const handleStartDistrictChange = async (event) => {
+    formik.setFieldValue('startLocation.district', event.target.value);
+
     startDistrictDisplay.forEach(async (district) => {
       if (event.target.value === district.name) {
         const response = await addressApi.getWard(district.code);
@@ -257,11 +236,11 @@ const CreateTrip = () => {
     setEndDistrict('');
     setEndDistrictDisplay([]);
     setEndWardDisplay([]);
+    formik.setFieldValue('endLocation.province', event.target.value);
 
     endProvinceDisplay.forEach(async (province) => {
       if (event.target.value === province.name) {
         const response = await addressApi.getDistrict(province.code);
-        console.log('district: ', response.data);
         setEndDistrictDisplay(response.data);
       }
     });
@@ -269,6 +248,8 @@ const CreateTrip = () => {
   };
 
   const handleEndDistrictChange = async (event) => {
+    formik.setFieldValue('endLocation.district', event.target.value);
+
     endDistrictDisplay.forEach(async (district) => {
       if (event.target.value === district.name) {
         const response = await addressApi.getWard(district.code);
@@ -302,20 +283,28 @@ const CreateTrip = () => {
             <Box>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  value={startDate}
-                  label="Ngày bắt đầu chuyến đi"
-                  onChange={(newValue) => setStartDate(dayjs(startDate))}
                   className={classes.customInput}
+                  label="Ngày bắt đầu chuyến đi"
+                  value={formik.values.startDate}
+                  name="startDate"
+                  format="DD/MM/YYYY"
+                  onChange={(value) => {
+                    formik.setFieldValue('startDate', dayjs(value));
+                  }}
                 />
               </LocalizationProvider>
             </Box>
             <Box>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  value={endDate}
                   label="Ngày kết thúc chuyến đi"
-                  onChange={(newValue) => setEndDate(newValue)}
                   className={classes.customInput}
+                  value={formik.values.endDate}
+                  name="endDate"
+                  format="DD/MM/YYYY"
+                  onChange={(value) => {
+                    formik.setFieldValue('endDate', dayjs(value));
+                  }}
                 />
               </LocalizationProvider>
             </Box>
@@ -323,6 +312,7 @@ const CreateTrip = () => {
         </>
       ),
     },
+    // Start Location
     {
       label: 'Thông tin địa điểm bắt đầu',
       description: (
@@ -330,8 +320,9 @@ const CreateTrip = () => {
           <TextField
             label="Tên địa điểm bắt đầu:"
             margin="normal"
-            value={startLocationName}
-            onChange={(e) => setStartLocationName(e.target.value)}
+            name="startLocation.name"
+            value={formik.values.startLocation.name}
+            onChange={formik.handleChange}
             fullWidth
             required
             InputLabelProps={{
@@ -341,8 +332,9 @@ const CreateTrip = () => {
           />
           <TextField
             label="Số điện thoai"
-            value={startLocationPhone}
-            onChange={(event) => setStartLocationPhone(event.target.value)}
+            name="startLocation.phoneNum"
+            value={formik.values.startLocation.phoneNum}
+            onChange={formik.handleChange}
             margin="normal"
             fullWidth
             required
@@ -354,8 +346,9 @@ const CreateTrip = () => {
           <Stack direction="row" spacing={1} justifyContent="flex-start" alignItems="center">
             <TextField
               label="Số nhà"
-              value={startAddressNum}
-              onChange={(event) => setStartAddressNum(event.target.value)}
+              name="startLocation.addressNum"
+              value={formik.values.startLocation.addressNum}
+              onChange={formik.handleChange}
               required
               className={classes.infoLocation}
               fullWidth
@@ -365,7 +358,13 @@ const CreateTrip = () => {
               <InputLabel required id="province-label">
                 Tỉnh/ Thành phố
               </InputLabel>
-              <Select labelId="province-label" displayEmpty value={startProivince} onChange={handleStartProvinceChange}>
+              <Select
+                labelId="province-label"
+                displayEmpty
+                name="startLocation.province"
+                value={formik.values.startLocation.province}
+                onChange={handleStartProvinceChange}
+              >
                 {startProvinceDisplay.map((province, index) => {
                   return (
                     <MenuItem key={province.code} value={province.name}>
@@ -379,7 +378,13 @@ const CreateTrip = () => {
               <InputLabel required id="district-label">
                 Quận/ Huyện
               </InputLabel>
-              <Select labelId="district-label" value={startDistrict} displayEmpty onChange={handleStartDistrictChange}>
+              <Select
+                labelId="district-label"
+                name="startLocation.district"
+                value={formik.values.startLocation.district}
+                displayEmpty
+                onChange={handleStartDistrictChange}
+              >
                 {startDistrictDisplay.length > 0 &&
                   startDistrictDisplay.map((district, index) => {
                     return (
@@ -394,7 +399,12 @@ const CreateTrip = () => {
               <InputLabel required id="ward-label">
                 Phường/ Xã
               </InputLabel>
-              <Select labelId="ward-label" value={startWard} onChange={(event) => setStartWard(event.target.value)}>
+              <Select
+                labelId="ward-label"
+                name="startLocation.ward"
+                value={formik.values.startLocation.ward}
+                onChange={formik.handleChange}
+              >
                 {startWardDisplay.length > 0 &&
                   startWardDisplay.map((ward, _index) => {
                     return (
@@ -410,7 +420,7 @@ const CreateTrip = () => {
             <InputLabel required id="ward-label">
               Loại địa điểm
             </InputLabel>
-            <Select value={startLocationType} onChange={(event) => setStartLocationType(event.target.value)}>
+            <Select name="startLocation.type" value={formik.values.startLocation.type} onChange={formik.handleChange}>
               {startLocationTypeDisplay.length > 0 &&
                 startLocationTypeDisplay.map((type, _index) => {
                   return (
@@ -424,14 +434,16 @@ const CreateTrip = () => {
           <TextField
             label="Mô tả điểm xuất phát"
             margin="normal"
-            value={startLocationDescription}
-            onChange={(e) => setStartLocationDescription(e.target.value)}
+            name="startLocation.description"
+            value={formik.values.startLocation.description}
+            onChange={formik.handleChange}
             fullWidth
             className={classes.infoLocation}
           />
         </Stack>
       ),
     },
+    // End Location
     {
       label: 'Thông tin địa điểm kết thúc',
       description: (
@@ -439,7 +451,9 @@ const CreateTrip = () => {
           <TextField
             label="Tên địa điểm kết thúc:"
             margin="normal"
-            value={endLocationName}
+            name="endLocation.name"
+            value={formik.values.endLocation.name}
+            onChange={formik.handleChange}
             fullWidth
             required
             InputLabelProps={{
@@ -449,8 +463,9 @@ const CreateTrip = () => {
           />
           <TextField
             label="Số điện thoai"
-            value={endLocationPhone}
-            onChange={(event) => setEndLocationPhone(event.target.value)}
+            name="endLocation.phoneNum"
+            value={formik.values.endLocation.phoneNum}
+            onChange={formik.handleChange}
             margin="normal"
             fullWidth
             required
@@ -462,8 +477,9 @@ const CreateTrip = () => {
           <Stack direction="row" spacing={1} justifyContent="flex-start" alignItems="center">
             <TextField
               label="Số nhà"
-              value={endAddressNum}
-              onChange={(event) => setEndAddressNum(event.target.value)}
+              name="endLocation.addressNum"
+              value={formik.values.endLocation.addressNum}
+              onChange={formik.handleChange}
               className={classes.infoLocation}
               required
               fullWidth
@@ -473,7 +489,13 @@ const CreateTrip = () => {
               <InputLabel required id="province-label">
                 Tỉnh/ Thành phố
               </InputLabel>
-              <Select labelId="province-label" displayEmpty value={endProivince} onChange={handleEndProvinceChange}>
+              <Select
+                labelId="province-label"
+                displayEmpty
+                name="endLocation.province"
+                value={formik.values.endLocation.province}
+                onChange={handleEndProvinceChange}
+              >
                 {endProvinceDisplay.map((province, index) => {
                   return (
                     <MenuItem key={province.code} value={province.name}>
@@ -487,7 +509,13 @@ const CreateTrip = () => {
               <InputLabel required id="district-label">
                 Quận/ Huyện
               </InputLabel>
-              <Select labelId="district-label" value={endDistrict} displayEmpty onChange={handleEndDistrictChange}>
+              <Select
+                labelId="district-label"
+                name="endLocation.district"
+                value={formik.values.endLocation.district}
+                displayEmpty
+                onChange={handleEndDistrictChange}
+              >
                 {endDistrictDisplay.length > 0 &&
                   endDistrictDisplay.map((district, index) => {
                     return (
@@ -502,7 +530,12 @@ const CreateTrip = () => {
               <InputLabel required id="ward-label">
                 Phường/ Xã
               </InputLabel>
-              <Select labelId="ward-label" value={endWard} onChange={(event) => setEndWard(event.target.value)}>
+              <Select
+                labelId="ward-label"
+                name="endLocation.ward"
+                value={formik.values.endLocation.ward}
+                onChange={formik.handleChange}
+              >
                 {endWardDisplay.length > 0 &&
                   endWardDisplay.map((ward, _index) => {
                     return (
@@ -518,7 +551,7 @@ const CreateTrip = () => {
             <InputLabel required id="ward-label">
               Loại địa điểm
             </InputLabel>
-            <Select value={endLocationType} onChange={(event) => setEndLocationType(event.target.value)}>
+            <Select name="endLocation.type" value={formik.values.endLocation.type} onChange={formik.handleChange}>
               {endLocationTypeDisplay.length > 0 &&
                 endLocationTypeDisplay.map((type, _index) => {
                   return (
@@ -531,7 +564,9 @@ const CreateTrip = () => {
           </FormControl>
           <TextField
             label="Mô tả điểm đến"
-            value={endLocationDescription}
+            name="endLocation.description"
+            value={formik.values.endLocation.description}
+            onChange={formik.handleChange}
             margin="normal"
             fullWidth
             className={classes.infoLocation}
@@ -539,37 +574,48 @@ const CreateTrip = () => {
         </Stack>
       ),
     },
+    // trip description
     {
       label: 'Mô tả cho chuyến đi của bạn',
       description: (
         <>
-          <TextField label="Mô tả về chuyến đi của bạn" margin="normal" fullWidth />
+          <TextField
+            name="description"
+            value={formik.values.description}
+            onChange={formik.handleChange}
+            label="Mô tả về chuyến đi của bạn"
+            margin="normal"
+            fullWidth
+          />
           <Stack direction="row" spacing={4} alignItems="center" sx={{ marginTop: '20px', marginBottom: '20px' }}>
             <InputLabel htmlFor="standard-adornment-amount">Tiền đặt cọc</InputLabel>
             <CurrencyTextField
               label="Số tiền"
               variant="standard"
-              value={deposit}
+              name="deposit"
+              value={formik.values.deposit}
               currencySymbol="VNĐ"
               minimumValue="0"
               outputFormat="string"
               decimalCharacter="."
               digitGroupSeparator=","
-              onChange={(event, value) => setDeposit(value)}
+              onChange={formik.handleChange}
             />
           </Stack>
           <Stack direction="row" spacing={5} alignItems="center" sx={{ marginTop: '20px', marginBottom: '20px' }}>
             <InputLabel>Số người tham gia</InputLabel>
             <OutlinedInput
-              value={minMember}
-              onChange={(e) => setMinMember(e.target.value)}
+              name="minMember"
+              value={formik.values.minMember}
+              onChange={formik.handleChange}
               required
               id="standard-adornment-amount"
               startAdornment={<InputAdornment position="start">Từ</InputAdornment>}
             />
             <OutlinedInput
-              value={maxMember}
-              onChange={(e) => setMaxMember(e.target.value)}
+              name="maxMember"
+              value={formik.values.maxMember}
+              onChange={formik.handleChange}
               required
               id="standard-adornment-amount"
               startAdornment={<InputAdornment position="start">Đến</InputAdornment>}
