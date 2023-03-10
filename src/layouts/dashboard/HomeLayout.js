@@ -1,7 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
+// firebase
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import { fetchNotify } from '../../firebase-message';
 //
 import Header from './header';
 import NavUser from './nav-user';
@@ -33,7 +38,21 @@ const Main = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function HomeLayout() {
+  const loginInfo = useSelector((state) => state.auth.loginInfo);
   const [open, setOpen] = useState(false);
+
+  // Handle get message push notify
+  useEffect(() => {
+    if (loginInfo && localStorage.getItem('access-token')) {
+      fetchNotify();
+      firebase.messaging().onMessage((data) => {
+        new Notification(data.notification.title, {
+          body: data.notification.body,
+          image: data.notification.image,
+        });
+      });
+    }
+  }, [localStorage.getItem('access-token')]);
   return (
     <StyledRoot>
       <Header onOpenNav={() => setOpen(true)} />

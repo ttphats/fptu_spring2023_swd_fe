@@ -32,7 +32,6 @@ function NavItem({item}) {
   const { title, path, icon, info } = item;
 
   const handleLogout = () => {
-    console.log('remove', title);
     if(title === 'Đăng xuất'){
       localStorage.removeItem('access-token')
       firebase.auth().signOut();
