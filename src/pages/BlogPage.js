@@ -35,6 +35,12 @@ export default function BlogPage() {
     fetchData();
   }, []);
 
+  const myData = [].concat(trips)
+    .sort((a, b) => a.postDate < b.postDate ? 1 : -1)
+    .map((item, i) => 
+    <BlogPostCard key={item.id} post={item} index={i} />
+    );
+
   return (
     <>
       <Helmet>
@@ -57,9 +63,10 @@ export default function BlogPage() {
         </Stack>
 
         <Grid container spacing={3}>
-          {trips.map((post, index) => (
+          {/* {trips.map((post, index) => (
             <BlogPostCard key={post.id} post={post} index={index} />
-          ))}
+          ))} */}
+          {myData}
         </Grid>
       </Container>
     </>
