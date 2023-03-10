@@ -47,7 +47,7 @@ export default function LoginForm() {
       } catch (error) {
         console.log(error);
         setIsLoginMessage({
-          message: error,
+          message: "Đã xảy ra lỗi vui lòng kiểm tra lại thông tin đăng nhập",
         });
         setSeverity('error');
         setOpen(true);

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
-import CurrencyTextField from '@unicef/material-ui-currency-textfield';
+import CurrencyInput from 'react-currency-input-field';
 import { Container, Typography, InputLabel, TextField } from '@material-ui/core';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
@@ -110,10 +111,12 @@ const CreateTrip = () => {
   const [endDistrict, setEndDistrict] = useState();
   const [endWard, setEndWard] = useState();
 
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [msg, setMsg] = useState(null);
   const { vertical, horizontal } = {
     vertical: 'top',
-    horizontal: 'right',
+    horizontal: 'center',
   };
 
   const formik = useFormik({
@@ -147,7 +150,6 @@ const CreateTrip = () => {
       voucherIds: [],
     },
   });
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = formik.values;
@@ -164,7 +166,11 @@ const CreateTrip = () => {
       if (response) {
         setOpen(true);
       }
+
+      navigate('/home/blog');
     } catch (error) {
+      setMsg('Thông tin chuyến đi chưa hợp lệ. Vui lòng kiểm tra lại');
+      setOpen(true);
       console.log(error);
     }
   };
@@ -589,17 +595,16 @@ const CreateTrip = () => {
           />
           <Stack direction="row" spacing={4} alignItems="center" sx={{ marginTop: '20px', marginBottom: '20px' }}>
             <InputLabel htmlFor="standard-adornment-amount">Tiền đặt cọc</InputLabel>
-            <CurrencyTextField
-              label="Số tiền"
-              variant="standard"
+            <CurrencyInput
+              customInput={TextField}
               name="deposit"
+              variant="outlined"
+              decimalsLimit={2}
               value={formik.values.deposit}
-              currencySymbol="VNĐ"
-              minimumValue="0"
-              outputFormat="string"
-              decimalCharacter="."
-              digitGroupSeparator=","
-              onChange={formik.handleChange}
+              onValueChange={(value, name) => formik.setFieldValue(name, value)}
+              InputProps={{
+                startAdornment: <span style={{ paddingRight: '10px' }}>VNĐ</span>,
+              }}
             />
           </Stack>
           <Stack direction="row" spacing={5} alignItems="center" sx={{ marginTop: '20px', marginBottom: '20px' }}>
@@ -652,6 +657,13 @@ const CreateTrip = () => {
           <strong>Tạo chuyến đi thành công</strong>
         </Alert>
       </Snackbar>
+      {msg && (
+        <Snackbar open={open} anchorOrigin={{ vertical, horizontal }} autoHideDuration={2000} onClose={handleClose}>
+          <Alert variant="outlined" onClose={handleClose} sx={{ width: '100%' }} severity="error">
+            <strong>{msg}</strong>
+          </Alert>
+        </Snackbar>
+      )}
       {/* <Formik>
         {(formilProps) => {
           return ( */}
