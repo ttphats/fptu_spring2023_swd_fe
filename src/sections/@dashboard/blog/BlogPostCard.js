@@ -83,29 +83,27 @@ export default function BlogPostCard({ post, index }) {
   const latestPostLarge = index === 0;
   const latestPost = index === 1 || index === 2;
   const [host, setHost] = useState();
-  const [imageAvatar, setImageAvatar] = useState();
   const [open, setOpen] = useState(false);
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [successMsg, setSuccessMsg] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const getUser = await tripApi.getTripMembers(post.id);
-        getUser.data.map((mem, _index) => {
-          if (mem.role === 'HOST') {
-            setHost(mem.user);
-            setImageAvatar(mem.user.avatarUrl);
-          }
-          return mem;
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    fetchData();
-  }, [post.id]);
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       const getUser = await tripApi.getTripMembers(post.id);
+  //       getUser.data.map((mem, _index) => {
+  //         if (mem.role === 'HOST') {
+  //           setHost(mem.user);
+  //         }
+  //         return mem;
+  //       });
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   }
+  //   fetchData();
+  // }, [post.id]);
 
   const handleJoinTrip = async () => {
     setOpenSnackBar(true);
@@ -198,9 +196,9 @@ export default function BlogPostCard({ post, index }) {
           <StyledAvatar
             alt="avatar"
             src={
-              !imageAvatar
+              !post?.host.avatarUrl
                 ? 'https://bcp.cdnchinhphu.vn/Uploaded/duongphuonglien/2020_09_24/giai%20nhat%20thuyen%20hoa.jpg'
-                : imageAvatar
+                : post.host.avatarUrl
             }
             sx={{
               ...((latestPostLarge || latestPost) && {
@@ -322,13 +320,13 @@ export default function BlogPostCard({ post, index }) {
                 <Grid item xs container direction="column" spacing={4}>
                   <Grid item xs>
                     <Typography gutterBottom variant="subtitle1" component="div">
-                      Người tạo chuyến đi: <strong>{host?.fullname ? host.fullname : ''}</strong>
+                      Người tạo chuyến đi: <strong>{post?.host.fullname ? post.host.fullname : ''}</strong>
                     </Typography>
                     <Typography variant="body2" gutterBottom>
                       Thông tin liên hệ:
                       <strong>
-                        &nbsp;{host?.email}&nbsp;{host?.phoneNum ? `- ${host.phoneNum}` : ''}&nbsp;
-                        {host?.address ? `- ${host.address}` : ''}{' '}
+                        &nbsp;{post?.host.email}&nbsp;{post?.host.phoneNum ? `- ${post.host.phoneNum}` : ''}&nbsp;
+                        {post?.host.address ? `- ${post.host.address}` : ''}{' '}
                       </strong>
                     </Typography>
                     <Typography variant="body2" gutterBottom>
