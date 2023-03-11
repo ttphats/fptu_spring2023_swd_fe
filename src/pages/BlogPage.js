@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useSelector } from 'react-redux';
+import { LoadingButton } from '@mui/lab';
 import { useNavigate } from 'react-router-dom';
 // @mui
 import { Grid, Button, Container, Stack, Typography, MenuItem, TextField } from '@mui/material';
@@ -22,6 +24,7 @@ const SORT_OPTIONS = [
 
 export default function BlogPage() {
   const navigate = useNavigate();
+  const currentUser = useSelector((state) => state.user.current);
   const [trips, setTrips] = useState([]);
   const [sort, setSort] = useState('desc');
 
@@ -55,9 +58,17 @@ export default function BlogPage() {
           <Typography variant="h4" gutterBottom>
             Tất cả chuyến đi
           </Typography>
-          <Button onClick={() => navigate('/trip')} variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-            Tạo chuyến đi mới
-          </Button>
+          {currentUser.role !== 'ADMIN' ? (
+            <LoadingButton
+              onClick={() => navigate('/trip')}
+              variant="contained"
+              startIcon={<Iconify icon="eva:plus-fill" />}
+            >
+              Tạo chuyến đi mới
+            </LoadingButton>
+          ) : (
+            <></>
+          )}
         </Stack>
 
         <Stack mb={5} direction="row" alignItems="center" justifyContent="space-between">

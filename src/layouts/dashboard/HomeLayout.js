@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Outlet } from 'react-router-dom';
+import { useNavigate, Outlet, Navigate } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
 // firebase
@@ -40,6 +40,11 @@ const Main = styled('div')(({ theme }) => ({
 export default function HomeLayout() {
   const loginInfo = useSelector((state) => state.auth.loginInfo);
   const [open, setOpen] = useState(false);
+  const currentUser = useSelector((state) => state.user.current);
+  const navigate = useNavigate();
+
+
+
 
   // Handle get message push notify
   useEffect(() => {
@@ -57,7 +62,7 @@ export default function HomeLayout() {
     <StyledRoot>
       <Header onOpenNav={() => setOpen(true)} />
 
-      <NavUser openNav={open} onCloseNav={() => setOpen(false)} />
+      {currentUser.role === "ADMIN" ? <Navigate to="/dashboard" /> : <NavUser openNav={open} onCloseNav={() => setOpen(false)} />}
 
       <Main>
         <Outlet />
