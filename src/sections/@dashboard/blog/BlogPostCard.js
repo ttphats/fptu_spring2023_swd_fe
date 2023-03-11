@@ -210,7 +210,7 @@ export default function BlogPostCard({ post, index }) {
             alt="avatar"
             src={
               !post?.host.avatarUrl
-                ? 'https://bcp.cdnchinhphu.vn/Uploaded/duongphuonglien/2020_09_24/giai%20nhat%20thuyen%20hoa.jpg'
+                ? 'https://media-cdn-v2.laodong.vn/storage/newsportal/2017/8/28/551691/Du-Lich_1.jpg'
                 : post.host.avatarUrl
             }
             sx={{
@@ -224,7 +224,7 @@ export default function BlogPostCard({ post, index }) {
             }}
           />
 
-          <StyledCover alt={title} src={post.imageUrls[0]} />
+          <StyledCover alt={title} src={post.imageUrls[0] ? post.imageUrls[0] : "https://daihoc.fpt.edu.vn/wp-content/uploads/2021/12/fpt-hinh-1-thumbnail-1618982244543115484692-768x432.png"} />
         </StyledCardMedia>
 
         <CardContent
@@ -326,7 +326,7 @@ export default function BlogPostCard({ post, index }) {
               </Grid>
               <Grid item>
                 <ButtonBase sx={{ width: 500, height: 500 }}>
-                  <Img alt="complex" src={post.imageUrls[0]} />
+                  <Img alt="complex" src={post.imageUrls[0] ? post.imageUrls[0] : "https://daihoc.fpt.edu.vn/wp-content/uploads/2021/12/fpt-hinh-1-thumbnail-1618982244543115484692-768x432.png"} />
                 </ButtonBase>
               </Grid>
               <Grid item xs={12} sm container>
