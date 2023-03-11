@@ -171,7 +171,12 @@ const CreateTrip = () => {
       });
 
       const formData = new FormData();
-      formData.append('images', fileUpload);
+      if(fileUpload){
+        formData.append('images', fileUpload);
+      }
+      else{
+        formData.append('images', null);
+      }
       formData.append('createTripRequestForm', blob);
       const response = await tripApi.createTrip(formData);
       if (response) {
