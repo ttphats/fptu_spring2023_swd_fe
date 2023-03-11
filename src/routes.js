@@ -57,10 +57,14 @@ export default function Router() {
             </ProtectedRoute>
           }
         />
-        <Route
+                <Route
           path="/trip/:id"
           element={
               <TripDetailsPage />
+         }
+          }
+        />
+        <Route
           path="/voucher"
           element={
             <ProtectedRoute loginInfo={loginInfo}>
