@@ -161,6 +161,7 @@ const CreateTrip = () => {
       .required('End Date is required')
       .typeError('Enter a value End date'),
   });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = formik.values;
@@ -172,6 +173,7 @@ const CreateTrip = () => {
 
       const formData = new FormData();
       if(fileUpload){
+        console.log(fileUpload)
         formData.append('images', fileUpload);
       }
       else{
