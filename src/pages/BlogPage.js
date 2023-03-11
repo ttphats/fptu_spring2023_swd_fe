@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 // @mui
-import { Grid, Button, Container, Stack, Typography } from '@mui/material';
+import { Grid, Button, Container, Stack, Typography, MenuItem, TextField } from '@mui/material';
 // components
 import Iconify from '../components/iconify';
-import { BlogPostCard, BlogPostsSort, BlogPostsSearch } from '../sections/@dashboard/blog';
+import { BlogPostCard, BlogPostsSearch } from '../sections/@dashboard/blog';
 // mock
 import POSTS from '../_mock/blog';
 import tripApi from '../api/tripApi';
@@ -13,9 +13,9 @@ import tripApi from '../api/tripApi';
 // ----------------------------------------------------------------------
 
 const SORT_OPTIONS = [
-  { value: 'latest', label: 'Mới nhất' },
-  { value: 'popular', label: 'Phổ biến' },
-  { value: 'oldest', label: 'Cũ nhất' },
+  { name: 'Mới nhất', value: 'desc', label: 'Mới nhất' },
+  { value: '', label: 'Phổ biến' },
+  { name: 'Cũ nhất', value: 'asc', label: 'Cũ nhất' },
 ];
 
 // ----------------------------------------------------------------------
@@ -23,10 +23,12 @@ const SORT_OPTIONS = [
 export default function BlogPage() {
   const navigate = useNavigate();
   const [trips, setTrips] = useState([]);
+  const [sort, setSort] = useState('desc');
+
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await tripApi.getAllTrips();
+        const response = await tripApi.getAllTrips(sort);
         setTrips(response.data);
       } catch (error) {
         console.log(error);
@@ -35,11 +37,12 @@ export default function BlogPage() {
     fetchData();
   }, []);
 
-  const myData = [].concat(trips)
-    .sort((a, b) => a.postDate < b.postDate ? 1 : -1)
-    .map((item, i) => 
-    <BlogPostCard key={item.id} post={item} index={i} />
-    );
+  const handleSort = async (sort) => {
+    const response = await tripApi.getAllTrips(sort);
+    setSort(sort);
+    setTrips(response.data);
+    console.log(response);
+  };
 
   return (
     <>
@@ -59,14 +62,19 @@ export default function BlogPage() {
 
         <Stack mb={5} direction="row" alignItems="center" justifyContent="space-between">
           <BlogPostsSearch posts={POSTS} />
-          <BlogPostsSort options={SORT_OPTIONS} />
+          <TextField select size="small" value={sort}>
+            {SORT_OPTIONS.map((option) => (
+              <MenuItem onClick={() => handleSort(option.value)} key={option.value} value={option.value}>
+                {option.name}
+              </MenuItem>
+            ))}
+          </TextField>
         </Stack>
 
         <Grid container spacing={3}>
-          {/* {trips.map((post, index) => (
+          {trips.map((post, index) => (
             <BlogPostCard key={post.id} post={post} index={index} />
-          ))} */}
-          {myData}
+          ))}
         </Grid>
       </Container>
     </>

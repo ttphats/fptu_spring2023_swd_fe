@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useFormik } from 'formik';
+import { useFormik, Form, Formik } from 'formik';
+import * as Yup from 'yup';
 import CurrencyInput from 'react-currency-input-field';
 import { Container, Typography, InputLabel, TextField } from '@material-ui/core';
 import Select from '@mui/material/Select';
@@ -150,6 +151,16 @@ const CreateTrip = () => {
       voucherIds: [],
     },
   });
+  // Validate
+  const DisplayingErrorMessagesSchema = Yup.object().shape({
+    startDate: Yup.date().nullable().typeError('Start date is required').required('Start Date is required'),
+
+    endDate: Yup.date()
+      .nullable()
+      .when('startDate', (startDate, yup) => startDate && yup.min(startDate, 'End date cannot be before start time'))
+      .required('End Date is required')
+      .typeError('Enter a value End date'),
+  });
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = formik.values;
@@ -169,7 +180,11 @@ const CreateTrip = () => {
 
       navigate('/home/blog');
     } catch (error) {
-      setMsg('Thông tin chuyến đi chưa hợp lệ. Vui lòng kiểm tra lại');
+      if (error.response.message) {
+        setMsg(error.response.message);
+      } else {
+        setMsg('Thông tin chuyến đi chưa hợp lệ. Vui lòng kiểm tra lại');
+      }
       setOpen(true);
       console.log(error);
     }
@@ -286,34 +301,56 @@ const CreateTrip = () => {
       description: (
         <>
           <Stack direction="row" sx={{ marginBottom: 2 }} justifyContent="flext-start" alignItems="center" spacing={2}>
-            <Box>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  className={classes.customInput}
-                  label="Ngày bắt đầu chuyến đi"
-                  value={formik.values.startDate}
-                  name="startDate"
-                  format="DD/MM/YYYY"
-                  onChange={(value) => {
-                    formik.setFieldValue('startDate', dayjs(value));
-                  }}
-                />
-              </LocalizationProvider>
-            </Box>
-            <Box>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Ngày kết thúc chuyến đi"
-                  className={classes.customInput}
-                  value={formik.values.endDate}
-                  name="endDate"
-                  format="DD/MM/YYYY"
-                  onChange={(value) => {
-                    formik.setFieldValue('endDate', dayjs(value));
-                  }}
-                />
-              </LocalizationProvider>
-            </Box>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Formik
+                initialValues={{
+                  startDate: null,
+                  endDate: null,
+                }}
+                validationSchema={DisplayingErrorMessagesSchema}
+                onSubmit={(values, { setSubmitting }) => {
+                  setTimeout(() => {
+                    setSubmitting(false);
+                    alert(JSON.stringify(values, null, 2));
+                  }, 500);
+                }}
+              >
+                {({ errors, touched, values }) => (
+                  <Form>
+                    <DatePicker
+                      className={classes.customInput}
+                      label="Ngày bắt đầu chuyến đi"
+                      value={formik.values.startDate}
+                      name="startDate"
+                      disablePast
+                      format="DD/MM/YYYY"
+                      onChange={(value) => {
+                        formik.setFieldValue('startDate', dayjs(value));
+                      }}
+                    />
+                    {touched.startDate && errors.startDate && <div>{errors.startDate}</div>}
+                    <DatePicker
+                      disablePast
+                      label="Ngày kết thúc chuyến đi"
+                      className={classes.customInput}
+                      value={formik.values.endDate}
+                      name="endDate"
+                      format="DD/MM/YYYY"
+                      onChange={(value) => {
+                        if(dayjs(value) >= formik.values.startDate){
+                          formik.setFieldValue('endDate', dayjs(value));
+                        } else {
+                          formik.setFieldValue('endDate', null);
+                          setMsg('Ngày kết thúc chuyến đi phải bằng hoặc sau ngày xuất phát');
+                          setOpen(true);
+                        }
+                      }}
+                      renderInput={(params) => <TextField size="small" {...params} sx={{ width: '100%' }} />}
+                    />
+                  </Form>
+                )}
+              </Formik>
+            </LocalizationProvider>
           </Stack>
         </>
       ),
