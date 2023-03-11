@@ -21,6 +21,7 @@ import OTPAuthenticationPage from './pages/OTPAuthenticationPage';
 import OTPForgotPasswordPage from './pages/OTPForgotPasswordPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import CreateTripPage from './pages/CreateTripPage';
+import CreateVoucherPage from './pages/CreateVoucherPage';
 
 // ----------------------------------------------------------------------
 
@@ -51,6 +52,14 @@ export default function Router() {
           element={
             <ProtectedRoute loginInfo={loginInfo}>
               <CreateTripPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/voucher"
+          element={
+            <ProtectedRoute loginInfo={loginInfo}>
+              <CreateVoucherPage />
             </ProtectedRoute>
           }
         />
