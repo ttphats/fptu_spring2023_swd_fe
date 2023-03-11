@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 // @mui
 import { alpha, styled } from '@mui/material/styles';
+import { LoadingButton } from '@mui/lab';
 import { Box, Link, Card, Grid, Avatar, Typography, CardContent } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
@@ -82,28 +83,27 @@ export default function BlogPostCard({ post, index }) {
   const { title, view, comment, share, author, createdAt } = post;
   const latestPostLarge = index === 0;
   const latestPost = index === 1 || index === 2;
-  const [host, setHost] = useState();
+  const [members, setMembers] = useState([]);
   const [open, setOpen] = useState(false);
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [successMsg, setSuccessMsg] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [response, setResponse] = useState();
 
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     try {
-  //       const getUser = await tripApi.getTripMembers(post.id);
-  //       getUser.data.map((mem, _index) => {
-  //         if (mem.role === 'HOST') {
-  //           setHost(mem.user);
-  //         }
-  //         return mem;
-  //       });
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  //   fetchData();
-  // }, [post.id]);
+
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const getUser = await tripApi.getTripMembers(post.id);
+        setResponse(getUser);
+        setMembers(getUser.data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchData();
+  }, [post.id]);
 
   const handleJoinTrip = async () => {
     setOpenSnackBar(true);
@@ -128,6 +128,13 @@ export default function BlogPostCard({ post, index }) {
     setOpenSnackBar(false);
     setOpen(false);
   };
+
+  const isJoined = () => {
+    if(response.status === "JOIN"){
+      return true;
+    }
+    return false;
+};
 
   const POST_INFO = [
     { number: comment, icon: 'eva:message-circle-fill' },
@@ -359,6 +366,9 @@ export default function BlogPostCard({ post, index }) {
                       Số thành viên tham gia chuyến đi: Từ <strong>{post.minMember} </strong> Đến{' '}
                       <strong>{post.maxMember}</strong> người
                     </Typography>
+                    <Typography variant="body2" gutterBottom>
+                      Số thành viên hiện có: &nbsp; {members.length}/<strong>{post.maxMember}</strong>
+                    </Typography>
                     <Typography variant="subtitle1" component="div">
                       Số tiền cần đặt cọc: {Intl.NumberFormat('en-US').format(post.deposit)} VNĐ
                     </Typography>
@@ -370,7 +380,7 @@ export default function BlogPostCard({ post, index }) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Quay lại</Button>
-          <Button onClick={handleJoinTrip}>Tham gia ngay</Button>
+          <LoadingButton disabled={isJoined} onClick={handleJoinTrip}>Tham gia ngay</LoadingButton>
         </DialogActions>
       </Dialog>
     </Grid>
