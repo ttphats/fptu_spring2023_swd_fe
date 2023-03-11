@@ -11,9 +11,9 @@ const tripApi = {
       },
     });
   },
-  getAllTrips: () => {
+  getAllTrips: (sort) => {
     const url = '/trips';
-    return axiosClient.get(`${url}?page=1&limit=30`);
+    return axiosClient.get(`${url}?page=1&limit=30&sort=postDate:${sort}`);
   },
   getTripMembers: (id) => {
     const url = '/trips';

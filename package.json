@@ -78,7 +78,8 @@
     "redux": "^4.2.1",
     "redux-persist": "^6.0.0",
     "simplebar-react": "^2.4.3",
-    "web-vitals": "^3.0.3"
+    "web-vitals": "^3.0.3",
+    "yup": "^1.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",
