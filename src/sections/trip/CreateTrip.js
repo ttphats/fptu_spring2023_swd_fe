@@ -337,7 +337,7 @@ const CreateTrip = () => {
                       name="endDate"
                       format="DD/MM/YYYY"
                       onChange={(value) => {
-                        if(dayjs(value) >= formik.values.startDate){
+                        if (dayjs(value) >= formik.values.startDate) {
                           formik.setFieldValue('endDate', dayjs(value));
                         } else {
                           formik.setFieldValue('endDate', null);
