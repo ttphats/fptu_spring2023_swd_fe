@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 // @mui
 import { alpha, styled } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
@@ -80,6 +81,7 @@ BlogPostCard.propTypes = {
 };
 
 export default function BlogPostCard({ post, index }) {
+  const currentUser = useSelector((state) => state.user.current);
   const { title, view, comment, share, author, createdAt } = post;
   const latestPostLarge = index === 0;
   const latestPost = index === 1 || index === 2;
@@ -88,15 +90,12 @@ export default function BlogPostCard({ post, index }) {
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [successMsg, setSuccessMsg] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [response, setResponse] = useState();
-
-
+  const [disable, setDisable] = useState();
 
   useEffect(() => {
     async function fetchData() {
       try {
         const getUser = await tripApi.getTripMembers(post.id);
-        setResponse(getUser);
         setMembers(getUser.data);
       } catch (error) {
         console.log(error);
@@ -106,18 +105,30 @@ export default function BlogPostCard({ post, index }) {
   }, [post.id]);
 
   const handleJoinTrip = async () => {
+    setDisable(true);
     setOpenSnackBar(true);
     try {
       const response = await tripApi.joinTripById(post.id);
       console.log(response);
-      setSuccessMsg(response.data.message);
+      setSuccessMsg(response.message);
     } catch (error) {
       setErrorMsg(error.response.data.message);
       console.log(error.response.data.message);
     }
   };
 
-  const handleClickOpen = () => {
+  const handleClickOpen = async (value) => {
+    const getUser = await tripApi.getTripMembers(value);
+    getUser.data.map((mem, _index) => {
+      console.log(currentUser.id);
+      console.log(mem.user.id);
+      if (mem.user.id === currentUser.id) {
+        console.log('disable');
+        setDisable(true);
+      } 
+      return _index;
+    });
+    console.log(value);
     setOpen(true);
   };
 
@@ -129,13 +140,6 @@ export default function BlogPostCard({ post, index }) {
     setOpen(false);
   };
 
-  const isJoined = () => {
-    if(response.status === "JOIN"){
-      return true;
-    }
-    return false;
-};
-
   const POST_INFO = [
     { number: comment, icon: 'eva:message-circle-fill' },
     { number: view, icon: 'eva:eye-fill' },
@@ -146,14 +150,16 @@ export default function BlogPostCard({ post, index }) {
     <Grid item xs={12} sm={latestPostLarge ? 12 : 6} md={latestPostLarge ? 6 : 3}>
       {successMsg && (
         <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-          <Alert variant="filled"  onClose={handleClose} severity="success" sx={{ width: '100%' }}>
+          <Alert variant="filled" onClose={handleClose} severity="success" sx={{ width: '100%' }}>
             {successMsg}
           </Alert>
         </Snackbar>
       )}
       {errorMsg && (
         <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-          <Alert variant="filled"  severity="error">{errorMsg}</Alert>
+          <Alert variant="filled" severity="error">
+            {errorMsg}
+          </Alert>
         </Snackbar>
       )}
 
@@ -164,7 +170,7 @@ export default function BlogPostCard({ post, index }) {
           },
           position: 'relative',
         }}
-        onClick={handleClickOpen}
+        onClick={() => handleClickOpen(post.id)}
       >
         <StyledCardMedia
           sx={{
@@ -336,28 +342,28 @@ export default function BlogPostCard({ post, index }) {
                         {post?.host.address ? `- ${post.host.address}` : ''}{' '}
                       </strong>
                     </Typography>
+                    <Typography variant="body2">
+                      Tên địa điểm xuất phát: {post.startLocation.name ? post.startLocation.name : ''} - Mô tả:{' '}
+                      {post.startLocation.description ? post.startLocation.description : ''}
+                    </Typography>
                     <Typography variant="body2" gutterBottom>
                       Địa điểm xuất phát:
                       <strong>
                         &nbsp;{post.startLocation.address} ({post.startLocation.type})
                       </strong>
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Tên địa điểm xuất phát: {post.startLocation.name ? post.startLocation.name : ''} - Mô tả:{' '}
-                      {post.startLocation.description ? post.startLocation.description : ''}
-                    </Typography>
                     <Typography variant="body2" gutterBottom>
                       Ngày khởi hành: <strong>{post.startDate ? fDate(post.startDate) : 'Chưa xác định'}</strong>
+                    </Typography>
+                    <Typography variant="body2">
+                      Tên địa điểm đến:&nbsp; {post.endLocation.name ? post.endLocation.name : ''} - Mô tả:{' '}
+                      {post.endLocation.description ? post.endLocation.description : ''}
                     </Typography>
                     <Typography variant="body2" gutterBottom>
                       Địa điểm đến:
                       <strong>
-                        {post.endLocation.address} ({post.endLocation.type})
+                        &nbsp;{post.endLocation.address} ({post.endLocation.type})
                       </strong>
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Tên địa điểm đến: {post.endLocation.name ? post.endLocation.name : ''} - Mô tả:{' '}
-                      {post.endLocation.description ? post.endLocation.description : ''}
                     </Typography>
                     <Typography variant="body2" gutterBottom>
                       Ngày kết thúc: <strong>{post.endDate ? fDate(post.endDate) : 'Chưa xác định'}</strong>
@@ -380,7 +386,9 @@ export default function BlogPostCard({ post, index }) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Quay lại</Button>
-          <LoadingButton disabled={isJoined} onClick={handleJoinTrip}>Tham gia ngay</LoadingButton>
+          <LoadingButton disabled={disable} onClick={handleJoinTrip}>
+            Tham gia ngay
+          </LoadingButton>
         </DialogActions>
       </Dialog>
     </Grid>
