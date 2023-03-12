@@ -1,4 +1,4 @@
-import { Navigate, Routes, Route } from 'react-router-dom';
+import { Navigate, Routes, Route, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 // layouts
@@ -21,11 +21,13 @@ import OTPAuthenticationPage from './pages/OTPAuthenticationPage';
 import OTPForgotPasswordPage from './pages/OTPForgotPasswordPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import CreateTripPage from './pages/CreateTripPage';
+import TripDetailsPage from './pages/TripDetailsPage';
 
 // ----------------------------------------------------------------------
 
 export default function Router() {
   const loginInfo = useSelector((state) => state.auth.loginInfo);
+  const { id } = useParams();
   console.log('loginInfo', loginInfo);
 
   return (
@@ -35,7 +37,7 @@ export default function Router() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
         <Route path="/otpauthentication" element={<OTPAuthenticationPage />} />
-        <Route path="/otpforgotpassword" element={<OTPForgotPasswordPage/>} />
+        <Route path="/otpforgotpassword" element={<OTPForgotPasswordPage />} />
         <Route path="/changepassword" element={<ChangePasswordPage />} />
         <Route path="*" element={<Navigate to="/404" replace />} />
         <Route
@@ -52,6 +54,12 @@ export default function Router() {
             <ProtectedRoute loginInfo={loginInfo}>
               <CreateTripPage />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trip/:id"
+          element={
+              <TripDetailsPage />
           }
         />
         <Route

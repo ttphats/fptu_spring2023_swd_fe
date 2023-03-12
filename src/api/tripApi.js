@@ -12,7 +12,7 @@ const tripApi = {
     });
   },
   getAllTrips: (sort) => {
-    const url = '/trips';
+    const url = '/public/trips';
     return axiosClient.get(`${url}?page=1&limit=30&sort=postDate:${sort}`);
   },
   getTripMembers: (id) => {
@@ -20,7 +20,7 @@ const tripApi = {
     return axiosClient.get(`${url}/${id}/trip-members`);
   },
   getTripById: (id) => {
-    const url = '/trips';
+    const url = '/public/trips';
     return axiosClient.get(`${url}/${id}`);
   },
   joinTripById: (id) => {

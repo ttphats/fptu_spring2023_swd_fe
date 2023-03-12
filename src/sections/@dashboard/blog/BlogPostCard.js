@@ -1,20 +1,16 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 // @mui
 import { alpha, styled } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
-import { Box, Link, Card, Grid, Avatar, Typography, CardContent } from '@mui/material';
+import { Box, Card, Grid, Avatar, Typography, CardContent } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import Paper from '@mui/material/Paper';
 import ButtonBase from '@mui/material/ButtonBase';
 
@@ -33,7 +29,7 @@ const StyledCardMedia = styled('div')({
   paddingTop: 'calc(100% * 3 / 4)',
 });
 
-const StyledTitle = styled(Link)({
+const StyledTitle = styled('div')({
   height: 44,
   overflow: 'hidden',
   WebkitLineClamp: 2,
@@ -87,10 +83,6 @@ export default function BlogPostCard({ post, index }) {
   const latestPost = index === 1 || index === 2;
   const [members, setMembers] = useState([]);
   const [open, setOpen] = useState(false);
-  const [openSnackBar, setOpenSnackBar] = useState(false);
-  const [successMsg, setSuccessMsg] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
-  const [disable, setDisable] = useState();
 
   useEffect(() => {
     async function fetchData() {
@@ -104,293 +96,272 @@ export default function BlogPostCard({ post, index }) {
     fetchData();
   }, [post.id]);
 
-  const handleJoinTrip = async () => {
-    setDisable(true);
-    setOpenSnackBar(true);
-    try {
-      const response = await tripApi.joinTripById(post.id);
-      console.log(response);
-      setSuccessMsg(response.message);
-    } catch (error) {
-      setErrorMsg(error.response.data.message);
-      console.log(error.response.data.message);
-    }
-  };
-
-  const handleClickOpen = async (value) => {
-    const getUser = await tripApi.getTripMembers(value);
-    getUser.data.map((mem, _index) => {
-      console.log(currentUser.id);
-      console.log(mem.user.id);
-      if (mem.user.id === currentUser.id) {
-        console.log('disable');
-        setDisable(true);
-      } 
-      return _index;
-    });
-    console.log(value);
-    setOpen(true);
-  };
-
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpenSnackBar(false);
-    setOpen(false);
-  };
-
-  const POST_INFO = [
-    { number: comment, icon: 'eva:message-circle-fill' },
-    { number: view, icon: 'eva:eye-fill' },
-    { number: share, icon: 'eva:share-fill' },
-  ];
-
   return (
     <Grid item xs={12} sm={latestPostLarge ? 12 : 6} md={latestPostLarge ? 6 : 3}>
-      {successMsg && (
-        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-          <Alert variant="filled" onClose={handleClose} severity="success" sx={{ width: '100%' }}>
-            {successMsg}
-          </Alert>
-        </Snackbar>
-      )}
-      {errorMsg && (
-        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-          <Alert variant="filled" severity="error">
-            {errorMsg}
-          </Alert>
-        </Snackbar>
-      )}
-
-      <Card
-        sx={{
-          '&:hover': {
-            cursor: 'pointer',
-          },
-          position: 'relative',
+      <Link
+        to={{
+          pathname: `/trip/${post.id}`,
         }}
-        onClick={() => handleClickOpen(post.id)}
+        state={{ postId: post.id }}
+        style={{ textDecoration: 'none' }}
       >
-        <StyledCardMedia
+        <Card
           sx={{
-            ...((latestPostLarge || latestPost) && {
-              pt: 'calc(100% * 4 / 3)',
-              '&:after': {
-                top: 0,
-                content: "''",
-                width: '100%',
-                height: '100%',
-                position: 'absolute',
-                bgcolor: (theme) => alpha(theme.palette.grey[900], 0.72),
-              },
-            }),
-            ...(latestPostLarge && {
-              pt: {
-                xs: 'calc(100% * 4 / 3)',
-                sm: 'calc(100% * 3 / 4.66)',
-              },
-            }),
+            '&:hover': {
+              cursor: 'pointer',
+            },
+            position: 'relative',
           }}
         >
-          <SvgColor
-            color="paper"
-            src="/assets/icons/shape-avatar.svg"
-            sx={{
-              width: 80,
-              height: 36,
-              zIndex: 9,
-              bottom: -15,
-              position: 'absolute',
-              color: 'background.paper',
-              ...((latestPostLarge || latestPost) && { display: 'none' }),
-            }}
-          />
-          <StyledAvatar
-            alt="avatar"
-            src={
-              !post?.host.avatarUrl
-                ? 'https://media-cdn-v2.laodong.vn/storage/newsportal/2017/8/28/551691/Du-Lich_1.jpg'
-                : post.host.avatarUrl
-            }
+          <StyledCardMedia
             sx={{
               ...((latestPostLarge || latestPost) && {
+                pt: 'calc(100% * 4 / 3)',
+                '&:after': {
+                  top: 0,
+                  content: "''",
+                  width: '100%',
+                  height: '100%',
+                  position: 'absolute',
+                  bgcolor: (theme) => alpha(theme.palette.grey[900], 0.72),
+                },
+              }),
+              ...(latestPostLarge && {
+                pt: {
+                  xs: 'calc(100% * 4 / 3)',
+                  sm: 'calc(100% * 3 / 4.66)',
+                },
+              }),
+            }}
+          >
+            <SvgColor
+              color="paper"
+              src="/assets/icons/shape-avatar.svg"
+              sx={{
+                width: 80,
+                height: 36,
                 zIndex: 9,
-                top: 24,
-                left: 24,
-                width: 40,
-                height: 40,
-              }),
-            }}
-          />
+                bottom: -15,
+                position: 'absolute',
+                color: 'background.paper',
+                ...((latestPostLarge || latestPost) && { display: 'none' }),
+              }}
+            />
+            <StyledAvatar
+              alt="avatar"
+              src={
+                !post?.host.avatarUrl
+                  ? 'https://media-cdn-v2.laodong.vn/storage/newsportal/2017/8/28/551691/Du-Lich_1.jpg'
+                  : post.host.avatarUrl
+              }
+              sx={{
+                ...((latestPostLarge || latestPost) && {
+                  zIndex: 9,
+                  top: 24,
+                  left: 24,
+                  width: 40,
+                  height: 40,
+                }),
+              }}
+            />
 
-          <StyledCover alt={title} src={post.imageUrls[0] ? post.imageUrls[0] : "https://daihoc.fpt.edu.vn/wp-content/uploads/2021/12/fpt-hinh-1-thumbnail-1618982244543115484692-768x432.png"} />
-        </StyledCardMedia>
+            <StyledCover
+              alt={title}
+              src={
+                post.imageUrls[0]
+                  ? post.imageUrls[0]
+                  : 'https://daihoc.fpt.edu.vn/wp-content/uploads/2021/12/fpt-hinh-1-thumbnail-1618982244543115484692-768x432.png'
+              }
+            />
+          </StyledCardMedia>
 
-        <CardContent
-          sx={{
-            pt: 4,
-            ...((latestPostLarge || latestPost) && {
-              bottom: 0,
-              width: '100%',
-              position: 'absolute',
-            }),
-          }}
-        >
-          <Typography gutterBottom variant="caption" sx={{ color: 'text.disabled', display: 'block' }}>
-            {fDate(post.postDate)}
-          </Typography>
-
-          <StyledTitle
-            color="inherit"
-            variant="subtitle2"
-            underline="hover"
+          <CardContent
             sx={{
-              ...(latestPostLarge && { typography: 'h5', height: 60 }),
+              pt: 4,
               ...((latestPostLarge || latestPost) && {
-                color: 'common.white',
+                bottom: 0,
+                width: '100%',
+                position: 'absolute',
               }),
             }}
           >
-            {!post.description ? 'Đã bao lâu rồi chúng ta chưa có dịp đi chơi cùng nhau' : post.description}
-          </StyledTitle>
+            <Typography gutterBottom variant="caption" sx={{ color: 'text.disabled', display: 'block' }}>
+              {fDate(post.postDate)}
+            </Typography>
 
-          <StyledTitle
-            color="inherit"
-            variant="subtitle2"
-            underline="hover"
-            sx={{
-              ...(latestPostLarge && { typography: 'p', height: 30 }),
-              ...((latestPostLarge || latestPost) && {
-                color: 'common.white',
-              }),
-            }}
-          >
-            {post.startDate && post.endDate ? `${fDate(post.startDate)} - ${fDate(post.endDate)} ` : ''}
-          </StyledTitle>
+            <StyledTitle
+              color="inherit"
+              variant="subtitle2"
+              underline="hover"
+              sx={{
+                ...(latestPostLarge && { typography: 'h5', height: 60 }),
+                ...((latestPostLarge || latestPost) && {
+                  color: 'common.white',
+                }),
+              }}
+            >
+              {!post.description ? 'Đã bao lâu rồi chúng ta chưa có dịp đi chơi cùng nhau' : post.description}
+            </StyledTitle>
 
-          <StyledTitle
-            color="inherit"
-            variant="subtitle2"
-            underline="hover"
-            sx={{
-              ...(latestPostLarge && { typography: 'p', height: 30 }),
-              ...((latestPostLarge || latestPost) && {
-                color: 'common.white',
-              }),
-            }}
-          >
-            {post.endLocation.address ? post.endLocation.address : ''}
-          </StyledTitle>
+            <StyledTitle
+              color="inherit"
+              variant="subtitle2"
+              underline="hover"
+              sx={{
+                ...(latestPostLarge && { typography: 'p', height: 30 }),
+                ...((latestPostLarge || latestPost) && {
+                  color: 'common.white',
+                }),
+              }}
+            >
+              {post.startDate && post.endDate ? `${fDate(post.startDate)} - ${fDate(post.endDate)} ` : ''}
+            </StyledTitle>
 
-          <StyledInfo>
-            {POST_INFO.map((info, index) => (
-              <Box
-                key={index}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  ml: index === 0 ? 0 : 1.5,
-                  ...((latestPostLarge || latestPost) && {
-                    color: 'grey.500',
-                  }),
-                }}
-              >
-                <Iconify icon={info.icon} sx={{ width: 16, height: 16, mr: 0.5 }} />
-                <Typography variant="caption">{fShortenNumber(info.number)}</Typography>
-              </Box>
-            ))}
-          </StyledInfo>
-        </CardContent>
-      </Card>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Chi tiết chuyến đi</DialogTitle>
-        <DialogContent>
-          <Paper
-            sx={{
-              p: 2,
-              margin: 'auto',
-              maxWidth: 900,
-              flexGrow: 1,
-              backgroundColor: (theme) => (theme.palette.mode === 'dark' ? '#1A2027' : '#fff'),
-            }}
-          >
-            <Grid container spacing={2}>
-              <Grid item>
-                <Typography gutterBottom variant="h3" component="div">
-                  {!post.description ? 'Đã bao lâu rồi chúng ta chưa có dịp đi chơi cùng nhau?' : post.description}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Ngày đăng bài: {post.postDate ? fDate(post.postDate) : 'Không xác định'}
-                </Typography>
-              </Grid>
-              <Grid item>
-                <ButtonBase sx={{ width: 500, height: 500 }}>
-                  <Img alt="complex" src={post.imageUrls[0] ? post.imageUrls[0] : "https://daihoc.fpt.edu.vn/wp-content/uploads/2021/12/fpt-hinh-1-thumbnail-1618982244543115484692-768x432.png"} />
-                </ButtonBase>
-              </Grid>
-              <Grid item xs={12} sm container>
-                <Grid item xs container direction="column" spacing={4}>
-                  <Grid item xs>
-                    <Typography gutterBottom variant="subtitle1" component="div">
-                      Người tạo chuyến đi: <strong>{post?.host.fullname ? post.host.fullname : ''}</strong>
-                    </Typography>
-                    <Typography variant="body2" gutterBottom>
-                      Thông tin liên hệ:
-                      <strong>
-                        &nbsp;{post?.host.email}&nbsp;{post?.host.phoneNum ? `- ${post.host.phoneNum}` : ''}&nbsp;
-                        {post?.host.address ? `- ${post.host.address}` : ''}{' '}
-                      </strong>
-                    </Typography>
-                    <Typography variant="body2">
-                      Tên địa điểm xuất phát: {post.startLocation.name ? post.startLocation.name : ''} - Mô tả:{' '}
-                      {post.startLocation.description ? post.startLocation.description : ''}
-                    </Typography>
-                    <Typography variant="body2" gutterBottom>
-                      Địa điểm xuất phát:
-                      <strong>
-                        &nbsp;{post.startLocation.address} ({post.startLocation.type})
-                      </strong>
-                    </Typography>
-                    <Typography variant="body2" gutterBottom>
-                      Ngày khởi hành: <strong>{post.startDate ? fDate(post.startDate) : 'Chưa xác định'}</strong>
-                    </Typography>
-                    <Typography variant="body2">
-                      Tên địa điểm đến:&nbsp; {post.endLocation.name ? post.endLocation.name : ''} - Mô tả:{' '}
-                      {post.endLocation.description ? post.endLocation.description : ''}
-                    </Typography>
-                    <Typography variant="body2" gutterBottom>
-                      Địa điểm đến:
-                      <strong>
-                        &nbsp;{post.endLocation.address} ({post.endLocation.type})
-                      </strong>
-                    </Typography>
-                    <Typography variant="body2" gutterBottom>
-                      Ngày kết thúc: <strong>{post.endDate ? fDate(post.endDate) : 'Chưa xác định'}</strong>
-                    </Typography>
-                    <Typography variant="body2" gutterBottom>
-                      Số thành viên tham gia chuyến đi: Từ <strong>{post.minMember} </strong> Đến{' '}
-                      <strong>{post.maxMember}</strong> người
-                    </Typography>
-                    <Typography variant="body2" gutterBottom>
-                      Số thành viên hiện có: &nbsp; {members.length}/<strong>{post.maxMember}</strong>
-                    </Typography>
-                    <Typography variant="subtitle1" component="div">
-                      Số tiền cần đặt cọc: {Intl.NumberFormat('en-US').format(post.deposit)} VNĐ
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Paper>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Quay lại</Button>
-          <LoadingButton disabled={disable} onClick={handleJoinTrip}>
-            Tham gia ngay
-          </LoadingButton>
-        </DialogActions>
-      </Dialog>
+            <StyledTitle
+              color="inherit"
+              variant="subtitle2"
+              underline="hover"
+              sx={{
+                ...(latestPostLarge && { typography: 'p', height: 30 }),
+                ...((latestPostLarge || latestPost) && {
+                  color: 'common.white',
+                }),
+              }}
+            >
+              {post.endLocation.address ? post.endLocation.address : ''}
+            </StyledTitle>
+
+            {post.currentMember === post.maxMember || post.currentMember > post.maxMember ? (
+              <StyledInfo>
+                <Box
+                  key={index}
+                  sx={{
+                    display: 'flex',
+                    ml: index === 0 ? 0 : 1.5,
+                    ...((latestPostLarge || latestPost) && {
+                      color: 'grey.500',
+                    }),
+                  }}
+                >
+                  <Iconify icon="mdi:user-group" sx={{ width: 16, height: 16, mr: 0.5, color: '#F94A29' }} />
+                  <Typography sx={{ color: '#F94A29' }} variant="caption">
+                    {post.currentMember} / {post.maxMember}
+                  </Typography>
+                </Box>
+              </StyledInfo>
+            ) : (
+              <StyledInfo>
+                <Box
+                  key={index}
+                  sx={{
+                    display: 'flex',
+                    ml: index === 0 ? 0 : 1.5,
+                    ...((latestPostLarge || latestPost) && {
+                      color: 'grey.500',
+                    }),
+                  }}
+                >
+                  <Iconify icon="mdi:user-group" sx={{ width: 16, height: 16, mr: 0.5, color: '#39B5E0' }} />
+                  <Typography sx={{ color: '#39B5E0' }} variant="caption">
+                    {post.currentMember} / {post.maxMember}
+                  </Typography>
+                </Box>
+              </StyledInfo>
+            )}
+
+            {post.status === 'UPCOMING' ? (
+              <StyledInfo sx={{ justifyContent: 'flex-end' }}>
+                <Box
+                  key={index}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    ml: index === 0 ? 0 : 1.5,
+                    ...((latestPostLarge || latestPost) && {
+                      color: 'grey.500',
+                    }),
+                  }}
+                >
+                  <Iconify icon="pajamas:status-active" sx={{ width: 16, height: 16, mr: 0.5, color: '#84D2C5' }} />
+                  <Typography sx={{ color: '#84D2C5' }} variant="caption">
+                    Sắp diễn ra
+                  </Typography>
+                </Box>
+              </StyledInfo>
+            ) : (
+              <></>
+            )}
+            {post.status === 'IN_PROGRESS' ? (
+              <StyledInfo sx={{ justifyContent: 'flex-end' }}>
+                <Box
+                  key={index}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    ml: index === 0 ? 0 : 1.5,
+                    ...((latestPostLarge || latestPost) && {
+                      color: 'grey.500',
+                    }),
+                  }}
+                >
+                  <Iconify icon="pajamas:status-active" sx={{ width: 16, height: 16, mr: 0.5, color: '#FF6E31' }} />
+                  <Typography sx={{ color: '#FF6E31' }} variant="caption">
+                    Đang diễn ra
+                  </Typography>
+                </Box>
+              </StyledInfo>
+            ) : (
+              <></>
+            )}
+            {post.status === 'COMPLETED' ? (
+              <StyledInfo sx={{ justifyContent: 'flex-end' }}>
+                <Box
+                  key={index}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    ml: index === 0 ? 0 : 1.5,
+                    ...((latestPostLarge || latestPost) && {
+                      color: 'grey.500',
+                    }),
+                  }}
+                >
+                  <Iconify icon="pajamas:status-active" sx={{ width: 16, height: 16, mr: 0.5, color: '#F55050' }} />
+                  <Typography sx={{ color: '#F55050' }} variant="caption">
+                    Đã kết thúc
+                  </Typography>
+                </Box>
+              </StyledInfo>
+            ) : (
+              <></>
+            )}
+            {post.status === 'DELAY' ? (
+              <StyledInfo sx={{ justifyContent: 'flex-end' }}>
+                <Box
+                  key={index}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    ml: index === 0 ? 0 : 1.5,
+                    ...((latestPostLarge || latestPost) && {
+                      color: 'grey.500',
+                    }),
+                  }}
+                >
+                  <Iconify icon="pajamas:status-active" sx={{ width: 16, height: 16, mr: 0.5, color: '#FEC868' }} />
+                  <Typography sx={{ color: '#FEC868' }} variant="caption">
+                    Tạm hoãn
+                  </Typography>
+                </Box>
+              </StyledInfo>
+            ) : (
+              <></>
+            )}
+
+        
+          </CardContent>
+        </Card>
+      </Link>
     </Grid>
   );
 }
