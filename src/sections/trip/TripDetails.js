@@ -130,7 +130,7 @@ export default function TripDetails({ trip }) {
           <Grid container direction="column" spacing={2}>
             <Grid item>
               <Typography gutterBottom variant="h3" component="div">
-              {!trip?.description ? 'Đã bao lâu rồi chúng ta chưa có dịp đi chơi cùng nhau' : trip.description}
+              {!trip?.name ? 'Đã bao lâu rồi chúng ta chưa có dịp đi chơi cùng nhau' : trip.name}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Ngày đăng bài: {trip?.postDate ? fDate(trip.postDate) : 'Không xác định'}
