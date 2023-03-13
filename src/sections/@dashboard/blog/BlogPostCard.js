@@ -13,7 +13,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Paper from '@mui/material/Paper';
 import ButtonBase from '@mui/material/ButtonBase';
-
+import { Icon } from '@iconify/react';
 // utils
 import { fDate } from '../../../utils/formatTime';
 import { fShortenNumber } from '../../../utils/formatNumber';
@@ -81,9 +81,9 @@ export default function BlogPostCard({ post, index }) {
   const { title, view, comment, share, author, createdAt } = post;
   const latestPostLarge = index === 0;
   const latestPost = index === 1 || index === 2;
-//  const [members, setMembers] = useState([]);
+  //  const [members, setMembers] = useState([]);
   const [open, setOpen] = useState(false);
-  console.log(post)
+  console.log(post);
 
   // useEffect(() => {
   //   async function fetchData() {
@@ -200,7 +200,7 @@ export default function BlogPostCard({ post, index }) {
                 ...((latestPostLarge || latestPost) && {
                   color: 'common.white',
                 }),
-                fontWeight: 'bold'
+                fontWeight: 'bold',
               }}
             >
               {!post?.name ? 'Đã bao lâu rồi chúng ta chưa có dịp đi chơi cùng nhau' : post.name}
@@ -214,9 +214,12 @@ export default function BlogPostCard({ post, index }) {
                 ...(latestPostLarge && { typography: 'body1', height: 30 }),
                 ...((latestPostLarge || latestPost) && {
                   color: 'common.white',
+                  fontSize: 16,
                 }),
+                fontSize: 13,
               }}
             >
+              <Icon icon="simple-line-icons:calender" /> &nbsp;
               {post.startDate && post.endDate ? `${fDate(post.startDate)} - ${fDate(post.endDate)} ` : ''}
             </StyledTitle>
 

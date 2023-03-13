@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
 // @mui
 import { alpha, styled } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
@@ -167,7 +168,7 @@ export default function TripDetails({ trip }) {
                       Địa điểm xuất phát: &nbsp;{trip?.startLocation.address} ({trip?.startLocation.type})
                     </Typography>
                     <Typography variant="h6" gutterBottom>
-                      Ngày khởi hành: {trip?.startDate ? fDate(trip.startDate) : 'Chưa xác định'}
+                      Ngày khởi hành: {trip?.startDate ? dayjs(trip.startDate).subtract(7, 'hour').format('HH:mm'): '--:--'} {trip?.startDate ? fDate(trip.startDate) : 'Chưa xác định'}
                     </Typography>
                   </Box>
                   <Box mt={2}>

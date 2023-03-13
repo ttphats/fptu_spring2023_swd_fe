@@ -26,6 +26,8 @@ import StepContent from '@mui/material/StepContent';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import moment from 'moment-timezone';
+import { getTimezoneOffset } from 'date-fns-tz';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -129,7 +131,7 @@ const CreateTrip = () => {
   const formik = useFormik({
     initialValues: {
       name: '',
-      startDate: null,
+      startDate: moment().format("DD/MM/YYYY HH:mm"),
       endDate: null,
       startLocation: {
         name: '',
@@ -158,7 +160,6 @@ const CreateTrip = () => {
       voucherIds: [],
     },
   });
-  console.log('Start Date: ', dayjs(formik.values.startDate))
   // Validate
   const DisplayingErrorMessagesSchema = Yup.object().shape({
     startDate: Yup.date().nullable().typeError('Start date is required').required('Start Date is required'),
@@ -172,7 +173,39 @@ const CreateTrip = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const form = formik.values;
+    const adjustedDate = dayjs.tz(formik.values.startDate, 'Asia/Ho_Chi_Minh').add(7, 'hour').toISOString();
+    formik.setFieldValue('startDate', adjustedDate);
+    console.log('startdate adjust', adjustedDate);
+    const form = {
+      name: formik.values.name,
+      startDate: adjustedDate,
+      endDate: formik.values.endDate,
+      startLocation: {
+        name: formik.values.startLocation.name,
+        addressNum: formik.values.startLocation.addressNum,
+        ward: formik.values.startLocation.ward,
+        district: formik.values.startLocation.district,
+        province: formik.values.startLocation.province,
+        type: formik.values.startLocation.type,
+        description: formik.values.startLocation.description,
+        phoneNum: formik.values.startLocation.phoneNum,
+      },
+      endLocation: {
+        name: formik.values.endLocation.name,
+        addressNum: formik.values.endLocation.addressNum,
+        ward: formik.values.endLocation.ward,
+        district: formik.values.endLocation.district,
+        province: formik.values.endLocation.province,
+        type: formik.values.endLocation.type,
+        description: formik.values.endLocation.description,
+        phoneNum: formik.values.endLocation.phoneNum,
+      },
+      description: formik.values.description,
+      deposit: formik.values.deposit,
+      maxMember: formik.values.maxMember,
+      minMember: formik.values.minMember,
+      voucherIds: formik.values.voucherIds,
+    };
     try {
       const json = JSON.stringify(form);
       const blob = new Blob([json], {
@@ -337,10 +370,10 @@ const CreateTrip = () => {
           <Stack direction="row" sx={{ marginBottom: 2 }} justifyContent="flext-start" alignItems="center" spacing={2}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <Formik
-                initialValues={{
-                  startDate: null,
-                  endDate: null,
-                }}
+                // initialValues={{
+                //   startDate: moment().format("DD/MM/YYYY HH:mm"),
+                //   endDate: null,
+                // }}
                 validationSchema={DisplayingErrorMessagesSchema}
                 onSubmit={(values, { setSubmitting }) => {
                   setTimeout(() => {
@@ -351,7 +384,7 @@ const CreateTrip = () => {
               >
                 {({ errors, touched, values }) => (
                   <Form>
-                    <DateTimePicker 
+                    <DateTimePicker
                       className={classes.customInput}
                       label="Ngày bắt đầu chuyến đi"
                       value={formik.values.startDate}
@@ -359,7 +392,7 @@ const CreateTrip = () => {
                       name="startDate"
                       format="DD/MM/YYYY HH:mm"
                       onChange={(value) => {
-                        formik.setFieldValue('startDate', dayjs(value).tz());
+                        formik.setFieldValue('startDate', value);
                       }}
                     />
                     {touched.startDate && errors.startDate && <div>{errors.startDate}</div>}
