@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
 // @mui
 import { alpha, styled } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
@@ -167,7 +168,7 @@ export default function TripDetails({ trip }) {
                       Địa điểm xuất phát: &nbsp;{trip?.startLocation.address} ({trip?.startLocation.type})
                     </Typography>
                     <Typography variant="h6" gutterBottom>
-                      Ngày khởi hành: {trip?.startDate ? fDate(trip.startDate) : 'Chưa xác định'}
+                      Ngày khởi hành: {trip?.startDate ? dayjs(trip.startDate).subtract(7, 'hour').format('HH:mm'): '--:--'} {trip?.startDate ? dayjs(trip.startDate).format('DD/MM/YYYY') : 'Chưa xác định'}
                     </Typography>
                   </Box>
                   <Box mt={2}>
@@ -185,11 +186,11 @@ export default function TripDetails({ trip }) {
                       Địa điểm đến: &nbsp;{trip?.endLocation.address} ({trip?.endLocation.type})
                     </Typography>
                     <Typography variant="h6" gutterBottom>
-                      Ngày kết thúc: {trip?.endDate ? fDate(trip.endDate) : 'Chưa xác định'}
+                      Ngày kết thúc: {trip?.endDate ? dayjs(trip.endDate).format('DD/MM/YYYY')  : 'Chưa xác định'}
                     </Typography>
                   </Box>
                   <Typography variant="h6" component="div">
-                    Số tiền cần đặt cọc: {Intl.NumberFormat('en-US').format(trip?.deposit)} VNĐ
+                    Số tiền cần đặt cọc: {Intl.NumberFormat('en-US').format(trip?.deposit)} Xu <Icon icon="ri:copper-coin-line" />
                   </Typography>
                   <Typography variant="h6" gutterBottom>
                     Số thành viên tham gia chuyến đi: Từ {trip?.minMember} Đến {trip?.maxMember} người
