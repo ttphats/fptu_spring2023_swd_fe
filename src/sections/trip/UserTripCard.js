@@ -148,7 +148,7 @@ export default function UserTripCard({ post, index }) {
 
           <CardContent>
             <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }}>
-              {fDate(post.postDate)}
+              {dayjs.tz(post.postDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')}
             </Typography>
             <StyledTitle
               color="inherit"
@@ -171,7 +171,7 @@ export default function UserTripCard({ post, index }) {
             >
               <Icon icon="simple-line-icons:calender" /> &nbsp;
               {post.startDate && post.endDate
-                ? `${dayjs(post.startDate).format('DD/MM/YYYY')} - ${dayjs(post.endDate).format('DD/MM/YYYY')} `
+                ? `${dayjs.tz(post.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')} - ${dayjs(post.endDate).format('DD/MM/YYYY')} `
                 : ''}
             </StyledTitle>
 

@@ -190,7 +190,7 @@ export default function BlogPostCard({ post, index }) {
             }}
           >
             <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }}>
-              {fDate(post.postDate)}
+            {dayjs.tz(post.postDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')}
             </Typography>
             <StyledTitle
               color="inherit"
@@ -221,7 +221,7 @@ export default function BlogPostCard({ post, index }) {
               }}
             >
               <Icon icon="simple-line-icons:calender" /> &nbsp;
-              {post.startDate && post.endDate ? `${dayjs(post.startDate).format('DD/MM/YYYY')} - ${dayjs(post.endDate).format('DD/MM/YYYY')} ` : ''}
+              {post.startDate && post.endDate ? `${dayjs.tz(post.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')} - ${dayjs(post.endDate).format('DD/MM/YYYY')} ` : ''}
             </StyledTitle>
 
             <StyledTitle
