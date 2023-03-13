@@ -133,7 +133,7 @@ export default function TripDetails({ trip }) {
               {!trip?.name ? 'Đã bao lâu rồi chúng ta chưa có dịp đi chơi cùng nhau' : trip.name}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Ngày đăng bài: {trip?.postDate ? fDate(trip.postDate) : 'Không xác định'}
+                Ngày đăng bài: {trip?.postDate ? dayjs.tz(trip.postDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : 'Không xác định'}
               </Typography>
             </Grid>
             <Grid justifyContent="center" item>
@@ -168,7 +168,7 @@ export default function TripDetails({ trip }) {
                       Địa điểm xuất phát: &nbsp;{trip?.startLocation.address} ({trip?.startLocation.type})
                     </Typography>
                     <Typography variant="h6" gutterBottom>
-                      Ngày khởi hành: {trip?.startDate ? dayjs(trip.startDate).subtract(7, 'hour').format('HH:mm'): '--:--'} {trip?.startDate ? dayjs(trip.startDate).format('DD/MM/YYYY') : 'Chưa xác định'}
+                      Ngày khởi hành: {trip?.startDate ? dayjs(trip.startDate).subtract(7, 'hour').format('HH:mm'): '--:--'} {trip?.startDate ? dayjs.tz(trip.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : 'Chưa xác định'}
                     </Typography>
                   </Box>
                   <Box mt={2}>
