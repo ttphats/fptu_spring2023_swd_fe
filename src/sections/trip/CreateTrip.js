@@ -24,7 +24,9 @@ import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
 // date
 import dayjs from 'dayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Helmet } from 'react-helmet-async';
@@ -32,6 +34,10 @@ import { useSelector } from 'react-redux';
 import 'firebase/auth';
 import addressApi from '../../api/addressApi';
 import tripApi from '../../api/tripApi';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault('Asia/Bangkok');
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -122,6 +128,7 @@ const CreateTrip = () => {
 
   const formik = useFormik({
     initialValues: {
+      name: '',
       startDate: null,
       endDate: null,
       startLocation: {
@@ -151,6 +158,7 @@ const CreateTrip = () => {
       voucherIds: [],
     },
   });
+  console.log('Start Date: ', dayjs(formik.values.startDate))
   // Validate
   const DisplayingErrorMessagesSchema = Yup.object().shape({
     startDate: Yup.date().nullable().typeError('Start date is required').required('Start Date is required'),
@@ -172,11 +180,10 @@ const CreateTrip = () => {
       });
 
       const formData = new FormData();
-      if(fileUpload){
-        console.log(fileUpload)
+      if (fileUpload) {
+        console.log(fileUpload);
         formData.append('images', fileUpload);
-      }
-      else{
+      } else {
         formData.append('images', null);
       }
       formData.append('createTripRequestForm', blob);
@@ -304,6 +311,26 @@ const CreateTrip = () => {
 
   const steps = [
     {
+      label: 'Nhập tiêu đề cho chuyến đi của bạn',
+      description: (
+        <TextField
+          label="Tên của chuyến đi:"
+          margin="normal"
+          name="name"
+          value={formik.values.name}
+          onChange={formik.handleChange}
+          fullWidth
+          required
+          InputLabelProps={{
+            shrink: true,
+          }}
+          className={classes.infoLocation}
+        />
+      ),
+    },
+
+    // Time for trip
+    {
       label: 'Chọn thời gian của chuyến đi',
       description: (
         <>
@@ -324,15 +351,15 @@ const CreateTrip = () => {
               >
                 {({ errors, touched, values }) => (
                   <Form>
-                    <DatePicker
+                    <DateTimePicker 
                       className={classes.customInput}
                       label="Ngày bắt đầu chuyến đi"
                       value={formik.values.startDate}
-                      name="startDate"
                       disablePast
-                      format="DD/MM/YYYY"
+                      name="startDate"
+                      format="DD/MM/YYYY HH:mm"
                       onChange={(value) => {
-                        formik.setFieldValue('startDate', dayjs(value));
+                        formik.setFieldValue('startDate', dayjs(value).tz());
                       }}
                     />
                     {touched.startDate && errors.startDate && <div>{errors.startDate}</div>}
@@ -689,6 +716,11 @@ const CreateTrip = () => {
         </>
       ),
     },
+    // Choose Voucher for trip
+    {
+      label: 'Chọn phiếu giảm giá cho chuyến đi của bạn',
+      description: <></>,
+    },
   ];
 
   return (
@@ -720,7 +752,7 @@ const CreateTrip = () => {
             <Stepper activeStep={activeStep} orientation="vertical">
               {steps.map((step, index) => (
                 <Step key={step.label}>
-                  <StepLabel optional={index === 4 ? <Typography variant="caption">Bước cuối</Typography> : null}>
+                  <StepLabel optional={index === 6 ? <Typography variant="caption">Bước cuối</Typography> : null}>
                     {step.label}
                   </StepLabel>
                   <StepContent>

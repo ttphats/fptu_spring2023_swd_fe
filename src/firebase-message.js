@@ -33,6 +33,24 @@ export const fetchNotify = async () => {
   }
 };
 
+export const setFcmTokenNotify = async () => {
+  let currentToken = '';
+  if (!messaging) return;
+  try {
+    currentToken = await getToken(messaging, {
+      vapidKey: process.env.REACT_APP_FIREBASE_FCM_VAPID_KEY,
+    });
+    const setNotify = await notifyApi.setFcmToken(currentToken);
+
+    console.log(setNotify);
+    console.log('FCM for set', currentToken);
+    localStorage.setItem('fcmToken', currentToken);
+
+  } catch (error) {
+    console.log('An error occurred while retrieving token. ', error);
+  }
+};
+
 // export const getMessagingToken = async () => {
 //   let currentToken = '';
 //   if (!messaging) return;

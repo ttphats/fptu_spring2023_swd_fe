@@ -20,7 +20,7 @@ export default function LoginForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoginMessage, setIsLoginMessage] = useState({ message: '' });
-  const [severity, setSeverity] = useState('');
+  const [severity, setSeverity] = useState('success');
   const [open, setOpen] = useState(false);
   const currentUser = useSelector((state) => state.user.current);
 
@@ -45,7 +45,7 @@ export default function LoginForm() {
         setEmail('');
         setPassword('');
       } catch (error) {
-        console.log(error);
+        console.log(error.response);
         setIsLoginMessage({
           message: "Đã xảy ra lỗi vui lòng kiểm tra lại thông tin đăng nhập",
         });

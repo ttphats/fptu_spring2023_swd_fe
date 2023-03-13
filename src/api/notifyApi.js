@@ -10,6 +10,10 @@ const notifyApi = {
       picture:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTgS6ggp18eT7mu_SfntVCBuKy53YbxUdM-g&usqp=CAU',
     });
   },
+  setFcmToken: (fcmToken) => {
+    const url = '/notification/fcmToken';
+    return axiosClient.post(url, fcmToken);
+  }
 };
 
 export default notifyApi;

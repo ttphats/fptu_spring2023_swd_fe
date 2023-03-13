@@ -6,7 +6,7 @@ import { styled } from '@mui/material/styles';
 // firebase
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
-import { fetchNotify } from '../../firebase-message';
+import { fetchNotify, setFcmTokenNotify } from '../../firebase-message';
 //
 import Header from './header';
 import NavUser from './nav-user';
@@ -43,12 +43,10 @@ export default function HomeLayout() {
   const currentUser = useSelector((state) => state.user.current);
   const navigate = useNavigate();
 
-
-
-
   // Handle get message push notify
   useEffect(() => {
-    if (loginInfo && localStorage.getItem('access-token')) {
+    if (loginInfo && localStorage.getItem('access-token') && !localStorage.getItem('fcmToken')) {
+      setFcmTokenNotify();
       fetchNotify();
       firebase.messaging().onMessage((data) => {
         new Notification(data.notification.title, {
@@ -56,13 +54,20 @@ export default function HomeLayout() {
           image: data.notification.image,
         });
       });
+      console.log('Push notification');
+      console.log(currentUser);
     }
   }, [localStorage.getItem('access-token')]);
+
   return (
     <StyledRoot>
       <Header onOpenNav={() => setOpen(true)} />
 
-      {currentUser.role === "ADMIN" ? <Navigate to="/dashboard" /> : <NavUser openNav={open} onCloseNav={() => setOpen(false)} />}
+      {currentUser.role === 'ADMIN' ? (
+        <Navigate to="/dashboard" />
+      ) : (
+        <NavUser openNav={open} onCloseNav={() => setOpen(false)} />
+      )}
 
       <Main>
         <Outlet />
