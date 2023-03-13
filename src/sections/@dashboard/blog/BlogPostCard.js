@@ -50,7 +50,7 @@ const StyledInfo = styled('div')(({ theme }) => ({
   display: 'flex',
   flexWrap: 'wrap',
   justifyContent: 'flex-end',
-  marginTop: theme.spacing(3),
+  marginTop: theme.spacing(1),
   color: theme.palette.text.disabled,
 }));
 
@@ -81,20 +81,21 @@ export default function BlogPostCard({ post, index }) {
   const { title, view, comment, share, author, createdAt } = post;
   const latestPostLarge = index === 0;
   const latestPost = index === 1 || index === 2;
-  const [members, setMembers] = useState([]);
+//  const [members, setMembers] = useState([]);
   const [open, setOpen] = useState(false);
+  console.log(post)
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const getUser = await tripApi.getTripMembers(post.id);
-        setMembers(getUser.data);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    fetchData();
-  }, [post.id]);
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       const getUser = await tripApi.getTripMembers(post.id);
+  //       setMembers(getUser.data);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   }
+  //   fetchData();
+  // }, [post.id]);
 
   return (
     <Grid item xs={12} sm={latestPostLarge ? 12 : 6} md={latestPostLarge ? 6 : 3}>
@@ -182,33 +183,35 @@ export default function BlogPostCard({ post, index }) {
                 bottom: 0,
                 width: '100%',
                 position: 'absolute',
+                martinTop: 3,
+                paddingBottom: 'none',
               }),
             }}
           >
-            <Typography gutterBottom variant="caption" sx={{ color: 'text.disabled', display: 'block' }}>
+            <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }}>
               {fDate(post.postDate)}
             </Typography>
-
             <StyledTitle
               color="inherit"
               variant="subtitle2"
               underline="hover"
               sx={{
-                ...(latestPostLarge && { typography: 'h5', height: 60 }),
+                ...(latestPostLarge && { typography: 'h4', height: 80 }),
                 ...((latestPostLarge || latestPost) && {
                   color: 'common.white',
                 }),
+                fontWeight: 'bold'
               }}
             >
-              {!post.description ? 'Đã bao lâu rồi chúng ta chưa có dịp đi chơi cùng nhau' : post.description}
+              {!post?.name ? 'Đã bao lâu rồi chúng ta chưa có dịp đi chơi cùng nhau' : post.name}
             </StyledTitle>
 
             <StyledTitle
               color="inherit"
-              variant="subtitle2"
+              variant="body2"
               underline="hover"
               sx={{
-                ...(latestPostLarge && { typography: 'p', height: 30 }),
+                ...(latestPostLarge && { typography: 'body1', height: 30 }),
                 ...((latestPostLarge || latestPost) && {
                   color: 'common.white',
                 }),
@@ -357,8 +360,6 @@ export default function BlogPostCard({ post, index }) {
             ) : (
               <></>
             )}
-
-        
           </CardContent>
         </Card>
       </Link>
