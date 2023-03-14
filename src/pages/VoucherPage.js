@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Container, Stack, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
+import Pagination from '@mui/material/Pagination';
+import Grid from '@mui/material/Grid';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
 import Iconify from '../components/iconify';
@@ -13,6 +15,9 @@ export default function VoucherPage() {
   const [openFilter, setOpenFilter] = useState(false);
   const currentUser = useSelector((state) => state.user.current);
   const [vouchers, setVouchers] = useState([]);
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     async function fetchVouchers() {
@@ -21,22 +26,20 @@ export default function VoucherPage() {
           navigate('/login');
           return;
         }
-        const response = await axios.get('https://hqtbe.site/api/v1/vouchers?page=1&size=10&sortBy=id&sortType=asc', {
+        const response = await axios.get(`https://hqtbe.site/api/v1/vouchers?page=${page}&size=${size}&sortBy=id&sortType=asc`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('access-token')}`,
           },
         });
-        console.log(typeof response.data);
         setVouchers(response.data.data);
-        console.log(vouchers);
-        console.log(response.data);
+        setTotalPages(response.data.totalPages);
       } catch (error) {
         console.error(error);
       }
     }
 
     fetchVouchers();
-  }, [currentUser]);
+  }, [currentUser, page, size]);
 
   const handleOpenFilter = () => {
     setOpenFilter(true);
@@ -44,6 +47,10 @@ export default function VoucherPage() {
 
   const handleCloseFilter = () => {
     setOpenFilter(false);
+  };
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
   };
 
   return (
@@ -71,6 +78,10 @@ export default function VoucherPage() {
         {Array.isArray(vouchers) ? (
           <Container>
             <VoucherList vouchers={vouchers} />
+            <br/>
+            <Grid xs display="flex" justifyContent="center" alignItems="center">
+              <Pagination color="primary" count={totalPages} page={page} onChange={handlePageChange} />
+            </Grid>
           </Container>
         ) : (
           <div>Loading...</div>

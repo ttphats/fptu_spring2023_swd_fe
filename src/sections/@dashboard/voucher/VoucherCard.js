@@ -15,12 +15,12 @@ VoucherCard.propTypes = {
 };
 
 export default function VoucherCard({ voucher }) {
-  const { nameVoucher, image, priceVoucher, description, locationName } = voucher;
+  const { nameVoucher, imageUrl, priceVoucher, description, locationName } = voucher;
 
   return (
     <Card>
       <Box sx={{ pt: '100%', position: 'relative' }}>
-        <StyledVoucherImg alt={nameVoucher} src={image} />
+        <StyledVoucherImg alt={nameVoucher} src={imageUrl} />
       </Box>
 
       <Stack spacing={2} sx={{ p: 3 }}>
