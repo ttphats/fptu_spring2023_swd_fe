@@ -59,13 +59,22 @@ export default function Router() {
           }
         />
         <Route
-          path="/voucher"
+          path="/voucher/create"
           element={
             <ProtectedRoute loginInfo={loginInfo}>
               <CreateVoucherPage />
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/voucher/:id"
+          element={
+            <ProtectedRoute loginInfo={loginInfo}>
+              <VoucherDetailPage />
+            </ProtectedRoute>
+          }
+        />
+
                 <Route
           path="/trip/:id"
           element={
