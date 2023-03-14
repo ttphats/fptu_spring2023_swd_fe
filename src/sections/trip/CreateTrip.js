@@ -22,6 +22,20 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
+import Avatar from '@mui/material/Avatar';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from '@mui/material/Dialog';
+import PersonIcon from '@mui/icons-material/Person';
+import AddIcon from '@mui/icons-material/Add';
+import { blue } from '@mui/material/colors';
+import { styled } from '@mui/material/styles';
+import Grid from '@mui/material/Grid';
+import ButtonBase from '@mui/material/ButtonBase';
 // date
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -34,12 +48,21 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Helmet } from 'react-helmet-async';
 import { useSelector } from 'react-redux';
 import 'firebase/auth';
+import { Icon } from '@iconify/react';
 import addressApi from '../../api/addressApi';
 import tripApi from '../../api/tripApi';
+import voucherApi from '../../api/voucherApi';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault('Asia/Bangkok');
+
+const Img = styled('img')({
+  margin: 'auto',
+  display: 'block',
+  maxWidth: '100%',
+  maxHeight: '100%',
+});
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -93,6 +116,48 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const initialValues = {
+  name: '',
+  startDate: moment().format('DD/MM/YYYY HH:mm'),
+  endDate: null,
+  startLocation: {
+    name: '',
+    addressNum: '',
+    ward: '',
+    district: '',
+    province: '',
+    type: '',
+    description: '',
+    phoneNum: '',
+  },
+  endLocation: {
+    name: '',
+    addressNum: '',
+    ward: '',
+    district: '',
+    province: '',
+    type: '',
+    description: '',
+    phoneNum: '',
+  },
+  description: '',
+  deposit: 0,
+  maxMember: 0,
+  minMember: 0,
+  voucherIds: [],
+};
+
+// Validate
+const DisplayingErrorMessagesSchema = Yup.object().shape({
+  name: Yup.string().min(2, 'Mininum 2 characters').max(15, 'Maximum 15 characters').required('Required!'),
+  startDate: Yup.date().nullable().typeError('Start date is required').required('Start Date is required'),
+  endDate: Yup.date()
+    .nullable()
+    .when('startDate', (startDate, yup) => startDate && yup.min(startDate, 'End date cannot be before start time'))
+    .required('End Date is required')
+    .typeError('Enter a value End date'),
+});
+
 const CreateTrip = () => {
   const classes = useStyles();
   const currentUser = useSelector((state) => state.user.current);
@@ -119,7 +184,7 @@ const CreateTrip = () => {
   const [endProivince, setEndProvince] = useState();
   const [endDistrict, setEndDistrict] = useState();
   const [endWard, setEndWard] = useState();
-
+  const [vouchers, setVouchers] = useState([]);
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [msg, setMsg] = useState(null);
@@ -128,49 +193,17 @@ const CreateTrip = () => {
     horizontal: 'center',
   };
 
-  const formik = useFormik({
-    initialValues: {
-      name: '',
-      startDate: moment().format("DD/MM/YYYY HH:mm"),
-      endDate: null,
-      startLocation: {
-        name: '',
-        addressNum: '',
-        ward: '',
-        district: '',
-        province: '',
-        type: '',
-        description: '',
-        phoneNum: '',
-      },
-      endLocation: {
-        name: '',
-        addressNum: '',
-        ward: '',
-        district: '',
-        province: '',
-        type: '',
-        description: '',
-        phoneNum: '',
-      },
-      description: '',
-      deposit: 0,
-      maxMember: 0,
-      minMember: 0,
-      voucherIds: [],
-    },
-  });
-  // Validate
-  const DisplayingErrorMessagesSchema = Yup.object().shape({
-    startDate: Yup.date().nullable().typeError('Start date is required').required('Start Date is required'),
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedValue, setSelectedValue] = useState([]);
+  const [isShowed, setIsShowed] = useState(false);
 
-    endDate: Yup.date()
-      .nullable()
-      .when('startDate', (startDate, yup) => startDate && yup.min(startDate, 'End date cannot be before start time'))
-      .required('End Date is required')
-      .typeError('Enter a value End date'),
-  });
+  const handleClickOpenDialog = () => {
+    setOpenDialog(true);
+  };
 
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     const adjustedDate = dayjs.tz(formik.values.startDate, 'Asia/Ho_Chi_Minh').add(7, 'hour').toISOString();
@@ -206,6 +239,7 @@ const CreateTrip = () => {
       minMember: formik.values.minMember,
       voucherIds: formik.values.voucherIds,
     };
+
     try {
       const json = JSON.stringify(form);
       const blob = new Blob([json], {
@@ -236,6 +270,12 @@ const CreateTrip = () => {
       console.log(error);
     }
   };
+
+  const formik = useFormik({
+    initialValues,
+    DisplayingErrorMessagesSchema,
+  });
+
   // Upload file image
   const onFileInputChange = (e) => {
     const file = e.target?.files?.[0];
@@ -340,25 +380,54 @@ const CreateTrip = () => {
     setOpen(false);
   };
 
+  // Fetch voucher
+  async function getVoucherByLocationType() {
+    const response = await voucherApi.getVoucherByLocationType(formik.values.endLocation.type);
+    setVouchers(response.data);
+  }
+
+  useEffect(() => {
+    console.log(formik.values.endLocation.type);
+    if (formik.values.endLocation.type) {
+      getVoucherByLocationType();
+    }
+  }, [formik.values.endLocation.type]);
+
+  const handleListItemClick = (value) => {
+    console.log('voucher: ', value);
+    setOpenDialog(false);
+    setIsShowed(true);
+    setSelectedValue(value);
+    formik.setFieldValue('voucherIds', value.id)
+  };
+
+  console.log('voucher formik: ', formik.values.voucherIds);
+
+
   // render form create steps
 
   const steps = [
     {
       label: 'Nhập tiêu đề cho chuyến đi của bạn',
       description: (
-        <TextField
-          label="Tên của chuyến đi:"
-          margin="normal"
-          name="name"
-          value={formik.values.name}
-          onChange={formik.handleChange}
-          fullWidth
-          required
-          InputLabelProps={{
-            shrink: true,
-          }}
-          className={classes.infoLocation}
-        />
+        <form>
+          <TextField
+            label="Tên của chuyến đi:"
+            margin="normal"
+            name="name"
+            value={formik.values.name}
+            onChange={formik.handleChange}
+            fullWidth
+            required
+            onBlur={formik.handleBlur}
+            error={formik.touched.name && Boolean(formik.errors.name)}
+            helperText={formik.touched.name && formik.errors.name}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            className={classes.infoLocation}
+          />
+        </form>
       ),
     },
 
@@ -391,6 +460,8 @@ const CreateTrip = () => {
                       disablePast
                       name="startDate"
                       format="DD/MM/YYYY HH:mm"
+                      error={formik.touched.startDate && Boolean(formik.errors.startDate)}
+                      helperText={formik.touched.startDate && formik.errors.startDate}
                       onChange={(value) => {
                         formik.setFieldValue('startDate', value);
                       }}
@@ -707,7 +778,7 @@ const CreateTrip = () => {
               value={formik.values.deposit}
               onValueChange={(value, name) => formik.setFieldValue(name, value)}
               InputProps={{
-                startAdornment: <span style={{ paddingRight: '10px' }}>VNĐ</span>,
+                startAdornment: <span style={{ paddingRight: '10px' }}>Xu</span>,
               }}
             />
           </Stack>
@@ -752,7 +823,86 @@ const CreateTrip = () => {
     // Choose Voucher for trip
     {
       label: 'Chọn phiếu giảm giá cho chuyến đi của bạn',
-      description: <></>,
+      description: (
+        <>
+          <LoadingButton onClick={handleClickOpenDialog}>
+            <Icon icon="fluent:gift-card-add-24-filled" color="#f88" width="50" height="50" />
+          </LoadingButton>
+          <Dialog onClose={handleCloseDialog} open={openDialog}>
+            <DialogTitle>Chọn giảm giá mong muốn cho chuyến đi của bạn</DialogTitle>
+            <List sx={{ pt: 0 }}>
+              {vouchers.map((voucher) => (
+                <ListItem disableGutters>
+                  <ListItemButton sx={{ boxShadow: 3 }} onClick={() => handleListItemClick(voucher)} key={voucher.id}>
+                    <Grid container spacing={2}>
+                      <Grid item>
+                        <ButtonBase sx={{ width: 128, height: 128 }}>
+                          <Img alt="complex" src={voucher.imageUrl} />
+                        </ButtonBase>
+                      </Grid>
+                      <Grid item xs={12} sm container>
+                        <Grid item xs container direction="column" spacing={2}>
+                          <Grid item xs>
+                            <Typography gutterBottom variant="subtitle1" component="div">
+                              {voucher?.nameVoucher}
+                            </Typography>
+                            <Typography variant="body2" gutterBottom>
+                              {voucher?.description}
+                            </Typography>
+                          </Grid>
+                          <Grid item>
+                            <Typography sx={{ cursor: 'pointer' }} variant="body2">
+                              Số lượng còn lại: {voucher.quantity}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                        <Grid item>
+                          <Typography variant="subtitle1" component="div">
+                            {Intl.NumberFormat('en-US').format(voucher?.priceVoucher)} Xu
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          </Dialog>
+          {isShowed ? (
+            <Grid container spacing={2} sx={{ boxShadow: 3 }}>
+              <Grid item>
+                <ButtonBase sx={{ width: 128, height: 128 }}>
+                  <Img alt="complex" src={selectedValue?.imageUrl} />
+                </ButtonBase>
+              </Grid>
+              <Grid item xs={12} sm container>
+                <Grid item xs container direction="column" spacing={2}>
+                  <Grid item xs>
+                    <Typography gutterBottom variant="subtitle1" component="div">
+                      {selectedValue?.nameVoucher}
+                    </Typography>
+                    <Typography variant="body2" gutterBottom>
+                      {selectedValue?.description}
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Typography sx={{ cursor: 'pointer' }} variant="body2">
+                      Số lượng còn lại: {selectedValue?.quantity}
+                    </Typography>
+                  </Grid>
+                </Grid>
+                <Grid item>
+                  <Typography variant="subtitle1" component="div">
+                    {Intl.NumberFormat('en-US').format(selectedValue?.priceVoucher)} Xu
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+          ) : (
+            <></>
+          )}
+        </>
+      ),
     },
   ];
 
