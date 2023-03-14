@@ -1,4 +1,4 @@
-import { Navigate, Routes, Route } from 'react-router-dom';
+import { Navigate, Routes, Route, Switch } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 // layouts
@@ -22,6 +22,7 @@ import OTPForgotPasswordPage from './pages/OTPForgotPasswordPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import CreateTripPage from './pages/CreateTripPage';
 import CreateVoucherPage from './pages/CreateVoucherPage';
+import VoucherDetailPage from './pages/VoucherDetailPage';
 
 // ----------------------------------------------------------------------
 
@@ -56,13 +57,22 @@ export default function Router() {
           }
         />
         <Route
-          path="/voucher"
+          path="/voucher/create"
           element={
             <ProtectedRoute loginInfo={loginInfo}>
               <CreateVoucherPage />
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/voucher/:id"
+          element={
+            <ProtectedRoute loginInfo={loginInfo}>
+              <VoucherDetailPage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/dashboard"
           element={

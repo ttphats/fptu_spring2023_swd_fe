@@ -1,5 +1,6 @@
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Box, Card, Link, Typography, Stack } from '@mui/material';
+import { Box, Card, Typography, Stack, CardActions } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 const StyledVoucherImg = styled('img')({
@@ -15,7 +16,7 @@ VoucherCard.propTypes = {
 };
 
 export default function VoucherCard({ voucher }) {
-  const { nameVoucher, imageUrl, priceVoucher, description, locationName } = voucher;
+  const { id, nameVoucher, imageUrl, priceVoucher, description, locationName } = voucher;
 
   return (
     <Card>
@@ -38,6 +39,12 @@ export default function VoucherCard({ voucher }) {
           <Typography variant="subtitle1">{locationName}</Typography>
           <Typography variant="subtitle1">{priceVoucher} Xu</Typography>
         </Stack>
+
+        <CardActions>
+          <Link to={`/voucher/${id}`} variant="body2">
+            Xem chi tiết
+          </Link>
+        </CardActions>
       </Stack>
     </Card>
   );
