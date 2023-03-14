@@ -74,14 +74,7 @@ export default function Router() {
             </ProtectedRoute>
           }
         />
-
-                <Route
-          path="/trip/:id"
-          element={
-              <TripDetailsPage />
-         }
-          }
-        />
+        <Route path="/trip/:id" element={<TripDetailsPage />} />
         <Route
           path="/voucher/create"
           element={

@@ -65,11 +65,10 @@ export default function VoucherPage() {
           </Typography>
           {currentUser.role === 'ADMIN' ? (
             <LoadingButton
-              onClick={() => navigate('/voucher')}
+              onClick={() => navigate('/voucher/create')}
               variant="contained"
               startIcon={<Iconify icon="eva:plus-fill" />}
             >
-            <LoadingButton onClick={() => navigate('/voucher')} variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
               Tạo ưu đãi mới
             </LoadingButton>
           ) : null}
