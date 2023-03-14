@@ -78,26 +78,8 @@ BlogPostCard.propTypes = {
 };
 
 export default function BlogPostCard({ post, index }) {
-  const currentUser = useSelector((state) => state.user.current);
-  const { title, view, comment, share, author, createdAt } = post;
   const latestPostLarge = index === 0;
   const latestPost = index === 1 || index === 2;
-  //  const [members, setMembers] = useState([]);
-  const [open, setOpen] = useState(false);
-  console.log(post);
-
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     try {
-  //       const getUser = await tripApi.getTripMembers(post.id);
-  //       setMembers(getUser.data);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  //   fetchData();
-  // }, [post.id]);
-
   return (
     <Grid item xs={12} sm={latestPostLarge ? 12 : 6} md={latestPostLarge ? 6 : 3}>
       <Link
@@ -168,7 +150,7 @@ export default function BlogPostCard({ post, index }) {
             />
 
             <StyledCover
-              alt={title}
+              alt={post?.name}
               src={
                 post.imageUrls[0]
                   ? post.imageUrls[0]
@@ -190,7 +172,7 @@ export default function BlogPostCard({ post, index }) {
             }}
           >
             <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }}>
-            {dayjs.tz(post.postDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')}
+              {dayjs.tz(post.postDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')}
             </Typography>
             <StyledTitle
               color="inherit"
@@ -221,7 +203,11 @@ export default function BlogPostCard({ post, index }) {
               }}
             >
               <Icon icon="simple-line-icons:calender" /> &nbsp;
-              {post.startDate && post.endDate ? `${dayjs.tz(post.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')} - ${dayjs(post.endDate).format('DD/MM/YYYY')} ` : ''}
+              {post.startDate && post.endDate
+                ? `${dayjs.tz(post.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')} - ${dayjs(post.endDate).format(
+                    'DD/MM/YYYY'
+                  )} `
+                : ''}
             </StyledTitle>
 
             <StyledTitle
@@ -235,7 +221,12 @@ export default function BlogPostCard({ post, index }) {
                 }),
               }}
             >
-              {post.endLocation.address ? post.endLocation.address : ''}
+              <Icon icon="ic:outline-location-on" />
+              {post.startLocation.name ? post.startLocation.name : ''} 
+              &nbsp;
+              &nbsp;
+              <Icon icon="mdi:location-radius-outline" />
+              {post.endLocation.name ? post.endLocation.name : ''}
             </StyledTitle>
 
             {post.currentMember === post.maxMember || post.currentMember > post.maxMember ? (
