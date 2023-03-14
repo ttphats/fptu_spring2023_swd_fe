@@ -103,7 +103,7 @@ const initialValues = {
 const validationSchema = Yup.object().shape({
     nameVoucher: Yup.string().required('Bắt buộc'),
     priceVoucher: Yup.number().required('Bắt buộc'),
-    quantity: Yup.number().required('Bắt buộc'),
+    quantity: Yup.number().min(1, 'Số lượng không được bé hơn 1').required('Bắt buộc'),
     description: Yup.string().required('Bắt buộc'),
     code: Yup.string().required('Bắt buộc'),
     start_date: Yup.date().required('Bắt buộc'),
@@ -222,8 +222,6 @@ const CreateVoucher = () => {
         }
     };
 
-
-
     const formik = useFormik({
         initialValues,
         validationSchema,
@@ -319,7 +317,7 @@ const CreateVoucher = () => {
                             <TextField
                                 fullWidth
                                 margin="normal"
-                                label="Tên ưu đãi"
+                                label="Tên ưu đãi*"
                                 name="nameVoucher"
                                 value={formik.values.nameVoucher}
                                 onChange={formik.handleChange}
@@ -331,7 +329,7 @@ const CreateVoucher = () => {
                             <TextField
                                 fullWidth
                                 margin="normal"
-                                label="Giá trị"
+                                label="Giá trị*"
                                 name="priceVoucher"
                                 type="number"
                                 value={formik.values.priceVoucher}
@@ -344,7 +342,7 @@ const CreateVoucher = () => {
                             <TextField
                                 fullWidth
                                 margin="normal"
-                                label="Số lượng phát hành"
+                                label="Số lượng phát hành*"
                                 name="quantity"
                                 type="number"
                                 value={formik.values.quantity}
@@ -357,7 +355,7 @@ const CreateVoucher = () => {
                             <TextField
                                 fullWidth
                                 margin="normal"
-                                label="Thêm mô tả"
+                                label="Thêm mô tả*"
                                 name="description"
                                 value={formik.values.description}
                                 onChange={formik.handleChange}
@@ -369,7 +367,7 @@ const CreateVoucher = () => {
                             <TextField
                                 fullWidth
                                 margin="normal"
-                                label="Mã ưu đãi"
+                                label="Mã ưu đãi*"
                                 name="code"
                                 value={formik.values.code}
                                 onChange={formik.handleChange}
