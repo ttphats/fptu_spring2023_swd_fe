@@ -184,7 +184,6 @@ const CreateTrip = () => {
       if (response) {
         setOpen(true);
       }
-
       navigate('/home/blog');
     } catch (error) {
       if (error.response.message) {
