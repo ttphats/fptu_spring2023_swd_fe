@@ -34,6 +34,7 @@ function NavItem({item}) {
   const handleLogout = () => {
     if(title === 'Đăng xuất'){
       localStorage.removeItem('access-token')
+      localStorage.removeItem('fcmToken')
       firebase.auth().signOut();
     }
   }

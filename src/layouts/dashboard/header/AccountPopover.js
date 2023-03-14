@@ -50,6 +50,7 @@ export default function AccountPopover() {
 
   const logout = () => {
     localStorage.removeItem('access-token');
+    localStorage.removeItem('fcmToken')
     navigate('/login');
   };
 

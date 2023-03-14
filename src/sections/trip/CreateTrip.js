@@ -24,7 +24,11 @@ import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
 // date
 import dayjs from 'dayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import moment from 'moment-timezone';
+import { getTimezoneOffset } from 'date-fns-tz';
+import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Helmet } from 'react-helmet-async';
@@ -32,6 +36,10 @@ import { useSelector } from 'react-redux';
 import 'firebase/auth';
 import addressApi from '../../api/addressApi';
 import tripApi from '../../api/tripApi';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault('Asia/Bangkok');
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -122,7 +130,8 @@ const CreateTrip = () => {
 
   const formik = useFormik({
     initialValues: {
-      startDate: null,
+      name: '',
+      startDate: moment().format("DD/MM/YYYY HH:mm"),
       endDate: null,
       startLocation: {
         name: '',
@@ -164,7 +173,39 @@ const CreateTrip = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const form = formik.values;
+    const adjustedDate = dayjs.tz(formik.values.startDate, 'Asia/Ho_Chi_Minh').add(7, 'hour').toISOString();
+    formik.setFieldValue('startDate', adjustedDate);
+    console.log('startdate adjust', adjustedDate);
+    const form = {
+      name: formik.values.name,
+      startDate: adjustedDate,
+      endDate: formik.values.endDate,
+      startLocation: {
+        name: formik.values.startLocation.name,
+        addressNum: formik.values.startLocation.addressNum,
+        ward: formik.values.startLocation.ward,
+        district: formik.values.startLocation.district,
+        province: formik.values.startLocation.province,
+        type: formik.values.startLocation.type,
+        description: formik.values.startLocation.description,
+        phoneNum: formik.values.startLocation.phoneNum,
+      },
+      endLocation: {
+        name: formik.values.endLocation.name,
+        addressNum: formik.values.endLocation.addressNum,
+        ward: formik.values.endLocation.ward,
+        district: formik.values.endLocation.district,
+        province: formik.values.endLocation.province,
+        type: formik.values.endLocation.type,
+        description: formik.values.endLocation.description,
+        phoneNum: formik.values.endLocation.phoneNum,
+      },
+      description: formik.values.description,
+      deposit: formik.values.deposit,
+      maxMember: formik.values.maxMember,
+      minMember: formik.values.minMember,
+      voucherIds: formik.values.voucherIds,
+    };
     try {
       const json = JSON.stringify(form);
       const blob = new Blob([json], {
@@ -172,11 +213,10 @@ const CreateTrip = () => {
       });
 
       const formData = new FormData();
-      if(fileUpload){
-        console.log(fileUpload)
+      if (fileUpload) {
+        console.log(fileUpload);
         formData.append('images', fileUpload);
-      }
-      else{
+      } else {
         formData.append('images', null);
       }
       formData.append('createTripRequestForm', blob);
@@ -303,16 +343,36 @@ const CreateTrip = () => {
 
   const steps = [
     {
+      label: 'Nhập tiêu đề cho chuyến đi của bạn',
+      description: (
+        <TextField
+          label="Tên của chuyến đi:"
+          margin="normal"
+          name="name"
+          value={formik.values.name}
+          onChange={formik.handleChange}
+          fullWidth
+          required
+          InputLabelProps={{
+            shrink: true,
+          }}
+          className={classes.infoLocation}
+        />
+      ),
+    },
+
+    // Time for trip
+    {
       label: 'Chọn thời gian của chuyến đi',
       description: (
         <>
           <Stack direction="row" sx={{ marginBottom: 2 }} justifyContent="flext-start" alignItems="center" spacing={2}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <Formik
-                initialValues={{
-                  startDate: null,
-                  endDate: null,
-                }}
+                // initialValues={{
+                //   startDate: moment().format("DD/MM/YYYY HH:mm"),
+                //   endDate: null,
+                // }}
                 validationSchema={DisplayingErrorMessagesSchema}
                 onSubmit={(values, { setSubmitting }) => {
                   setTimeout(() => {
@@ -323,15 +383,15 @@ const CreateTrip = () => {
               >
                 {({ errors, touched, values }) => (
                   <Form>
-                    <DatePicker
+                    <DateTimePicker
                       className={classes.customInput}
                       label="Ngày bắt đầu chuyến đi"
                       value={formik.values.startDate}
-                      name="startDate"
                       disablePast
-                      format="DD/MM/YYYY"
+                      name="startDate"
+                      format="DD/MM/YYYY HH:mm"
                       onChange={(value) => {
-                        formik.setFieldValue('startDate', dayjs(value));
+                        formik.setFieldValue('startDate', value);
                       }}
                     />
                     {touched.startDate && errors.startDate && <div>{errors.startDate}</div>}
@@ -688,6 +748,11 @@ const CreateTrip = () => {
         </>
       ),
     },
+    // Choose Voucher for trip
+    {
+      label: 'Chọn phiếu giảm giá cho chuyến đi của bạn',
+      description: <></>,
+    },
   ];
 
   return (
@@ -719,7 +784,7 @@ const CreateTrip = () => {
             <Stepper activeStep={activeStep} orientation="vertical">
               {steps.map((step, index) => (
                 <Step key={step.label}>
-                  <StepLabel optional={index === 4 ? <Typography variant="caption">Bước cuối</Typography> : null}>
+                  <StepLabel optional={index === 6 ? <Typography variant="caption">Bước cuối</Typography> : null}>
                     {step.label}
                   </StepLabel>
                   <StepContent>

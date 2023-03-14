@@ -20,20 +20,48 @@ import {
   AppCurrentSubject,
   AppConversionRates,
 } from '../sections/@dashboard/app';
+import adminApi from '../api/adminApi';
+import tripApi from '../api/tripApi';
 
 // ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
   const theme = useTheme();
   const navigate = useNavigate();
-  const userInfo = useSelector((state) => state.user)
+  const userInfo = useSelector((state) => state.user);
   const [name, setName] = useState();
+  const [users, setUsers] = useState([]);
+  const [trips, setTrips] = useState([]);
+  const [vouchers, setVouchers] = useState([]);
+
+
+  async function fetchUser() {
+    const users = await adminApi.getListUser();
+    setUsers(users.data);
+  }
+
+  async function fetchTrip() {
+    const trips = await tripApi.getAllTrips('desc');
+    setTrips(trips.data);
+  }
+
+  async function fetchVoucher() {
+    const vouchers = await adminApi.getListVoucher();
+  console.log(vouchers)
+    setVouchers(vouchers.data);
+  }
+
+  useEffect(() => {
+    fetchUser();
+    fetchTrip();
+    fetchVoucher();
+  }, []);
 
   useEffect(() => {
     if (localStorage.getItem('access-token')) {
       setName(userInfo.current.fullname);
     }
-    if(userInfo.current.role !== "ADMIN"){
+    if (userInfo.current.role !== 'ADMIN') {
       navigate('/home');
     }
   }, [localStorage.getItem('access-token'), userInfo]);
@@ -50,19 +78,17 @@ export default function DashboardAppPage() {
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Tổng thu nhập" total={714000} icon={'ant-design:android-filled'} />
+            <AppWidgetSummary title="Người dùng trong hệ thống" total={users?.length} color="info" icon={'emojione-monotone:motorcycle'} />
           </Grid>
-
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Người dùng mới" total={1352831} color="info" icon={'ant-design:apple-filled'} />
+            <AppWidgetSummary title="Chuyến đi" total={trips?.length} icon={'fluent:beach-16-filled'} />
           </Grid>
-
           <Grid item xs={12} sm={6} md={3}>
             <AppWidgetSummary
               title="Phiếu giảm giá hiện có"
-              total={1723315}
+              total={vouchers?.length}
               color="warning"
-              icon={'ant-design:windows-filled'}
+              icon={'fluent:gift-card-money-20-filled'}
             />
           </Grid>
 

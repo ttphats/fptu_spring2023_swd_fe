@@ -16,12 +16,11 @@ import ButtonBase from '@mui/material/ButtonBase';
 import { Icon } from '@iconify/react';
 import dayjs from 'dayjs';
 // utils
-import { fDate } from '../../../utils/formatTime';
-import { fShortenNumber } from '../../../utils/formatNumber';
+import { fDate } from '../../utils/formatTime';
 //
-import SvgColor from '../../../components/svg-color';
-import Iconify from '../../../components/iconify';
-import tripApi from '../../../api/tripApi';
+import SvgColor from '../../components/svg-color';
+import Iconify from '../../components/iconify';
+import tripApi from '../../api/tripApi';
 
 // ----------------------------------------------------------------------
 
@@ -72,16 +71,34 @@ const Img = styled('img')({
 
 // ----------------------------------------------------------------------
 
-BlogPostCard.propTypes = {
+UserTripCard.propTypes = {
   post: PropTypes.object.isRequired,
   index: PropTypes.number,
 };
 
-export default function BlogPostCard({ post, index }) {
+export default function UserTripCard({ post, index }) {
+  const currentUser = useSelector((state) => state.user.current);
+  const { title, view, comment, share, author, createdAt } = post;
   const latestPostLarge = index === 0;
   const latestPost = index === 1 || index === 2;
+  //  const [members, setMembers] = useState([]);
+  const [open, setOpen] = useState(false);
+  console.log(post);
+
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       const getUser = await tripApi.getTripMembers(post.id);
+  //       setMembers(getUser.data);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   }
+  //   fetchData();
+  // }, [post.id]);
+
   return (
-    <Grid item xs={12} sm={latestPostLarge ? 12 : 6} md={latestPostLarge ? 6 : 3}>
+    <Grid item xs={12} sm={6} md={3}>
       <Link
         to={{
           pathname: `/trip/${post.id}`,
@@ -97,27 +114,7 @@ export default function BlogPostCard({ post, index }) {
             position: 'relative',
           }}
         >
-          <StyledCardMedia
-            sx={{
-              ...((latestPostLarge || latestPost) && {
-                pt: 'calc(100% * 4 / 3)',
-                '&:after': {
-                  top: 0,
-                  content: "''",
-                  width: '100%',
-                  height: '100%',
-                  position: 'absolute',
-                  bgcolor: (theme) => alpha(theme.palette.grey[900], 0.72),
-                },
-              }),
-              ...(latestPostLarge && {
-                pt: {
-                  xs: 'calc(100% * 4 / 3)',
-                  sm: 'calc(100% * 3 / 4.66)',
-                },
-              }),
-            }}
-          >
+          <StyledCardMedia>
             <SvgColor
               color="paper"
               src="/assets/icons/shape-avatar.svg"
@@ -128,7 +125,6 @@ export default function BlogPostCard({ post, index }) {
                 bottom: -15,
                 position: 'absolute',
                 color: 'background.paper',
-                ...((latestPostLarge || latestPost) && { display: 'none' }),
               }}
             />
             <StyledAvatar
@@ -138,19 +134,10 @@ export default function BlogPostCard({ post, index }) {
                   ? 'https://media-cdn-v2.laodong.vn/storage/newsportal/2017/8/28/551691/Du-Lich_1.jpg'
                   : post.host.avatarUrl
               }
-              sx={{
-                ...((latestPostLarge || latestPost) && {
-                  zIndex: 9,
-                  top: 24,
-                  left: 24,
-                  width: 40,
-                  height: 40,
-                }),
-              }}
             />
 
             <StyledCover
-              alt={post?.name}
+              alt={title}
               src={
                 post.imageUrls[0]
                   ? post.imageUrls[0]
@@ -159,18 +146,7 @@ export default function BlogPostCard({ post, index }) {
             />
           </StyledCardMedia>
 
-          <CardContent
-            sx={{
-              pt: 4,
-              ...((latestPostLarge || latestPost) && {
-                bottom: 0,
-                width: '100%',
-                position: 'absolute',
-                martinTop: 3,
-                paddingBottom: 'none',
-              }),
-            }}
-          >
+          <CardContent>
             <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }}>
               {dayjs.tz(post.postDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')}
             </Typography>
@@ -179,10 +155,6 @@ export default function BlogPostCard({ post, index }) {
               variant="subtitle2"
               underline="hover"
               sx={{
-                ...(latestPostLarge && { typography: 'h4', height: 80 }),
-                ...((latestPostLarge || latestPost) && {
-                  color: 'common.white',
-                }),
                 fontWeight: 'bold',
               }}
             >
@@ -194,39 +166,20 @@ export default function BlogPostCard({ post, index }) {
               variant="body2"
               underline="hover"
               sx={{
-                ...(latestPostLarge && { typography: 'body1', height: 30 }),
-                ...((latestPostLarge || latestPost) && {
-                  color: 'common.white',
-                  fontSize: 16,
-                }),
                 fontSize: 13,
               }}
             >
               <Icon icon="simple-line-icons:calender" /> &nbsp;
               {post.startDate && post.endDate
-                ? `${dayjs.tz(post.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')} - ${dayjs(post.endDate).format(
-                    'DD/MM/YYYY'
-                  )} `
+                ? `${dayjs.tz(post.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')} - ${dayjs(post.endDate).format('DD/MM/YYYY')} `
                 : ''}
             </StyledTitle>
 
             <StyledTitle
               color="inherit"
               variant="subtitle2"
-              underline="hover"
-              sx={{
-                ...(latestPostLarge && { typography: 'p', height: 30 }),
-                ...((latestPostLarge || latestPost) && {
-                  color: 'common.white',
-                }),
-              }}
             >
-              <Icon icon="ic:outline-location-on" />
-              {post.startLocation.name ? post.startLocation.name : ''} 
-              &nbsp;
-              &nbsp;
-              <Icon icon="mdi:location-radius-outline" />
-              {post.endLocation.name ? post.endLocation.name : ''}
+              {post.endLocation.address ? post.endLocation.address : ''}
             </StyledTitle>
 
             {post.currentMember === post.maxMember || post.currentMember > post.maxMember ? (
@@ -236,9 +189,6 @@ export default function BlogPostCard({ post, index }) {
                   sx={{
                     display: 'flex',
                     ml: index === 0 ? 0 : 1.5,
-                    ...((latestPostLarge || latestPost) && {
-                      color: 'grey.500',
-                    }),
                   }}
                 >
                   <Iconify icon="mdi:user-group" sx={{ width: 16, height: 16, mr: 0.5, color: '#F94A29' }} />
@@ -254,9 +204,6 @@ export default function BlogPostCard({ post, index }) {
                   sx={{
                     display: 'flex',
                     ml: index === 0 ? 0 : 1.5,
-                    ...((latestPostLarge || latestPost) && {
-                      color: 'grey.500',
-                    }),
                   }}
                 >
                   <Iconify icon="mdi:user-group" sx={{ width: 16, height: 16, mr: 0.5, color: '#39B5E0' }} />
@@ -275,9 +222,6 @@ export default function BlogPostCard({ post, index }) {
                     display: 'flex',
                     alignItems: 'center',
                     ml: index === 0 ? 0 : 1.5,
-                    ...((latestPostLarge || latestPost) && {
-                      color: 'grey.500',
-                    }),
                   }}
                 >
                   <Iconify icon="pajamas:status-active" sx={{ width: 16, height: 16, mr: 0.5, color: '#84D2C5' }} />
@@ -297,9 +241,6 @@ export default function BlogPostCard({ post, index }) {
                     display: 'flex',
                     alignItems: 'center',
                     ml: index === 0 ? 0 : 1.5,
-                    ...((latestPostLarge || latestPost) && {
-                      color: 'grey.500',
-                    }),
                   }}
                 >
                   <Iconify icon="pajamas:status-active" sx={{ width: 16, height: 16, mr: 0.5, color: '#FF6E31' }} />
@@ -319,9 +260,6 @@ export default function BlogPostCard({ post, index }) {
                     display: 'flex',
                     alignItems: 'center',
                     ml: index === 0 ? 0 : 1.5,
-                    ...((latestPostLarge || latestPost) && {
-                      color: 'grey.500',
-                    }),
                   }}
                 >
                   <Iconify icon="pajamas:status-active" sx={{ width: 16, height: 16, mr: 0.5, color: '#F55050' }} />
@@ -341,9 +279,6 @@ export default function BlogPostCard({ post, index }) {
                     display: 'flex',
                     alignItems: 'center',
                     ml: index === 0 ? 0 : 1.5,
-                    ...((latestPostLarge || latestPost) && {
-                      color: 'grey.500',
-                    }),
                   }}
                 >
                   <Iconify icon="pajamas:status-active" sx={{ width: 16, height: 16, mr: 0.5, color: '#FEC868' }} />

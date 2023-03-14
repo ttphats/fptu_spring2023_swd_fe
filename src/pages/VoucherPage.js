@@ -63,8 +63,12 @@ export default function VoucherPage() {
           <Typography variant="h4" gutterBottom>
             Tất cả phiếu giảm giá hiện có
           </Typography>
-          {currentUser?.role === 'ADMIN' ? (
-            <LoadingButton onClick={() => navigate('/voucher/create')} variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
+          {currentUser.role === 'ADMIN' ? (
+            <LoadingButton
+              onClick={() => navigate('/voucher/create')}
+              variant="contained"
+              startIcon={<Iconify icon="eva:plus-fill" />}
+            >
               Tạo ưu đãi mới
             </LoadingButton>
           ) : null}

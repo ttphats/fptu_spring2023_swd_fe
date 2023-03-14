@@ -1,8 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 // @mui
 import { styled } from '@mui/material/styles';
+// firebase
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import { fetchNotify, setFcmTokenNotify } from '../../firebase-message';
 //
+
 import Header from './header';
 import Nav from './nav';
 
@@ -34,6 +40,23 @@ const Main = styled('div')(({ theme }) => ({
 
 export default function DashboardLayout() {
   const [open, setOpen] = useState(false);
+  const loginInfo = useSelector((state) => state.auth.loginInfo);
+
+
+// Handle get message push notify
+useEffect(() => {
+  if (loginInfo && localStorage.getItem('access-token') && !localStorage.getItem('fcmToken')) {
+    setFcmTokenNotify();
+    fetchNotify();
+    firebase.messaging().onMessage((data) => {
+      new Notification(data.notification.title, {
+        body: data.notification.body,
+        image: data.notification.image,
+      });
+    });
+  }
+}, [localStorage.getItem('access-token')]);
+
   return (
     <StyledRoot>
       <Header onOpenNav={() => setOpen(true)} />
