@@ -7,7 +7,11 @@ VoucherList.propTypes = {
   vouchers: PropTypes.array.isRequired,
 };
 
-export default function VoucherList({ vouchers, ...other }) {
+export default function VoucherList({ vouchers = [], ...other }) {
+  if (!Array.isArray(vouchers)) {
+    return <div>Error: Vouchers is not an array</div>;
+  }
+
   return (
     <Grid container spacing={3} {...other}>
       {vouchers.map((voucher) => (
@@ -18,3 +22,9 @@ export default function VoucherList({ vouchers, ...other }) {
     </Grid>
   );
 }
+
+
+
+
+
+
