@@ -17,19 +17,26 @@ export default function VoucherPage() {
   useEffect(() => {
     async function fetchVouchers() {
       try {
-        const response = await axios.get('https://hqtbe.site/api/v1/vouchers/getAllVoucher?page=1&size=10&sortBy=id&sortType=asc', {
+        if (!currentUser) {
+          navigate('/login');
+          return;
+        }
+        const response = await axios.get('https://hqtbe.site/api/v1/vouchers?page=1&size=10&sortBy=id&sortType=asc', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('access-token')}`,
           },
         });
-        setVouchers(response.data);
+        console.log(typeof response.data);
+        setVouchers(response.data.data);
+        console.log(vouchers);
+        console.log(response.data);
       } catch (error) {
         console.error(error);
       }
     }
 
     fetchVouchers();
-  }, []);
+  }, [currentUser]);
 
   const handleOpenFilter = () => {
     setOpenFilter(true);
@@ -58,9 +65,7 @@ export default function VoucherPage() {
             <LoadingButton onClick={() => navigate('/voucher')} variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
               Tạo ưu đãi mới
             </LoadingButton>
-          ) : (
-            <></>
-          )}
+          ) : null}
         </Stack>
         <Stack direction="row" flexWrap="wrap-reverse" alignItems="center" justifyContent="flex-end" sx={{ mb: 5 }}>
           <Stack direction="row" spacing={1} flexShrink={0} sx={{ my: 1 }}>
@@ -68,7 +73,13 @@ export default function VoucherPage() {
             <VoucherSort />
           </Stack>
         </Stack>
-        <VoucherList vouchers={vouchers} />
+        {Array.isArray(vouchers) ? (
+          <Container>
+            <VoucherList vouchers={vouchers} />
+          </Container>
+        ) : (
+          <div>Loading...</div>
+        )}
       </Container>
     </>
   );

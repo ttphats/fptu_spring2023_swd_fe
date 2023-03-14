@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import { Box, Card, Link, Typography, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { fCurrency } from '../../../utils/formatNumber';
 
 const StyledVoucherImg = styled('img')({
   top: 0,
@@ -37,7 +36,7 @@ export default function VoucherCard({ voucher }) {
 
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Typography variant="subtitle1">{locationName}</Typography>
-          <Typography variant="subtitle1">{fCurrency(priceVoucher)}</Typography>
+          <Typography variant="subtitle1">{priceVoucher} Xu</Typography>
         </Stack>
       </Stack>
     </Card>
