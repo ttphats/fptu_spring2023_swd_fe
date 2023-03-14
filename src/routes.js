@@ -21,6 +21,8 @@ import OTPAuthenticationPage from './pages/OTPAuthenticationPage';
 import OTPForgotPasswordPage from './pages/OTPForgotPasswordPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import CreateTripPage from './pages/CreateTripPage';
+import CreateVoucherPage from './pages/CreateVoucherPage';
+import VoucherDetailPage from './pages/VoucherDetailPage';
 import TripDetailsPage from './pages/TripDetailsPage';
 
 // ----------------------------------------------------------------------
@@ -57,11 +59,39 @@ export default function Router() {
           }
         />
         <Route
-          path="/trip/:id"
+          path="/voucher/create"
           element={
-              <TripDetailsPage />
+            <ProtectedRoute loginInfo={loginInfo}>
+              <CreateVoucherPage />
+            </ProtectedRoute>
           }
         />
+        <Route
+          path="/voucher/:id"
+          element={
+            <ProtectedRoute loginInfo={loginInfo}>
+              <VoucherDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/trip/:id" element={<TripDetailsPage />} />
+        <Route
+          path="/voucher/create"
+          element={
+            <ProtectedRoute loginInfo={loginInfo}>
+              <CreateVoucherPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/voucher/:id"
+          element={
+            <ProtectedRoute loginInfo={loginInfo}>
+              <VoucherDetailPage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/dashboard"
           element={

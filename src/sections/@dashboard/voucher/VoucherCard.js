@@ -1,14 +1,7 @@
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-// @mui
-import { Box, Card, Link, Typography, Stack } from '@mui/material';
+import { Box, Card, Typography, Stack, CardActions } from '@mui/material';
 import { styled } from '@mui/material/styles';
-// utils
-import { fCurrency } from '../../../utils/formatNumber';
-// components
-import Label from '../../../components/label';
-import { ColorPreview } from '../../../components/color-utils';
-
-// ----------------------------------------------------------------------
 
 const StyledVoucherImg = styled('img')({
   top: 0,
@@ -18,60 +11,40 @@ const StyledVoucherImg = styled('img')({
   position: 'absolute',
 });
 
-// ----------------------------------------------------------------------
-
-ShopVoucherCard.propTypes = {
+VoucherCard.propTypes = {
   voucher: PropTypes.object,
 };
 
-export default function ShopVoucherCard({ voucher }) {
-  const { name, cover, price, colors, status, priceSale } = voucher;
+export default function VoucherCard({ voucher }) {
+  const { id, nameVoucher, imageUrl, priceVoucher, description, locationName } = voucher;
 
   return (
     <Card>
       <Box sx={{ pt: '100%', position: 'relative' }}>
-        {status && (
-          <Label
-            variant="filled"
-            color={(status === 'sale' && 'error') || 'info'}
-            sx={{
-              zIndex: 9,
-              top: 16,
-              right: 16,
-              position: 'absolute',
-              textTransform: 'uppercase',
-            }}
-          >
-            {status}
-          </Label>
-        )}
-        <StyledVoucherImg alt={name} src={cover} />
+        <StyledVoucherImg alt={nameVoucher} src={imageUrl} />
       </Box>
 
       <Stack spacing={2} sx={{ p: 3 }}>
         <Link color="inherit" underline="hover">
           <Typography variant="subtitle2" noWrap>
-            {name}
+            {nameVoucher}
           </Typography>
         </Link>
 
+        <Typography variant="body2" color="text.secondary" noWrap>
+          {description}
+        </Typography>
+
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <ColorPreview colors={colors} />
-          <Typography variant="subtitle1">
-            <Typography
-              component="span"
-              variant="body1"
-              sx={{
-                color: 'text.disabled',
-                textDecoration: 'line-through',
-              }}
-            >
-              {priceSale && fCurrency(priceSale)}
-            </Typography>
-            &nbsp;
-            {fCurrency(price)}
-          </Typography>
+          <Typography variant="subtitle1">{locationName}</Typography>
+          <Typography variant="subtitle1">{priceVoucher} Xu</Typography>
         </Stack>
+
+        <CardActions>
+          <Link to={`/voucher/${id}`} variant="body2">
+            Xem chi tiết
+          </Link>
+        </CardActions>
       </Stack>
     </Card>
   );
