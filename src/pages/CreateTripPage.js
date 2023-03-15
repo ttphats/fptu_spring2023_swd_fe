@@ -18,7 +18,7 @@ const CreateTripPage = () => {
   return (
     <StyledRoot>
       {currentUser.role === 'USER' ? <NavUser /> : <Nav />}
-      {currentUser.role === 'USER' ? <CreateTrip /> :  <Navigate to="/dashboard"/>}
+      <CreateTrip />
     </StyledRoot>
   );
 };
