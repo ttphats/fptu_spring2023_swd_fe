@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import CurrencyInput from 'react-currency-input-field';
@@ -196,6 +196,17 @@ const CreateTrip = () => {
   const [selectedValue, setSelectedValue] = useState([]);
   const [selectedVoucherId, setSelectedVoucherId] = useState([]);
   const [isShowed, setIsShowed] = useState(false);
+  const location = useLocation();
+  const data = location.state;
+
+  useEffect(() => {
+    if (data) {
+      setSelectedValue([...selectedValue, data]);
+      setSelectedVoucherId([...selectedVoucherId, data.id]);
+      setIsShowed(true);
+    }
+  }, [data]);
+  console.log(selectedValue);
 
   const handleClickOpenDialog = () => {
     setOpenDialog(true);
@@ -877,7 +888,7 @@ const CreateTrip = () => {
             </List>
           </Dialog>
           {isShowed &&
-            selectedValue.map((selected) => (
+            selectedValue?.map((selected) => (
               <Grid key={selected.value} container spacing={2} sx={{ boxShadow: 3, marginBottom: 3, marginTop: 2 }}>
                 <Grid item>
                   <ButtonBase sx={{ width: 128, height: 128 }}>
