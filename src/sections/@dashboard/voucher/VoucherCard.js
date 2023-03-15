@@ -19,7 +19,7 @@ VoucherCard.propTypes = {
 
 export default function VoucherCard({ voucher }) {
   const locationName = voucher.location.name;
-  const { id, name, imageUrl, price, description, status } = voucher;
+  const { id, name, imageUrl, price, description, status, quantity } = voucher;
 
   if (status === 'DELETE')
     return (
@@ -43,6 +43,9 @@ export default function VoucherCard({ voucher }) {
               ? dayjs.tz(voucher.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
               : 'Không xác định'}
             - {voucher?.endDate ? dayjs.tz(voucher.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : 'Không xác định'}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" noWrap>
+            Số lượng còn lại: {quantity}
           </Typography>
 
           <Stack direction="row" alignItems="center" justifyContent="space-between">
@@ -71,12 +74,12 @@ export default function VoucherCard({ voucher }) {
           {description}
         </Typography>
         <Typography variant="body2" color="text.secondary" noWrap>
-            {voucher?.startDate
-              ? dayjs.tz(voucher.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
-              : 'Không xác định'}
-            - {voucher?.endDate ? dayjs.tz(voucher.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : 'Không xác định'}
-          </Typography>
-
+          {voucher?.startDate ? dayjs.tz(voucher.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : 'Không xác định'}
+          - {voucher?.endDate ? dayjs.tz(voucher.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : 'Không xác định'}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" noWrap>
+          Số lượng còn lại: {quantity}
+        </Typography>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Typography variant="subtitle1">{locationName}</Typography>
           <Typography variant="subtitle1">{price} Xu</Typography>
