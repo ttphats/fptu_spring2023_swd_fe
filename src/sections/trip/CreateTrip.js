@@ -41,7 +41,6 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import moment from 'moment-timezone';
-import { getTimezoneOffset } from 'date-fns-tz';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -438,10 +437,6 @@ const CreateTrip = () => {
           <Stack direction="row" sx={{ marginBottom: 2 }} justifyContent="flext-start" alignItems="center" spacing={2}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <Formik
-                // initialValues={{
-                //   startDate: moment().format("DD/MM/YYYY HH:mm"),
-                //   endDate: null,
-                // }}
                 validationSchema={DisplayingErrorMessagesSchema}
                 onSubmit={(values, { setSubmitting }) => {
                   setTimeout(() => {

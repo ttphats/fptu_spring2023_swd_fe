@@ -19,13 +19,19 @@ import IconButton from '@mui/material/IconButton';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import { makeStyles } from '@material-ui/core/styles';
 import { LoadingButton } from '@mui/lab';
+
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-
 import addressApi from '../../../api/addressApi';
 import 'firebase/auth';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault('Asia/Bangkok');
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -97,7 +103,6 @@ const initialValues = {
         description: null,
         phoneNum: null
     },
-    image: null
 };
 
 const validationSchema = Yup.object().shape({
@@ -144,78 +149,64 @@ const CreateVoucher = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // if (currentUser.role !== 'ADMIN') {
+        //     navigate('/login');
+        //     return;
+        // }
+
         const values = formik.values;
-        try {
-            const formData = new FormData();
-            const payload = {
-                createVoucherRequestForm: {
-                    nameVoucher: values.nameVoucher,
-                    priceVoucher: values.priceVoucher,
-                    quantity: values.quantity,
-                    description: values.description,
-                    code: values.code,
-                    start_date: values.start_date,
-                    end_date: values.end_date,
-                    location: {
-                        name: values.location.name,
-                        addressNum: values.location.addressNum,
-                        ward: values.location.ward,
-                        district: values.location.district,
-                        province: values.location.province,
-                        type: values.location.type,
-                        description: values.location.description,
-                        phoneNum: values.location.phoneNum,
-                    },
+        const formData = new FormData();
+
+        const payload = {
+            createVoucherRequestForm: {
+                nameVoucher: values.nameVoucher,
+                priceVoucher: values.priceVoucher,
+                quantity: values.quantity,
+                description: values.description,
+                code: values.code,
+                start_date: values.start_date,
+                end_date: values.end_date,
+                location: {
+                    name: values.location.name,
+                    addressNum: values.location.addressNum,
+                    ward: values.location.ward,
+                    district: values.location.district,
+                    province: values.location.province,
+                    type: values.location.type,
+                    description: values.location.description,
+                    phoneNum: values.location.phoneNum,
                 },
-                image: null,
+            },
+        };
+
+        if (fileUpload) {
+            formData.append('images', fileUpload);
+        } else {
+            formData.append('images', null);
+        }
+
+        formData.append('createVoucherRequestForm', JSON.stringify(payload));
+
+        try {
+            const response = await fetch('https://hqtbe.site/api/v1/vouchers', formData , {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${localStorage.getItem('access-token')}`,
+                },
+            });
+
+            const data = await response.json();
+            if (response) {
+                setOpen(true);
             };
-            if (fileUpload) {
-                const reader = new FileReader();
-                reader.readAsDataURL(fileUpload);
-                reader.onload = () => {
-                    const dataUrl = reader.result;
-                    payload.image = dataUrl;
-                    formData.append('image', dataUrl);
-                    formData.append('createVoucherRequestForm', JSON.stringify(payload.createVoucherRequestForm));
-                    fetch('https://hqtbe.site/api/v1/vouchers/createVoucher', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('access-token')}`,
-                        },
-                    })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            console.log('Tạo ưu đãi mới thành công!', data);
-                            alert('Tạo ưu đãi mới thành công!');
-                            navigate('/dashboard/voucher');
-                        })
-                        .catch((error) => {
-                            console.error('Đã có lỗi xảy ra:', error);
-                            alert('Đã có lỗi xảy ra, vui lòng thử lại!');
-                        });
-                };
-            } else {
-                formData.append('image', null);
-                formData.append('createVoucherRequestForm', JSON.stringify(payload.createVoucherRequestForm));
-                fetch('https://hqtbe.site/api/v1/vouchers/createVoucher', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('access-token')}`,
-                    },
-                })
-                    .then((response) => response.json())
-                    .then((data) => {
-                        console.log('Tạo ưu đãi mới thành công!', data);
-                        alert('Tạo ưu đãi mới thành công!');
-                        navigate('/dashboard/voucher');
-                    })
-                    .catch((error) => {
-                        console.error('Đã có lỗi xảy ra:', error);
-                        alert('Đã có lỗi xảy ra, vui lòng thử lại!');
-                    });
-            }
+            console.log('Tạo ưu đãi mới thành công!', data);
+            
+            alert('Tạo ưu đãi mới thành công!');
+            console.log(typeof fileUpload);
+            navigate('/dashboard/voucher');
         } catch (error) {
             console.error('Đã có lỗi xảy ra:', error);
             alert('Đã có lỗi xảy ra, vui lòng thử lại!');
@@ -232,7 +223,6 @@ const CreateVoucher = () => {
         if (reason === 'clickaway') {
             return;
         }
-
         setOpen(false);
     };
 
