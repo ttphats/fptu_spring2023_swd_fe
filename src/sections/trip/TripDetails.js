@@ -21,6 +21,7 @@ import { fShortenNumber } from '../../utils/formatNumber';
 import SvgColor from '../../components/svg-color';
 import Iconify from '../../components/iconify';
 import tripApi from '../../api/tripApi';
+import voucherApi from '../../api/voucherApi';
 
 // ----------------------------------------------------------------------
 
@@ -60,6 +61,16 @@ export default function TripDetails({ trip }) {
   const [errorMsg, setErrorMsg] = useState(null);
   const [disable, setDisable] = useState(false);
   const [members, setMembers] = useState([]);
+  const [vouchers, setVouchers] = useState([]);
+
+  async function getListVouchers() {
+    const reps = await voucherApi.getVouchersByTripID(trip?.id);
+    setVouchers(reps.data);
+  }
+
+  useEffect(() => {
+    getListVouchers();
+  }, [trip]);
 
   useEffect(() => {
     async function handleDisabled() {
@@ -130,10 +141,11 @@ export default function TripDetails({ trip }) {
           <Grid container direction="column" spacing={2}>
             <Grid item>
               <Typography gutterBottom variant="h3" component="div">
-              {!trip?.name ? 'Đã bao lâu rồi chúng ta chưa có dịp đi chơi cùng nhau' : trip.name}
+                {!trip?.name ? 'Đã bao lâu rồi chúng ta chưa có dịp đi chơi cùng nhau' : trip.name}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Ngày đăng bài: {trip?.postDate ? dayjs.tz(trip.postDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : 'Không xác định'}
+                Ngày đăng bài:{' '}
+                {trip?.postDate ? dayjs.tz(trip.postDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : 'Không xác định'}
               </Typography>
             </Grid>
             <Grid justifyContent="center" item>
@@ -168,7 +180,11 @@ export default function TripDetails({ trip }) {
                       Địa điểm xuất phát: &nbsp;{trip?.startLocation.address} ({trip?.startLocation.type})
                     </Typography>
                     <Typography variant="h6" gutterBottom>
-                      Ngày khởi hành: {trip?.startDate ? dayjs(trip.startDate).subtract(7, 'hour').format('HH:mm'): '--:--'} {trip?.startDate ? dayjs.tz(trip.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : 'Chưa xác định'}
+                      Ngày khởi hành:{' '}
+                      {trip?.startDate ? dayjs(trip.startDate).subtract(7, 'hour').format('HH:mm') : '--:--'}{' '}
+                      {trip?.startDate
+                        ? dayjs.tz(trip.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                        : 'Chưa xác định'}
                     </Typography>
                   </Box>
                   <Box mt={2}>
@@ -186,11 +202,12 @@ export default function TripDetails({ trip }) {
                       Địa điểm đến: &nbsp;{trip?.endLocation.address} ({trip?.endLocation.type})
                     </Typography>
                     <Typography variant="h6" gutterBottom>
-                      Ngày kết thúc: {trip?.endDate ? dayjs(trip.endDate).format('DD/MM/YYYY')  : 'Chưa xác định'}
+                      Ngày kết thúc: {trip?.endDate ? dayjs(trip.endDate).format('DD/MM/YYYY') : 'Chưa xác định'}
                     </Typography>
                   </Box>
                   <Typography variant="h6" component="div">
-                    Số tiền cần đặt cọc: {Intl.NumberFormat('en-US').format(trip?.deposit)} Xu <Icon icon="ri:copper-coin-line" />
+                    Số tiền cần đặt cọc: {Intl.NumberFormat('en-US').format(trip?.deposit)} Xu{' '}
+                    <Icon icon="ri:copper-coin-line" />
                   </Typography>
                   <Typography variant="h6" gutterBottom>
                     Số thành viên tham gia chuyến đi: Từ {trip?.minMember} Đến {trip?.maxMember} người
@@ -244,6 +261,53 @@ export default function TripDetails({ trip }) {
                   <Grid item sx={{ marginRight: 2 }}>
                     <Typography variant="subtitle1" component="div">
                       Vai trò: {member?.role}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Grid>
+            ))}
+          </Paper>
+          {/* Trip vouchers */}
+          <Typography variant="h6" gutterBottom>
+            Voucher của chuyến đi:
+          </Typography>
+          <Paper
+            sx={{
+              p: 2,
+              margin: 'auto',
+              maxWidth: 700,
+              flexGrow: 1,
+            }}
+          >
+            {vouchers?.map((selected) => (
+              <Grid key={selected.id} container spacing={2} sx={{ boxShadow: 3, marginBottom: 3, marginTop: 2 }}>
+                <Grid item>
+                  <ButtonBase sx={{ width: 128, height: 128 }}>
+                    <Img alt="complex" src={selected?.imageUrl} />
+                  </ButtonBase>
+                </Grid>
+                <Grid item xs={12} sm container>
+                  <Grid item xs container direction="column" spacing={2}>
+                    <Grid item xs>
+                      <Typography gutterBottom variant="subtitle1" component="div">
+                        {selected?.name}
+                      </Typography>
+                      <Typography variant="body2" gutterBottom>
+                        {selected?.description}
+                      </Typography>
+                      <Typography variant="body2" gutterBottom>
+                        {selected?.startDate ? dayjs.tz(selected.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : ''} - {selected?.endDate ? dayjs.tz(selected.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : ''}
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Typography sx={{ cursor: 'pointer' }} variant="body2">
+                        Số lượng còn lại: {selected?.quantity}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="subtitle1" component="div">
+                      {Intl.NumberFormat('en-US').format(selected?.price)} Xu
                     </Typography>
                   </Grid>
                 </Grid>

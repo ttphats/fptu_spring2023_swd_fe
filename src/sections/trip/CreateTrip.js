@@ -194,6 +194,7 @@ const CreateTrip = () => {
 
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedValue, setSelectedValue] = useState([]);
+  const [selectedVoucherId, setSelectedVoucherId] = useState([]);
   const [isShowed, setIsShowed] = useState(false);
 
   const handleClickOpenDialog = () => {
@@ -203,11 +204,14 @@ const CreateTrip = () => {
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const adjustedDate = dayjs.tz(formik.values.startDate, 'Asia/Ho_Chi_Minh').add(7, 'hour').toISOString();
     formik.setFieldValue('startDate', adjustedDate);
-    console.log('startdate adjust', adjustedDate);
+    const reps = await voucherApi.validateVoucher({ voucherIDs: selectedVoucherId });
+    const createTripVouchers = reps.data;
+
     const form = {
       name: formik.values.name,
       startDate: adjustedDate,
@@ -236,9 +240,9 @@ const CreateTrip = () => {
       deposit: formik.values.deposit,
       maxMember: formik.values.maxMember,
       minMember: formik.values.minMember,
-      voucherIds: formik.values.voucherIds,
+      voucherIds: createTripVouchers,
     };
-
+    console.log(form);
     try {
       const json = JSON.stringify(form);
       const blob = new Blob([json], {
@@ -382,6 +386,7 @@ const CreateTrip = () => {
   async function getVoucherByLocationType() {
     const response = await voucherApi.getVoucherByLocationType(formik.values.endLocation.type);
     setVouchers(response.data);
+    console.log(response.data);
   }
 
   useEffect(() => {
@@ -392,15 +397,12 @@ const CreateTrip = () => {
   }, [formik.values.endLocation.type]);
 
   const handleListItemClick = (value) => {
-    console.log('voucher: ', value);
     setOpenDialog(false);
     setIsShowed(true);
-    setSelectedValue(value);
-    formik.setFieldValue('voucherIds', value.id)
+    setSelectedValue([...selectedValue, value]);
+    setSelectedVoucherId([...selectedVoucherId, value.id]);
+    console.log(value.id);
   };
-
-  console.log('voucher formik: ', formik.values.voucherIds);
-
 
   // render form create steps
 
@@ -826,7 +828,7 @@ const CreateTrip = () => {
             <DialogTitle>Chọn giảm giá mong muốn cho chuyến đi của bạn</DialogTitle>
             <List sx={{ pt: 0 }}>
               {vouchers.map((voucher) => (
-                <ListItem disableGutters>
+                <ListItem key={voucher.id} disableGutters>
                   <ListItemButton sx={{ boxShadow: 3 }} onClick={() => handleListItemClick(voucher)} key={voucher.id}>
                     <Grid container spacing={2}>
                       <Grid item>
@@ -842,6 +844,18 @@ const CreateTrip = () => {
                             </Typography>
                             <Typography variant="body2" gutterBottom>
                               {voucher?.description}
+                            </Typography>
+                            <Typography variant="body2" gutterBottom>
+                              {voucher?.startDate
+                                ? dayjs.tz(voucher.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                : ''}{' '}
+                              -{' '}
+                              {voucher?.endDate
+                                ? dayjs.tz(voucher.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                : ''}
+                            </Typography>
+                            <Typography variant="body2" gutterBottom>
+                              Loại: {voucher?.location.type}
                             </Typography>
                           </Grid>
                           <Grid item>
@@ -862,39 +876,44 @@ const CreateTrip = () => {
               ))}
             </List>
           </Dialog>
-          {isShowed ? (
-            <Grid container spacing={2} sx={{ boxShadow: 3 }}>
-              <Grid item>
-                <ButtonBase sx={{ width: 128, height: 128 }}>
-                  <Img alt="complex" src={selectedValue?.imageUrl} />
-                </ButtonBase>
-              </Grid>
-              <Grid item xs={12} sm container>
-                <Grid item xs container direction="column" spacing={2}>
-                  <Grid item xs>
-                    <Typography gutterBottom variant="subtitle1" component="div">
-                      {selectedValue?.nameVoucher}
-                    </Typography>
-                    <Typography variant="body2" gutterBottom>
-                      {selectedValue?.description}
-                    </Typography>
+          {isShowed &&
+            selectedValue.map((selected) => (
+              <Grid key={selected.value} container spacing={2} sx={{ boxShadow: 3, marginBottom: 3, marginTop: 2 }}>
+                <Grid item>
+                  <ButtonBase sx={{ width: 128, height: 128 }}>
+                    <Img alt="complex" src={selected?.imageUrl} />
+                  </ButtonBase>
+                </Grid>
+                <Grid item xs={12} sm container>
+                  <Grid item xs container direction="column" spacing={2}>
+                    <Grid item xs>
+                      <Typography gutterBottom variant="subtitle1" component="div">
+                        {selected?.nameVoucher}
+                      </Typography>
+                      <Typography variant="body2" gutterBottom>
+                        {selected?.description}
+                      </Typography>
+                      <Typography variant="body2" gutterBottom>
+                        {selected?.startDate
+                          ? dayjs.tz(selected.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                          : ''}{' '}
+                        - {selected?.endDate ? dayjs.tz(selected.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : ''}
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Typography sx={{ cursor: 'pointer' }} variant="body2">
+                        Số lượng còn lại: {selected?.quantity}
+                      </Typography>
+                    </Grid>
                   </Grid>
                   <Grid item>
-                    <Typography sx={{ cursor: 'pointer' }} variant="body2">
-                      Số lượng còn lại: {selectedValue?.quantity}
+                    <Typography variant="subtitle1" component="div">
+                      {Intl.NumberFormat('en-US').format(selected?.priceVoucher)} Xu
                     </Typography>
                   </Grid>
                 </Grid>
-                <Grid item>
-                  <Typography variant="subtitle1" component="div">
-                    {Intl.NumberFormat('en-US').format(selectedValue?.priceVoucher)} Xu
-                  </Typography>
-                </Grid>
               </Grid>
-            </Grid>
-          ) : (
-            <></>
-          )}
+            ))}
         </>
       ),
     },
