@@ -840,7 +840,7 @@ const CreateTrip = () => {
                         <Grid item xs container direction="column" spacing={2}>
                           <Grid item xs>
                             <Typography gutterBottom variant="subtitle1" component="div">
-                              {voucher?.nameVoucher}
+                              {voucher?.name}
                             </Typography>
                             <Typography variant="body2" gutterBottom>
                               {voucher?.description}
@@ -866,7 +866,7 @@ const CreateTrip = () => {
                         </Grid>
                         <Grid item>
                           <Typography variant="subtitle1" component="div">
-                            {Intl.NumberFormat('en-US').format(voucher?.priceVoucher)} Xu
+                            {Intl.NumberFormat('en-US').format(voucher?.price)} Xu
                           </Typography>
                         </Grid>
                       </Grid>
@@ -888,7 +888,7 @@ const CreateTrip = () => {
                   <Grid item xs container direction="column" spacing={2}>
                     <Grid item xs>
                       <Typography gutterBottom variant="subtitle1" component="div">
-                        {selected?.nameVoucher}
+                        {selected?.name}
                       </Typography>
                       <Typography variant="body2" gutterBottom>
                         {selected?.description}
@@ -908,7 +908,7 @@ const CreateTrip = () => {
                   </Grid>
                   <Grid item>
                     <Typography variant="subtitle1" component="div">
-                      {Intl.NumberFormat('en-US').format(selected?.priceVoucher)} Xu
+                      {Intl.NumberFormat('en-US').format(selected?.price)} Xu
                     </Typography>
                   </Grid>
                 </Grid>
