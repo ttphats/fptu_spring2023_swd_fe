@@ -11,6 +11,14 @@ const tripApi = {
       },
     });
   },
+  createVoucher: (formData) => {
+    const url = '/vouchers';
+    return axiosClient.post(url, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
   getAllTrips: (sort) => {
     const url = '/public/trips';
     return axiosClient.get(`${url}?page=1&limit=200&sort=postDate:${sort}`);

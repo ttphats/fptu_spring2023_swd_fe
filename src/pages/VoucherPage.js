@@ -16,7 +16,7 @@ export default function VoucherPage() {
   const currentUser = useSelector((state) => state.user.current);
   const [vouchers, setVouchers] = useState([]);
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(10);
+  const [size, setSize] = useState(200);
   const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function VoucherPage() {
           navigate('/login');
           return;
         }
-        const response = await axios.get(`https://hqtbe.site/api/v1/vouchers?page=${page}&size=${size}&sortBy=id&sortType=asc`, {
+        const response = await axios.get(`https://hqtbe.site/api/v1/vouchers?page=1&size=50&sortBy=id&sortType=desc`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('access-token')}`,
           },
