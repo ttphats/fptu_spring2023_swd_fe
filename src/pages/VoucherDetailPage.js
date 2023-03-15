@@ -115,6 +115,9 @@ const VoucherDetailPage = () => {
               {voucher?.endDate ? dayjs.tz(voucher.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : 'Không xác định'}
             </span>
           </Typography>
+          <Typography variant="body2" color="text.secondary" noWrap>
+            Số lượng còn lại: {voucher.quantity}
+          </Typography>
           {currentUser.role === 'ADMIN' ? (
             <Button variant="contained" color="secondary" onClick={handleDeleteClick}>
               Xoá ưu đãi
