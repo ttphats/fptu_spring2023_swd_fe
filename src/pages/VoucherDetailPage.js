@@ -1,33 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import dayjs from 'dayjs';
+import axios from 'axios';
 import {
     Box,
     Button,
-    Card,
-    CardActions,
-    CardContent,
-    CardMedia,
+    Grid,
     Typography,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
         margin: theme.spacing(3),
     },
-    card: {
-        maxWidth: 500,
+    image: {
+        width: '100%',
+        height: 400,
+        objectFit: 'cover',
     },
-    media: {
-        height: 0,
-        paddingTop: '56.25%', // 16:9
+    section: {
+        margin: theme.spacing(2, 0),
     },
-    description: {
-        margin: theme.spacing(2),
+    label: {
+        fontWeight: 600,
+    },
+    value: {
+        marginLeft: theme.spacing(1),
     },
 }));
 
@@ -35,6 +40,10 @@ const VoucherDetailPage = () => {
     const classes = useStyles();
     const { id } = useParams();
     const [voucher, setVoucher] = useState(null);
+    const navigate = useNavigate();
+    const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
+    const currentUser = useSelector((state) => state.user.current);
+
 
     useEffect(() => {
         const fetchVoucher = async () => {
@@ -48,8 +57,23 @@ const VoucherDetailPage = () => {
             setVoucher(response.data.data);
         };
         fetchVoucher();
-        console.log(voucher);
     }, [id]);
+
+    const handleDeleteClick = () => {
+        setShowConfirmationDialog(true);
+    }
+
+    const handleDelete = async () => {
+        const token = localStorage.getItem('access-token');
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        await axios.delete(`https://hqtbe.site/api/v1/vouchers/voucherId/${id}`, config);
+        navigate('/dashboard/voucher');
+    }
+
 
     if (!voucher) {
         return <Typography variant="h6">Loading...</Typography>;
@@ -57,40 +81,71 @@ const VoucherDetailPage = () => {
 
     return (
         <Box className={classes.root}>
-            <Card className={classes.card}>
-                <CardMedia className={classes.media} image={voucher.imageUrl} title={voucher.nameVoucher} />
-                <CardContent>
-                    <Typography gutterBottom variant="h5" component="h2">
-                        {voucher.nameVoucher}
+            <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                    <img src={voucher.imageUrl} alt={voucher.name} className={classes.image} />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                    <Typography variant="h4" component="h1" className={classes.section}>
+                        {voucher.name}
                     </Typography>
-                    <Typography variant="h6" color="textSecondary" component="p">
-                        {voucher.priceVoucher} Xu
+                    <Typography variant="h6" color="textSecondary" className={classes.section}>
+                        {voucher.price} Xu
                     </Typography>
-                    <Typography variant="body1" className={classes.description}>
+                    <Typography variant="body1" className={classes.section}>
                         {voucher.description}
                     </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p">
-                        Mã Ưu đãi: {voucher.code}
+                    <Typography variant="body2" className={classes.section}>
+                        <span className={classes.label}>Mã Ưu đãi:</span>
+                        <span className={classes.value}>{voucher.code}</span>
                     </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p">
-                        Địa chỉ: {voucher.location.name}, {voucher.location.addressNum}, {voucher.location.ward},{' '}
-                        {voucher.location.district}, {voucher.location.province}
+                    <Typography variant="body2" className={classes.section}>
+                        <span className={classes.label}>Địa chỉ:</span>
+                        <span className={classes.value}>
+                            {voucher.location.address}
+                        </span>
                     </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p">
-                        Áp dụng từ: {new Date(voucher.start_date).toLocaleDateString()}
+                    <Typography variant="body2" className={classes.section}>
+                        <span className={classes.label}>Áp dụng từ:</span>
+                        <span className={classes.value}>
+                            {voucher?.startDate ? dayjs.tz(voucher.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : 'Không xác định'}
+                        </span>
                     </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p">
-                        Đến ngày: {new Date(voucher.end_date).toLocaleDateString()}
+                    <Typography variant="body2" className={classes.section}>
+                        <span className={classes.label}>Đến ngày:</span>
+                        <span className={classes.value}>
+                            {voucher?.endDate ? dayjs.tz(voucher.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : 'Không xác định'}
+                        </span>
                     </Typography>
-                </CardContent>
-                <CardActions>
-                    <Button size="small" color="primary">
-                        Đổi ưu đãi
-                    </Button>
-                </CardActions>
-            </Card>
+                    {currentUser.role === 'ADMIN' ?
+                        <Button variant="contained" color="secondary" onClick={handleDeleteClick}>
+                            Xoá ưu đãi
+                        </Button>
+                        : null
+                    }
+                    <Dialog
+                        open={showConfirmationDialog}
+                        onClose={() => setShowConfirmationDialog(false)}
+                    >
+                        <DialogTitle>Xoá ưu đãi</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Vui lòng xác nhận: Bạn muốn xoá ưu đãi?
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => setShowConfirmationDialog(false)} color="primary">
+                                Huỷ
+                            </Button>
+                            <Button onClick={handleDelete} color="primary">
+                                Xác nhận
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                </Grid>
+            </Grid>
         </Box>
-    );
-};
+    )
+}
 
 export default VoucherDetailPage;
