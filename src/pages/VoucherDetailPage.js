@@ -13,8 +13,18 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Paper,
+  Container,
+  TextField,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { emphasize, styled } from '@mui/material/styles';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Chip from '@mui/material/Chip';
+import HomeIcon from '@mui/icons-material/Home';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,6 +45,45 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: theme.spacing(1),
   },
 }));
+
+const primary = "#2196f3";
+const secondary = "#f44336";
+
+const StyledBreadcrumb = styled(Chip)(({ theme }) => {
+  const backgroundColor =
+    theme.palette.mode === 'light'
+      ? theme.palette.grey[100]
+      : theme.palette.grey[800];
+  return {
+    backgroundColor,
+    height: theme.spacing(3),
+    color: theme.palette.text.primary,
+    fontWeight: theme.typography.fontWeightRegular,
+    '&:hover, &:focus': {
+      backgroundColor: emphasize(backgroundColor, 0.06),
+    },
+    '&:active': {
+      boxShadow: theme.shadows[1],
+      backgroundColor: emphasize(backgroundColor, 0.12),
+    },
+  };
+});
+
+function myFunction() {
+  const copyText = document.getElementById("copyText");
+
+  copyText.select();
+  copyText.setSelectionRange(0, 99999);
+
+  document.execCommand("copy");
+
+  alert(`Đã sao chép Mã ưu đãi: ${copyText.value}`);
+}
+
+function handleClick(event) {
+  event.preventDefault();
+  console.info('You clicked a breadcrumb.');
+}
 
 const VoucherDetailPage = () => {
   const classes = useStyles();
@@ -78,29 +127,63 @@ const VoucherDetailPage = () => {
   }
 
   return (
-    <Box className={classes.root}>
+    <Container className={classes.root} sx={{ margin: "0 auto" }}>
+      <div role="presentation" onClick={handleClick}>
+        <Breadcrumbs aria-label="breadcrumb">
+          <StyledBreadcrumb
+            component="a"
+            href="/home"
+            label="Trang chủ"
+            icon={<HomeIcon fontSize="small" />}
+          />
+          <StyledBreadcrumb component="a" href="/dashboard/voucher" label="Các ưu đãi" />
+          <StyledBreadcrumb component="a" href="#" label="Chi tiết ưu đãi" />
+        </Breadcrumbs>
+      </div>
+
+      <Typography variant="h4" component="h1" className={classes.section}>
+        {voucher.name}
+      </Typography>
+      <Typography variant="body2" className={classes.section}>
+        <span className={classes.value}>{voucher.quantity} Ưu đãi đang chờ bạn </span>
+        <LocationOnIcon fontSize="small" sx={{ display: 'inline-flex', marginBottom: '-2px', marginLeft: '16px', marginRight: '-8px' }} />
+        <span className={classes.value}>{voucher.location.address} </span>
+      </Typography>
+      <Paper elevation={12} >
+        <img src={voucher.imageUrl} alt={voucher.name} className={classes.image} />
+      </Paper>
+
       <Grid container spacing={2}>
-        <Grid item xs={12} md={6}>
-          <img src={voucher.imageUrl} alt={voucher.name} className={classes.image} />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Typography variant="h4" component="h1" className={classes.section}>
-            {voucher.name}
-          </Typography>
-          <Typography variant="h6" color="textSecondary" className={classes.section}>
-            {voucher.price} Xu
-          </Typography>
-          <Typography variant="body1" className={classes.section}>
-            {voucher.description}
-          </Typography>
-          <Typography variant="body2" className={classes.section}>
-            <span className={classes.label}>Mã Ưu đãi:</span>
-            <span className={classes.value}>{voucher.code}</span>
-          </Typography>
-          <Typography variant="body2" className={classes.section}>
-            <span className={classes.label}>Địa chỉ:</span>
-            <span className={classes.value}>{voucher.location.address}</span>
-          </Typography>
+        <Grid item xs={6} md={8} spacing={2}>
+          <Box sx={{ p: 2, borderRadius: '24px', backgroundColor: '#fcf6f2', marginTop: '36px', display: 'flex', flexDirection: 'column' }}>
+            <Grid container spacing={2}>
+              <Grid item xs={6} md={2} sx={{ margin: '0 auto', display: 'flex', verticalAlign: 'center', justifyContent: 'center', alignItems: 'center' }}>
+                <ThumbUpIcon fontSize="large" sx={{ color: "#ffb74d" }} />
+              </Grid>
+              <Grid item xs={6} md={10}>
+                <Typography variant="body1" className={classes.section}>
+                  {voucher.description}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
+          <Grid container alignItems="center" className={classes.section} spacing={2} >
+            <Grid item xs={6} md={4}>
+              <TextField
+                id="copyText"
+                value={voucher.code}
+                type="text"
+                variant="outlined"
+                sx={{ marginRight: "16px" }}
+              />
+            </Grid>
+            <Grid item xs={6} md={8} sx={{ display: 'flex', alignItems: 'center' }}>
+              <Button variant="outlined" onClick={myFunction} >
+                Sao chép Mã Ưu đãi
+              </Button>
+            </Grid>
+          </Grid>
+
           <Typography variant="body2" className={classes.section}>
             <span className={classes.label}>Áp dụng từ:</span>
             <span className={classes.value}>
@@ -115,38 +198,44 @@ const VoucherDetailPage = () => {
               {voucher?.endDate ? dayjs.tz(voucher.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : 'Không xác định'}
             </span>
           </Typography>
-          <Typography variant="body2" color="text.secondary" noWrap>
-            Số lượng còn lại: {voucher.quantity}
-          </Typography>
-          {currentUser.role === 'ADMIN' ? (
-            <Button variant="contained" color="secondary" onClick={handleDeleteClick}>
-              Xoá ưu đãi
-            </Button>
-          ) : null}
-          {currentUser.role === 'USER' ? (
-            <Link to={`/trip`} state={voucher} style={{ textDecoration: 'none' }} variant="body2">
-              <Button variant="contained" color="secondary">
-                Tạo chuyến đi ngay
+        </Grid>
+        <Grid item xs={6} md={4}>
+          <Box sx={{ p: 2, border: '1px solid #C5C5C5', borderRadius: '24px', marginTop: '36px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', textAlign: 'center' }}>
+            <Typography variant="h4" color="textPrimary" className={classes.section}>
+              {voucher.price} Xu
+            </Typography>
+            {currentUser.role === 'ADMIN' ? (
+              <Button variant="contained" color="secondary" onClick={handleDeleteClick}>
+                Xoá ưu đãi
               </Button>
-            </Link>
-          ) : null}
-          <Dialog open={showConfirmationDialog} onClose={() => setShowConfirmationDialog(false)}>
-            <DialogTitle>Xoá ưu đãi</DialogTitle>
-            <DialogContent>
-              <DialogContentText>Vui lòng xác nhận: Bạn muốn xoá ưu đãi?</DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setShowConfirmationDialog(false)} color="primary">
-                Huỷ
-              </Button>
-              <Button onClick={handleDelete} color="primary">
-                Xác nhận
-              </Button>
-            </DialogActions>
-          </Dialog>
+            ) : null}
+            {currentUser.role === 'USER' ? (
+              <Link to={`/trip`} state={voucher} style={{ textDecoration: 'none' }} variant="body2">
+                <Button variant="contained" color="primary">
+                  Tạo chuyến đi ngay
+                </Button>
+              </Link>
+            ) : null}
+          </Box>
+
         </Grid>
       </Grid>
-    </Box>
+
+      <Dialog open={showConfirmationDialog} onClose={() => setShowConfirmationDialog(false)}>
+        <DialogTitle>Xoá ưu đãi</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Vui lòng xác nhận: Bạn muốn xoá ưu đãi?</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowConfirmationDialog(false)} color="primary">
+            Huỷ
+          </Button>
+          <Button onClick={handleDelete} color="primary">
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Container>
   );
 };
 
