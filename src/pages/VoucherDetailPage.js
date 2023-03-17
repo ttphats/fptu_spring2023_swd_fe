@@ -126,7 +126,7 @@ const VoucherDetailPage = () => {
           {currentUser.role === 'USER' ? (
             <Link to={`/trip`} state={voucher} style={{ textDecoration: 'none' }} variant="body2">
               <Button variant="contained" color="secondary">
-                Thêm ưu đãi vào chuyến đi
+                Tạo chuyến đi ngay
               </Button>
             </Link>
           ) : null}

@@ -33,10 +33,10 @@ function applySortFilter(array, query) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   if (query) {
     return filter(array, (_trip) => {
-      if(_trip.name !== null){
+      if (_trip.name !== null) {
         console.log(_trip)
-       return _trip.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1 || 
-       _trip.description?.toLowerCase().indexOf(query.toLowerCase()) !== -1;
+        return _trip.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+          _trip.description?.toLowerCase().indexOf(query.toLowerCase()) !== -1;
       }
       return false;
     });
