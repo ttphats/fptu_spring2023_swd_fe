@@ -64,9 +64,13 @@ export default function TripDetails({ trip }) {
   const [vouchers, setVouchers] = useState([]);
 
   async function getListVouchers() {
-    const reps = await voucherApi.getVouchersByTripID(trip?.id);
-    setVouchers(reps.data);
+    if (trip.id) {
+      const reps = await voucherApi.getVouchersByTripID(trip?.id);
+      setVouchers(reps.data);
+    }
   }
+
+  console.log('trip: ', trip);
 
   useEffect(() => {
     getListVouchers();
@@ -75,14 +79,16 @@ export default function TripDetails({ trip }) {
   useEffect(() => {
     async function handleDisabled() {
       try {
-        const getUser = await tripApi.getTripMembers(trip?.id);
-        setMembers(getUser.data);
-        getUser.data.map((mem, _index) => {
-          if (mem.user.id === currentUser.id) {
-            setDisable(true);
-          }
-          return _index;
-        });
+        if (trip.id) {
+          const getUser = await tripApi.getTripMembers(trip?.id);
+          setMembers(getUser.data);
+          getUser.data.map((mem, _index) => {
+            if (mem.user.id === currentUser.id) {
+              setDisable(true);
+            }
+            return _index;
+          });
+        }
       } catch (error) {
         console.log(error);
       }
@@ -192,6 +198,7 @@ export default function TripDetails({ trip }) {
                       <Icon icon="mdi:map-marker" />
                       Thông tin điểm đến
                     </Typography>
+                    S
                     <Typography variant="h6" gutterBottom>
                       Tên địa điểm đến:&nbsp; {trip?.endLocation.name ? trip.endLocation.name : ''}
                     </Typography>
@@ -296,7 +303,10 @@ export default function TripDetails({ trip }) {
                         {selected?.description}
                       </Typography>
                       <Typography variant="body2" gutterBottom>
-                        {selected?.startDate ? dayjs.tz(selected.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : ''} - {selected?.endDate ? dayjs.tz(selected.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : ''}
+                        {selected?.startDate
+                          ? dayjs.tz(selected.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                          : ''}{' '}
+                        - {selected?.endDate ? dayjs.tz(selected.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : ''}
                       </Typography>
                     </Grid>
                     <Grid item>
