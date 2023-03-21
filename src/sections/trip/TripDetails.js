@@ -1,22 +1,26 @@
 import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 // @mui
-import { alpha, styled } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
-import { Box, Card, Grid, Avatar, Typography, CardContent, ButtonBase } from '@mui/material';
-import TextField from '@mui/material/TextField';
-import Stack from '@mui/material/Stack';
+import {
+  Box,
+  Grid,
+  Typography,
+  ButtonBase,
+  DialogContentText,
+  DialogActions,
+  DialogTitle,
+  DialogContent,
+  Dialog,
+} from '@mui/material';
 import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Paper from '@mui/material/Paper';
 import { Icon } from '@iconify/react';
-// utils
-import { fDate } from '../../utils/formatTime';
-import { fShortenNumber } from '../../utils/formatNumber';
 //
 import SvgColor from '../../components/svg-color';
 import Iconify from '../../components/iconify';
@@ -62,11 +66,22 @@ export default function TripDetails({ trip }) {
   const [disable, setDisable] = useState(false);
   const [members, setMembers] = useState([]);
   const [vouchers, setVouchers] = useState([]);
+  const [openConfirm, setOpenConfirm] = useState(false);
 
   async function getListVouchers() {
-    const reps = await voucherApi.getVouchersByTripID(trip?.id);
-    setVouchers(reps.data);
+    if (trip.id) {
+      const reps = await voucherApi.getVouchersByTripID(trip?.id);
+      setVouchers(reps.data);
+    }
   }
+
+  const handleClickOpenConfirm = () => {
+    setOpenConfirm(true);
+  };
+
+  const handleCloseConfirm = () => {
+    setOpenConfirm(false);
+  };
 
   useEffect(() => {
     getListVouchers();
@@ -75,14 +90,16 @@ export default function TripDetails({ trip }) {
   useEffect(() => {
     async function handleDisabled() {
       try {
-        const getUser = await tripApi.getTripMembers(trip?.id);
-        setMembers(getUser.data);
-        getUser.data.map((mem, _index) => {
-          if (mem.user.id === currentUser.id) {
-            setDisable(true);
-          }
-          return _index;
-        });
+        if (trip.id) {
+          const getUser = await tripApi.getTripMembers(trip?.id);
+          setMembers(getUser.data);
+          getUser.data.map((mem, _index) => {
+            if (mem.user.id === currentUser.id) {
+              setDisable(true);
+            }
+            return _index;
+          });
+        }
       } catch (error) {
         console.log(error);
       }
@@ -96,6 +113,7 @@ export default function TripDetails({ trip }) {
     try {
       const response = await tripApi.joinTripById(trip?.id);
       setSuccessMsg(response.message);
+      setOpenConfirm(false);
     } catch (error) {
       setErrorMsg(error.response.data.message);
       console.log(error.response.data.message);
@@ -192,6 +210,7 @@ export default function TripDetails({ trip }) {
                       <Icon icon="mdi:map-marker" />
                       Thông tin điểm đến
                     </Typography>
+                    S
                     <Typography variant="h6" gutterBottom>
                       Tên địa điểm đến:&nbsp; {trip?.endLocation.name ? trip.endLocation.name : ''}
                     </Typography>
@@ -296,7 +315,10 @@ export default function TripDetails({ trip }) {
                         {selected?.description}
                       </Typography>
                       <Typography variant="body2" gutterBottom>
-                        {selected?.startDate ? dayjs.tz(selected.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : ''} - {selected?.endDate ? dayjs.tz(selected.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : ''}
+                        {selected?.startDate
+                          ? dayjs.tz(selected.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                          : ''}{' '}
+                        - {selected?.endDate ? dayjs.tz(selected.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : ''}
                       </Typography>
                     </Grid>
                     <Grid item>
@@ -333,10 +355,31 @@ export default function TripDetails({ trip }) {
               </Grid>
             ) : (
               <Grid item>
-                <StyledButton onClick={handleJoinTrip}>Tham gia ngay</StyledButton>
+                <StyledButton onClick={handleClickOpenConfirm}>Tham gia ngay</StyledButton>
               </Grid>
             )}
           </Grid>
+          <Dialog
+            open={openConfirm}
+            onClose={handleCloseConfirm}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              {'Xác nhận thanh toán tiền đặt cọc để tham gia chuyến đi'}
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Cần <strong>{trip?.deposit} Xu</strong> để tham gia chuyến đi này
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <LoadingButton onClick={handleCloseConfirm}>Huỷ</LoadingButton>
+              <LoadingButton onClick={handleJoinTrip} autoFocus>
+                Xác nhận
+              </LoadingButton>
+            </DialogActions>
+          </Dialog>
         </Paper>
       ) : (
         <></>
