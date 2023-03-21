@@ -251,60 +251,65 @@ const CreateTrip = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const adjustedDate = dayjs.tz(formik.values?.startDate, 'Asia/Ho_Chi_Minh').add(7, 'hour').toISOString();
-      if (adjustedDate) {
-        formik.setFieldValue('startDate', adjustedDate);
-      }
-      const reps = await voucherApi.validateVoucher({ voucherIDs: selectedVoucherId });
-      const createTripVouchers = reps.data;
-
-      const form = {
-        name: formik.values.name,
-        startDate: adjustedDate,
-        endDate: formik.values.endDate,
-        startLocation: {
-          name: formik.values.startLocation.name,
-          addressNum: formik.values.startLocation.addressNum,
-          ward: formik.values.startLocation.ward,
-          district: formik.values.startLocation.district,
-          province: formik.values.startLocation.province,
-          type: formik.values.startLocation.type,
-          description: formik.values.startLocation.description,
-          phoneNum: formik.values.startLocation.phoneNum,
-        },
-        endLocation: {
-          name: formik.values.endLocation.name,
-          addressNum: formik.values.endLocation.addressNum,
-          ward: formik.values.endLocation.ward,
-          district: formik.values.endLocation.district,
-          province: formik.values.endLocation.province,
-          type: formik.values.endLocation.type,
-          description: formik.values.endLocation.description,
-          phoneNum: formik.values.endLocation.phoneNum,
-        },
-        description: formik.values.description,
-        deposit: formik.values.deposit,
-        maxMember: formik.values.maxMember,
-        minMember: formik.values.minMember,
-        voucherIds: createTripVouchers,
-      };
-      const json = JSON.stringify(form);
-      const blob = new Blob([json], {
-        type: 'application/json',
-      });
-
-      const formData = new FormData();
-      if (fileUpload) {
-        console.log(fileUpload);
-        formData.append('images', fileUpload);
+      if((formik.values.startDate !== null && formik.values.endDate !== null)) {
+        const adjustedDate = dayjs.tz(formik.values?.startDate, 'Asia/Ho_Chi_Minh').add(7, 'hour').toISOString();
+        if (adjustedDate) {
+          formik.setFieldValue('startDate', adjustedDate);
+        }
+        const reps = await voucherApi.validateVoucher({ voucherIDs: selectedVoucherId });
+        const createTripVouchers = reps.data;
+  
+        const form = {
+          name: formik.values.name,
+          startDate: adjustedDate,
+          endDate: formik.values.endDate,
+          startLocation: {
+            name: formik.values.startLocation.name,
+            addressNum: formik.values.startLocation.addressNum,
+            ward: formik.values.startLocation.ward,
+            district: formik.values.startLocation.district,
+            province: formik.values.startLocation.province,
+            type: formik.values.startLocation.type,
+            description: formik.values.startLocation.description,
+            phoneNum: formik.values.startLocation.phoneNum,
+          },
+          endLocation: {
+            name: formik.values.endLocation.name,
+            addressNum: formik.values.endLocation.addressNum,
+            ward: formik.values.endLocation.ward,
+            district: formik.values.endLocation.district,
+            province: formik.values.endLocation.province,
+            type: formik.values.endLocation.type,
+            description: formik.values.endLocation.description,
+            phoneNum: formik.values.endLocation.phoneNum,
+          },
+          description: formik.values.description,
+          deposit: formik.values.deposit,
+          maxMember: formik.values.maxMember,
+          minMember: formik.values.minMember,
+          voucherIds: createTripVouchers,
+        };
+        const json = JSON.stringify(form);
+        const blob = new Blob([json], {
+          type: 'application/json',
+        });
+  
+        const formData = new FormData();
+        if (fileUpload) {
+          console.log(fileUpload);
+          formData.append('images', fileUpload);
+        } else {
+          formData.append('images', null);
+        }
+        formData.append('createTripRequestForm', blob);
+        const response = await tripApi.createTrip(formData);
+        if (response) {
+          setOpen(true);
+          navigate('/home/blog');
+        }
       } else {
-        formData.append('images', null);
-      }
-      formData.append('createTripRequestForm', blob);
-      const response = await tripApi.createTrip(formData);
-      if (response) {
+        setMsg('Vui lòng không để trống thông tin');
         setOpen(true);
-        navigate('/home/blog');
       }
     } catch (error) {
       console.log(error);
@@ -533,6 +538,7 @@ const CreateTrip = () => {
                             onBlur={formik.handleBlur}
                             error={formik.touched.startDate && Boolean(formik.errors.startDate)}
                             helperText={formik.touched.startDate && formik.errors.startDate}
+                            touched={formik.touched.startDate}
                             name="startDate"
                             format="DD/MM/YYYY HH:mm"
                             onChange={(value) => {
@@ -549,6 +555,7 @@ const CreateTrip = () => {
                             error={formik.touched.endDate && Boolean(formik.errors.endDate)}
                             helperText={formik.touched.endDate && formik.errors.endDate}
                             name="endDate"
+                            touched={formik.touched.endDate}
                             format="DD/MM/YYYY"
                             onChange={(value) => {
                               if (dayjs(value) >= formik.values.startDate) {

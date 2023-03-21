@@ -18,7 +18,7 @@ export default function VoucherList({ vouchers = [], ...other }) {
       {vouchers
         .filter((voucher) => currentUser.role === 'ADMIN' || voucher.status === 'ACTIVE')
         .map((voucher) => (
-          <Grid key={voucher.id} item xs={12} sm={6} md={3}>
+          <Grid key={voucher.id} item xs={12} sm={8} md={4}>
             <VoucherCard voucher={voucher} />
           </Grid>
         ))}

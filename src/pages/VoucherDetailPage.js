@@ -25,12 +25,12 @@ import HomeIcon from '@mui/icons-material/Home';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 
-
 const useStyles = makeStyles((theme) => ({
   root: {
     margin: theme.spacing(3),
   },
   image: {
+    borderRadius: 10,
     width: '100%',
     height: 400,
     objectFit: 'cover',
@@ -46,14 +46,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const primary = "#2196f3";
-const secondary = "#f44336";
+const primary = '#2196f3';
+const secondary = '#f44336';
 
 const StyledBreadcrumb = styled(Chip)(({ theme }) => {
-  const backgroundColor =
-    theme.palette.mode === 'light'
-      ? theme.palette.grey[100]
-      : theme.palette.grey[800];
+  const backgroundColor = theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[800];
   return {
     backgroundColor,
     height: theme.spacing(3),
@@ -70,12 +67,12 @@ const StyledBreadcrumb = styled(Chip)(({ theme }) => {
 });
 
 function myFunction() {
-  const copyText = document.getElementById("copyText");
+  const copyText = document.getElementById('copyText');
 
   copyText.select();
   copyText.setSelectionRange(0, 99999);
 
-  document.execCommand("copy");
+  document.execCommand('copy');
 
   alert(`Đã sao chép Mã ưu đãi: ${copyText.value}`);
 }
@@ -127,15 +124,10 @@ const VoucherDetailPage = () => {
   }
 
   return (
-    <Container className={classes.root} sx={{ margin: "0 auto" }}>
+    <Container className={classes.root} sx={{ margin: '0 auto' }}>
       <div role="presentation" onClick={handleClick}>
         <Breadcrumbs aria-label="breadcrumb">
-          <StyledBreadcrumb
-            component="a"
-            href="/home"
-            label="Trang chủ"
-            icon={<HomeIcon fontSize="small" />}
-          />
+          <StyledBreadcrumb component="a" href="/" label="Trang chủ" icon={<HomeIcon fontSize="small" />} />
           <StyledBreadcrumb component="a" href="/dashboard/voucher" label="Các ưu đãi" />
           <StyledBreadcrumb component="a" href="#" label="Chi tiết ưu đãi" />
         </Breadcrumbs>
@@ -146,19 +138,39 @@ const VoucherDetailPage = () => {
       </Typography>
       <Typography variant="body2" className={classes.section}>
         <span className={classes.value}>{voucher.quantity} Ưu đãi đang chờ bạn </span>
-        <LocationOnIcon fontSize="small" sx={{ display: 'inline-flex', marginBottom: '-2px', marginLeft: '16px', marginRight: '-8px' }} />
+        <LocationOnIcon
+          fontSize="small"
+          sx={{ display: 'inline-flex', marginBottom: '-2px', marginLeft: '16px', marginRight: '-8px' }}
+        />
         <span className={classes.value}>{voucher.location.address} </span>
       </Typography>
-      <Paper elevation={12} >
-        <img src={voucher.imageUrl} alt={voucher.name} className={classes.image} />
-      </Paper>
-
+      <img src={voucher.imageUrl} alt={voucher.name} className={classes.image} />
       <Grid container spacing={2}>
         <Grid item xs={6} md={8} spacing={2}>
-          <Box sx={{ p: 2, borderRadius: '24px', backgroundColor: '#fcf6f2', marginTop: '36px', display: 'flex', flexDirection: 'column' }}>
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: '24px',
+              backgroundColor: '#fcf6f2',
+              marginTop: '36px',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
             <Grid container spacing={2}>
-              <Grid item xs={6} md={2} sx={{ margin: '0 auto', display: 'flex', verticalAlign: 'center', justifyContent: 'center', alignItems: 'center' }}>
-                <ThumbUpIcon fontSize="large" sx={{ color: "#ffb74d" }} />
+              <Grid
+                item
+                xs={6}
+                md={2}
+                sx={{
+                  margin: '0 auto',
+                  display: 'flex',
+                  verticalAlign: 'center',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <ThumbUpIcon fontSize="large" sx={{ color: '#ffb74d' }} />
               </Grid>
               <Grid item xs={6} md={10}>
                 <Typography variant="body1" className={classes.section}>
@@ -167,18 +179,18 @@ const VoucherDetailPage = () => {
               </Grid>
             </Grid>
           </Box>
-          <Grid container alignItems="center" className={classes.section} spacing={2} >
+          <Grid container alignItems="center" className={classes.section} spacing={2}>
             <Grid item xs={6} md={4}>
               <TextField
                 id="copyText"
                 value={voucher.code}
                 type="text"
                 variant="outlined"
-                sx={{ marginRight: "16px" }}
+                sx={{ marginRight: '16px' }}
               />
             </Grid>
             <Grid item xs={6} md={8} sx={{ display: 'flex', alignItems: 'center' }}>
-              <Button variant="outlined" onClick={myFunction} >
+              <Button variant="outlined" onClick={myFunction}>
                 Sao chép Mã Ưu đãi
               </Button>
             </Grid>
@@ -200,7 +212,20 @@ const VoucherDetailPage = () => {
           </Typography>
         </Grid>
         <Grid item xs={6} md={4}>
-          <Box sx={{ p: 2, border: '1px solid #C5C5C5', borderRadius: '24px', marginTop: '36px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', textAlign: 'center' }}>
+          <Box
+            sx={{
+              p: 2,
+              border: '1px solid #C5C5C5',
+              borderRadius: '24px',
+              marginTop: '36px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              textAlign: 'center',
+            }}
+          >
             <Typography variant="h4" color="textPrimary" className={classes.section}>
               {voucher.price} Xu
             </Typography>
@@ -217,7 +242,6 @@ const VoucherDetailPage = () => {
               </Link>
             ) : null}
           </Box>
-
         </Grid>
       </Grid>
 

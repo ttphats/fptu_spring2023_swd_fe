@@ -1,30 +1,18 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 // @mui
 import { alpha, styled } from '@mui/material/styles';
-import { LoadingButton } from '@mui/lab';
 import { Box, Card, Grid, Avatar, Typography, CardContent } from '@mui/material';
-import TextField from '@mui/material/TextField';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-import Paper from '@mui/material/Paper';
-import ButtonBase from '@mui/material/ButtonBase';
+import { makeStyles } from '@material-ui/core/styles';
 import { Icon } from '@iconify/react';
 import dayjs from 'dayjs';
-// utils
-import { fDate } from '../../../utils/formatTime';
-import { fShortenNumber } from '../../../utils/formatNumber';
+
 //
 import SvgColor from '../../../components/svg-color';
 import Iconify from '../../../components/iconify';
-import tripApi from '../../../api/tripApi';
 
 // ----------------------------------------------------------------------
-
 const StyledCardMedia = styled('div')({
   position: 'relative',
   paddingTop: 'calc(100% * 3 / 4)',
@@ -80,6 +68,7 @@ BlogPostCard.propTypes = {
 export default function BlogPostCard({ post, index }) {
   const latestPostLarge = index === 0;
   const latestPost = index === 1 || index === 2;
+
   return (
     <Grid item xs={12} sm={latestPostLarge ? 12 : 6} md={latestPostLarge ? 6 : 3}>
       <Link
@@ -148,15 +137,14 @@ export default function BlogPostCard({ post, index }) {
                 }),
               }}
             />
-
-            <StyledCover
-              alt={post?.name}
-              src={
-                post.imageUrls[0]
-                  ? post.imageUrls[0]
-                  : 'https://daihoc.fpt.edu.vn/wp-content/uploads/2021/12/fpt-hinh-1-thumbnail-1618982244543115484692-768x432.png'
-              }
-            />
+              <StyledCover
+                alt={post?.name}
+                src={
+                  post.imageUrls[0]
+                    ? post.imageUrls[0]
+                    : 'https://daihoc.fpt.edu.vn/wp-content/uploads/2021/12/fpt-hinh-1-thumbnail-1618982244543115484692-768x432.png'
+                }
+              />
           </StyledCardMedia>
 
           <CardContent
@@ -222,9 +210,8 @@ export default function BlogPostCard({ post, index }) {
               }}
             >
               <Icon icon="ic:outline-location-on" />
-              {post.startLocation.name ? post.startLocation.name : ''} 
-              &nbsp;
-              &nbsp;
+              {post.startLocation.name ? post.startLocation.name : ''}
+              &nbsp; &nbsp;
               <Icon icon="mdi:location-radius-outline" />
               {post.endLocation.name ? post.endLocation.name : ''}
             </StyledTitle>
