@@ -3,13 +3,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik, Form, Formik, FormikConfig, FormikValues, ErrorMessage, Field } from 'formik';
 import * as Yup from 'yup';
 import CurrencyInput from 'react-currency-input-field';
-import { Container, Typography, InputLabel, TextField, FormHelperText } from '@material-ui/core';
+import { Container, Typography, InputLabel, TextField, FormHelperText, DialogContent, DialogActions } from '@material-ui/core';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 import FormControl from '@mui/material/FormControl';
 import Stack from '@mui/material/Stack';
+import { DialogContentText } from '@mui/material';
 import Box from '@mui/material/Box';
 import { LoadingButton } from '@mui/lab';
 import IconButton from '@mui/material/IconButton';
@@ -146,10 +147,7 @@ const DisplayingErrorMessagesSchema = Yup.object().shape({
     .min(5, 'Nhập ít nhất 5 ký tự')
     .max(30, 'Tối đa 30 ký tự')
     .required('Vui lòng không được để trống tên của chuyến đi!'),
-  startDate: Yup.date()
-  .required()
-  .typeError("Please select a valid date")
-  .nullable(),
+  startDate: Yup.date().required().typeError('Please select a valid date').nullable(),
   endDate: Yup.date().nullable().required(),
   startLocation: Yup.object().shape({
     name: Yup.string()
@@ -226,6 +224,7 @@ const CreateTrip = () => {
   };
 
   const [openDialog, setOpenDialog] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState(false);
   const [selectedValue, setSelectedValue] = useState([]);
   const [selectedVoucherId, setSelectedVoucherId] = useState([]);
   const [isShowed, setIsShowed] = useState(false);
@@ -248,17 +247,25 @@ const CreateTrip = () => {
     setOpenDialog(false);
   };
 
+  const handleClickOpenConfirm = () => {
+    setOpenConfirm(true);
+  };
+
+  const handleCloseConfirm = () => {
+    setOpenConfirm(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if((formik.values.startDate !== null && formik.values.endDate !== null)) {
+      if (formik.values.startDate !== null && formik.values.endDate !== null) {
         const adjustedDate = dayjs.tz(formik.values?.startDate, 'Asia/Ho_Chi_Minh').add(7, 'hour').toISOString();
         if (adjustedDate) {
           formik.setFieldValue('startDate', adjustedDate);
         }
         const reps = await voucherApi.validateVoucher({ voucherIDs: selectedVoucherId });
         const createTripVouchers = reps.data;
-  
+
         const form = {
           name: formik.values.name,
           startDate: adjustedDate,
@@ -293,7 +300,7 @@ const CreateTrip = () => {
         const blob = new Blob([json], {
           type: 'application/json',
         });
-  
+
         const formData = new FormData();
         if (fileUpload) {
           console.log(fileUpload);
@@ -304,6 +311,7 @@ const CreateTrip = () => {
         formData.append('createTripRequestForm', blob);
         const response = await tripApi.createTrip(formData);
         if (response) {
+          setOpenConfirm(false);
           setOpen(true);
           navigate('/home/blog');
         }
@@ -745,10 +753,15 @@ const CreateTrip = () => {
                       <Box sx={{ mb: 2 }}>
                         <div>
                           <LoadingButton
-                            disabled={formik.errors.startLocation?.name || formik.errors.startLocation?.phoneNum ||
-                              formik.errors.startLocation?.addressNum || formik.errors.startLocation?.province ||
-                              formik.errors.startLocation?.district || formik.errors.startLocation?.ward ||
-                              formik.errors.startLocation?.type}
+                            disabled={
+                              formik.errors.startLocation?.name ||
+                              formik.errors.startLocation?.phoneNum ||
+                              formik.errors.startLocation?.addressNum ||
+                              formik.errors.startLocation?.province ||
+                              formik.errors.startLocation?.district ||
+                              formik.errors.startLocation?.ward ||
+                              formik.errors.startLocation?.type
+                            }
                             className={classes.button}
                             variant="contained"
                             onClick={handleNext}
@@ -920,10 +933,15 @@ const CreateTrip = () => {
                       <Box sx={{ mb: 2 }}>
                         <div>
                           <LoadingButton
-                          disabled={formik.errors.endLocation?.name || formik.errors.endLocation?.phoneNum ||
-                            formik.errors.endLocation?.addressNum || formik.errors.endLocation?.province ||
-                            formik.errors.endLocation?.district || formik.errors.endLocation?.ward ||
-                            formik.errors.endLocation?.type}
+                            disabled={
+                              formik.errors.endLocation?.name ||
+                              formik.errors.endLocation?.phoneNum ||
+                              formik.errors.endLocation?.addressNum ||
+                              formik.errors.endLocation?.province ||
+                              formik.errors.endLocation?.district ||
+                              formik.errors.endLocation?.ward ||
+                              formik.errors.endLocation?.type
+                            }
                             className={classes.button}
                             variant="contained"
                             onClick={handleNext}
@@ -1010,7 +1028,12 @@ const CreateTrip = () => {
                       <Box sx={{ mb: 2 }}>
                         <div>
                           <LoadingButton
-                          disabled={formik.errors.description || formik.errors.deposit || formik.errors.minMember ||  formik.errors.maxMember }
+                            disabled={
+                              formik.errors.description ||
+                              formik.errors.deposit ||
+                              formik.errors.minMember ||
+                              formik.errors.maxMember
+                            }
                             className={classes.button}
                             variant="contained"
                             onClick={handleNext}
@@ -1197,14 +1220,34 @@ const CreateTrip = () => {
                   </Paper>
                 )}
               </Box>
+              <Dialog
+                open={openConfirm}
+                onClose={handleCloseConfirm}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+              >
+                <DialogTitle id="alert-dialog-title">{"Xác nhận thanh toán tiền đặt cọc để tạo chuyến đi"}</DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-description">
+                    Cần <strong>{formik.values.deposit} Xu</strong> để tạo chuyến đi này
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <LoadingButton onClick={handleCloseConfirm}>Huỷ</LoadingButton>
+                  <LoadingButton onClick={handleSubmit} autoFocus>
+                    Xác nhận
+                  </LoadingButton>
+                </DialogActions>
+              </Dialog>
               <LoadingButton
                 className={classes.button}
                 sx={{ marginTop: '30px' }}
+                disabled={!formik.isValid}
                 fullWidth
                 size="small"
                 type="submit"
                 variant="contained"
-                onClick={handleSubmit}
+                onClick={handleClickOpenConfirm}
               >
                 Tạo chuyến đi
               </LoadingButton>
