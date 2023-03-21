@@ -44,6 +44,15 @@ const useStyles = makeStyles((theme) => ({
   value: {
     marginLeft: theme.spacing(1),
   },
+  button: {
+    background: 'linear-gradient(45deg, #6D17CB 30%, #2876F9 90%)',
+    border: 0,
+    borderRadius: 3,
+    boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
+    color: 'white',
+    height: 48,
+    padding: '0 30px',
+  },
 }));
 
 const primary = "#2196f3";
@@ -78,11 +87,6 @@ function myFunction() {
   document.execCommand("copy");
 
   alert(`Đã sao chép Mã ưu đãi: ${copyText.value}`);
-}
-
-function handleClick(event) {
-  event.preventDefault();
-  console.info('You clicked a breadcrumb.');
 }
 
 const VoucherDetailPage = () => {
@@ -128,7 +132,7 @@ const VoucherDetailPage = () => {
 
   return (
     <Container className={classes.root} sx={{ margin: "0 auto" }}>
-      <div role="presentation" onClick={handleClick}>
+      <div role="presentation" >
         <Breadcrumbs aria-label="breadcrumb">
           <StyledBreadcrumb
             component="a"
@@ -184,20 +188,22 @@ const VoucherDetailPage = () => {
             </Grid>
           </Grid>
 
-          <Typography variant="body2" className={classes.section}>
-            <span className={classes.label}>Áp dụng từ:</span>
-            <span className={classes.value}>
-              {voucher?.startDate
-                ? dayjs.tz(voucher.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
-                : 'Không xác định'}
+          <Typography variant="body2" className={classes.section} >
+            <span className={classes.value}> *Chọn "Tạo chuyến đi ngay" để bắt đầu lên kế hoạch cho chuyến đi của bạn và sử dụng Ưu đãi. Ưu đãi khả dụng từ ngày &nbsp;
+              <span className={classes.label} >
+                {voucher?.startDate
+                  ? dayjs.tz(voucher.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                  : 'Không xác định'}
+              </span>
+              &nbsp; đến hết ngày &nbsp;
+              <span className={classes.label} >
+                {voucher?.endDate ? dayjs.tz(voucher.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : 'Không xác định'}
+              </span>
+              .
             </span>
           </Typography>
-          <Typography variant="body2" className={classes.section}>
-            <span className={classes.label}>Đến ngày:</span>
-            <span className={classes.value}>
-              {voucher?.endDate ? dayjs.tz(voucher.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : 'Không xác định'}
-            </span>
-          </Typography>
+
+          
         </Grid>
         <Grid item xs={6} md={4}>
           <Box sx={{ p: 2, border: '1px solid #C5C5C5', borderRadius: '24px', marginTop: '36px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', textAlign: 'center' }}>
@@ -211,13 +217,12 @@ const VoucherDetailPage = () => {
             ) : null}
             {currentUser.role === 'USER' ? (
               <Link to={`/trip`} state={voucher} style={{ textDecoration: 'none' }} variant="body2">
-                <Button variant="contained" color="primary">
+                <Button variant="contained" className={classes.button}>
                   Tạo chuyến đi ngay
                 </Button>
               </Link>
             ) : null}
           </Box>
-
         </Grid>
       </Grid>
 

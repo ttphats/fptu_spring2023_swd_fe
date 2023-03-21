@@ -64,7 +64,7 @@ export default function VoucherPage() {
           navigate('/login');
           return;
         }
-        const response = await axios.get(`https://hqtbe.site/api/v1/vouchers?page=1&size=50&sortType=desc`, {
+        const response = await axios.get(`https://hqtbe.site/api/v1/vouchers?page=1&size=20&sortType=desc`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('access-token')}`,
           },
@@ -133,7 +133,7 @@ export default function VoucherPage() {
         </Stack>
         {Array.isArray(filteredVouchers) ? (
           <Container>
-            <VoucherList vouchers={filteredVouchers} />
+            <VoucherList vouchers={filteredVouchers} /> 
             <br />
             <Grid xs display="flex" justifyContent="center" alignItems="center">
               <Pagination color="primary" count={totalPages} page={page} onChange={handlePageChange} />
