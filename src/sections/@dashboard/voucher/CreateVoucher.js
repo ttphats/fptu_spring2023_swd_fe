@@ -107,13 +107,23 @@ const initialValues = {
 };
 
 const validationSchema = Yup.object().shape({
-  nameVoucher: Yup.string().required('Bắt buộc'),
-  priceVoucher: Yup.number().required('Bắt buộc'),
-  quantity: Yup.number().min(1, 'Số lượng không được bé hơn 1').required('Bắt buộc'),
-  description: Yup.string().required('Bắt buộc'),
+  nameVoucher: Yup.string().required('Vui lòng nhập tên của phiếu giảm giá'),
+  priceVoucher: Yup.number().typeError('Vui lòng nhập số').positive('Số tiền phải lớn hơn 0').required('Bắt buộc'),
+  quantity: Yup.number()
+    .typeError('Vui lòng nhập số')
+    .positive('Số tiền phải lớn hơn 0')
+    .min(1, 'Số lượng phải lớn hơn 0')
+    .required('Bắt buộc'),
+  description: Yup.string().required('Vui lòng nhập mô tả cho phiếu giảm giá'),
   code: Yup.string().required('Bắt buộc'),
-  start_date: Yup.date().required('Bắt buộc'),
-  end_date: Yup.date().required('Bắt buộc'),
+  start_date: Yup.date()
+  .required()
+  .typeError("Please select a valid date")
+  .nullable(),
+  end_date: Yup.date()
+  .required()
+  .typeError("Please select a valid date")
+  .nullable().min(Yup.ref('start_date'), 'Ngày kết thúc phải sau ngày bắt đầu'),
   location: Yup.object().shape({
     name: Yup.string().required('Bắt buộc'),
     addressNum: Yup.string().required('Bắt buộc'),
@@ -122,7 +132,9 @@ const validationSchema = Yup.object().shape({
     province: Yup.string().required('Bắt buộc'),
     type: Yup.string().required('Bắt buộc'),
     description: Yup.string().required('Bắt buộc'),
-    phoneNum: Yup.string().required('Bắt buộc'),
+    phoneNum: Yup.string()
+      .matches(/^\+?\d{10,12}$/, 'Số định thoại phải từ 10 đến 12 số')
+      .required('Vui lòng điền số điện thoại'),
   }),
 });
 
@@ -154,27 +166,30 @@ const CreateVoucher = () => {
     const values = formik.values;
     const formData = new FormData();
 
+    console.log('date', values.start_date)
+
+   if((values.start_date !== null && values.end_date !== null) || !formik.isValid){
     const payload = {
-        nameVoucher: values.nameVoucher,
-        priceVoucher: values.priceVoucher,
-        quantity: values.quantity,
-        description: values.description,
-        code: values.code,
-        start_date: values.start_date,
-        end_date: values.end_date,
-        location: {
-          name: values.location.name,
-          addressNum: values.location.addressNum,
-          ward: values.location.ward,
-          district: values.location.district,
-          province: values.location.province,
-          type: values.location.type,
-          description: values.location.description,
-          phoneNum: values.location.phoneNum,
-        },
+      nameVoucher: values.nameVoucher,
+      priceVoucher: values.priceVoucher,
+      quantity: values.quantity,
+      description: values.description,
+      code: values.code,
+      start_date: values.start_date,
+      end_date: values.end_date,
+      location: {
+        name: values.location.name,
+        addressNum: values.location.addressNum,
+        ward: values.location.ward,
+        district: values.location.district,
+        province: values.location.province,
+        type: values.location.type,
+        description: values.location.description,
+        phoneNum: values.location.phoneNum,
+      },
     };
 
-    console.log(payload)
+    console.log(payload);
 
     const json = JSON.stringify(payload);
     const blob = new Blob([json], {
@@ -194,6 +209,10 @@ const CreateVoucher = () => {
     } catch (error) {
       console.error('Đã có lỗi xảy ra:', error);
     }
+   } else {
+      setMsg('Vui lòng không để trống thông tin!');
+      setOpen(true);
+   }
   };
 
   const formik = useFormik({
@@ -262,7 +281,7 @@ const CreateVoucher = () => {
     }
   }, [currentUser]);
 
-  console.log(formik.values.nameVoucher)
+  console.log(formik.values.nameVoucher);
   return (
     <>
       <Helmet>
@@ -280,288 +299,309 @@ const CreateVoucher = () => {
           </Alert>
         </Snackbar>
       )}
-      <Container maxWidth="xl" className={classes.root}>
-        <Paper className={classes.voucher}>
-          <Typography variant="h3" component="h1" className={classes.title}>
-            Tạo ưu đãi mới
-          </Typography>
-          <Box sx={{ minWidth: 800 }}>
-            <form onSubmit={handleSubmit}>
-              {/* Name of voucher */}
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Tên ưu đãi"
-                name="nameVoucher"
-                value={formik.values.nameVoucher}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched.nameVoucher && Boolean(formik.errors.nameVoucher)}
-                helperText={formik.touched.nameVoucher && formik.errors.nameVoucher}
-              />
-              {/* Price of voucher */}
-              <Stack direction="row" spacing={4} alignItems="center" sx={{ marginTop: '20px', marginBottom: '20px' }}>
-                <InputLabel htmlFor="standard-adornment-amount">Giá tiền</InputLabel>
-                <CurrencyInput
-                  customInput={TextField}
-                  name="priceVoucher"
-                  variant="outlined"
-                  decimalsLimit={2}
-                  value={formik.values.priceVoucher}
-                  onBlur={formik.handleBlur}
-                  error={formik.touched.priceVoucher && Boolean(formik.errors.priceVoucher)}
-                  helperText={formik.touched.priceVoucher && formik.errors.priceVoucher}
-                  onValueChange={(value, name) => formik.setFieldValue(name, value)}
-                  InputProps={{
-                    startAdornment: <span style={{ paddingRight: '10px' }}>Xu</span>,
-                  }}
-                />
-              </Stack>
-              {/* Quantity */}
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Số lượng phát hành*"
-                name="quantity"
-                type="number"
-                value={formik.values.quantity}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched.quantity && Boolean(formik.errors.quantity)}
-                helperText={formik.touched.quantity && formik.errors.quantity}
-              />
-              {/* Description */}
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Thêm mô tả*"
-                name="description"
-                value={formik.values.description}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched.description && Boolean(formik.errors.description)}
-                helperText={formik.touched.description && formik.errors.description}
-              />
-              {/* Code */}
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Mã ưu đãi*"
-                name="code"
-                value={formik.values.code}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched.code && Boolean(formik.errors.code)}
-                helperText={formik.touched.code && formik.errors.code}
-              />
-              {/* Timeline */}
-              <Stack
-                direction="row"
-                sx={{ marginBottom: 6 }}
-                justifyContent="flext-start"
-                alignItems="center"
-                spacing={3}
-              >
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <Formik
-                    initialValues={{
-                      start_date: null,
-                      end_date: null,
-                    }}
-                    validationSchema={validationSchema}
-                    onSubmit={(values, { setSubmitting }) => {
-                      setTimeout(() => {
-                        setSubmitting(false);
-                        alert(JSON.stringify(values, null, 2));
-                      }, 500);
-                    }}
-                  >
-                    {({ errors, touched, values }) => (
-                      <Form>
-                        <DatePicker
-                          className={classes.customInput}
-                          label="Ngày bắt đầu áp dụng"
-                          value={formik.values.start_date}
-                          name="start_date"
-                          disablePast
-                          format="DD/MM/YYYY"
-                          onChange={(value) => {
-                            formik.setFieldValue('start_date', dayjs(value));
-                          }}
-                        />
-                        {touched.start_date && errors.start_date && <div>{errors.start_date}</div>}
-                        <DatePicker
-                          disablePast
-                          label="Ngày hết hạn"
-                          className={classes.customInput}
-                          value={formik.values.end_date}
-                          name="end_date"
-                          format="DD/MM/YYYY"
-                          onChange={(value) => {
-                            if (dayjs(value) >= formik.values.start_date) {
-                              formik.setFieldValue('end_date', dayjs(value));
-                            } else {
-                              formik.setFieldValue('end_date', null);
-                              setMsg('Ngày hết hạn phải bằng hoặc sau ngày phát hành');
-                              setOpen(true);
-                            }
-                          }}
-                          renderInput={(params) => <TextField size="small" {...params} sx={{ width: '100%' }} />}
-                        />
-                      </Form>
-                    )}
-                  </Formik>
-                </LocalizationProvider>
-              </Stack>
-              {/* Location */}
-              <TextField
-                label="Tên địa điểm diễn ra ưu đãi:"
-                margin="normal"
-                name="location.name"
-                value={formik.values.location.name}
-                onChange={formik.handleChange}
-                fullWidth
-                required
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                className={classes.infoLocation}
-              />
-              <TextField
-                label="Số điện thoai"
-                name="location.phoneNum"
-                value={formik.values.location.phoneNum}
-                onChange={formik.handleChange}
-                margin="normal"
-                fullWidth
-                required
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                className={classes.infoLocation}
-              />
-              <Stack direction="row" spacing={1} justifyContent="flex-start" alignItems="center">
+      <Formik initialValues={initialValues} validationSchema={validationSchema}>
+        <Container maxWidth="xl" className={classes.root}>
+          <Paper className={classes.voucher}>
+            <Typography variant="h3" component="h1" className={classes.title}>
+              Tạo ưu đãi mới
+            </Typography>
+            <Box sx={{ minWidth: 800 }}>
+              <form onSubmit={handleSubmit}>
+                {/* Name of voucher */}
                 <TextField
-                  label="Số nhà"
-                  name="location.addressNum"
-                  value={formik.values.location.addressNum}
-                  onChange={formik.handleChange}
-                  required
-                  className={classes.infoLocation}
                   fullWidth
-                  sx={{ marginRight: '30px' }}
+                  margin="normal"
+                  label="Tên ưu đãi"
+                  name="nameVoucher"
+                  value={formik.values.nameVoucher}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.nameVoucher && Boolean(formik.errors.nameVoucher)}
+                  helperText={formik.touched.nameVoucher && formik.errors.nameVoucher}
                 />
-                <FormControl fullWidth margin="normal" className={classes.infoLocation}>
-                  <InputLabel required id="province-label">
-                    Tỉnh/ Thành phố
-                  </InputLabel>
-                  <Select
-                    labelId="province-label"
-                    displayEmpty
-                    name="location.province"
-                    value={formik.values.location.province}
-                    onChange={handleProvinceChange}
-                  >
-                    {ProvinceDisplay.map((province, index) => {
-                      return (
-                        <MenuItem key={province.code} value={province.name}>
-                          <div style={{ paddingLeft: 10 }}>{province.name}</div>
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
-                <FormControl fullWidth margin="normal" className={classes.infoLocation}>
-                  <InputLabel required id="district-label">
-                    Quận/ Huyện
-                  </InputLabel>
-                  <Select
-                    labelId="district-label"
-                    name="location.district"
-                    value={formik.values.location.district}
-                    displayEmpty
-                    onChange={handleDistrictChange}
-                  >
-                    {DistrictDisplay.length > 0 &&
-                      DistrictDisplay.map((district, index) => {
+                {/* Price of voucher */}
+                <Stack direction="row" spacing={4} alignItems="center" sx={{ marginTop: '20px', marginBottom: '20px' }}>
+                  <InputLabel htmlFor="standard-adornment-amount">Giá tiền</InputLabel>
+                  <CurrencyInput
+                    customInput={TextField}
+                    name="priceVoucher"
+                    variant="outlined"
+                    decimalsLimit={2}
+                    value={formik.values.priceVoucher}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.priceVoucher && Boolean(formik.errors.priceVoucher)}
+                    helperText={formik.touched.priceVoucher && formik.errors.priceVoucher}
+                    onValueChange={(value, name) => formik.setFieldValue(name, value)}
+                    InputProps={{
+                      startAdornment: <span style={{ paddingRight: '10px' }}>Xu</span>,
+                    }}
+                  />
+                </Stack>
+                {/* Quantity */}
+                <TextField
+                  fullWidth
+                  margin="normal"
+                  label="Số lượng phát hành*"
+                  name="quantity"
+                  type="number"
+                  value={formik.values.quantity}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.quantity && Boolean(formik.errors.quantity)}
+                  helperText={formik.touched.quantity && formik.errors.quantity}
+                />
+                {/* Description */}
+                <TextField
+                  fullWidth
+                  margin="normal"
+                  label="Thêm mô tả*"
+                  name="description"
+                  value={formik.values.description}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.description && Boolean(formik.errors.description)}
+                  helperText={formik.touched.description && formik.errors.description}
+                />
+                {/* Code */}
+                <TextField
+                  fullWidth
+                  margin="normal"
+                  label="Mã ưu đãi*"
+                  name="code"
+                  value={formik.values.code}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.code && Boolean(formik.errors.code)}
+                  helperText={formik.touched.code && formik.errors.code}
+                />
+                {/* Timeline */}
+                <Stack
+                  direction="row"
+                  sx={{ marginBottom: 6 }}
+                  justifyContent="flext-start"
+                  alignItems="center"
+                  spacing={3}
+                >
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        className={classes.customInput}
+                        label="Ngày bắt đầu áp dụng"
+                        value={formik.values.start_date}
+                        onBlur={formik.handleBlur}
+                        error={formik.errors.start_date}
+                        helperText={formik.touched.start_date && Boolean(formik.errors.start_date)}
+                        touched={formik.touched.start_date}
+                        name="start_date"
+                        disablePast
+                        format="DD/MM/YYYY"
+                        onChange={(value) => {
+                          formik.setFieldValue('end_date', null);
+                          formik.setFieldValue('start_date', dayjs(value));
+                        }}
+                      />
+                      <DatePicker
+                        disablePast
+                        label="Ngày hết hạn"
+                        className={classes.customInput}
+                        value={formik.values.end_date}
+                        onBlur={formik.handleBlur}
+                        error={formik.touched.end_date && Boolean(formik.errors.end_date)}
+                        helperText={formik.touched.end_date && formik.errors.end_date}
+                        touched={formik.touched.end_date}
+                        name="end_date"
+                        format="DD/MM/YYYY"
+                        onChange={(value) => {
+                          if (dayjs(value) >= formik.values.start_date) {
+                            formik.setFieldValue('end_date', dayjs(value));
+                          } else {
+                            formik.setFieldValue('end_date', null);
+                            setMsg('Ngày hết hạn phải bằng hoặc sau ngày phát hành');
+                            setOpen(true);
+                          }
+                        }}
+                        renderInput={(params) => <TextField size="small" {...params} sx={{ width: '100%' }} />}
+                      />
+                  </LocalizationProvider>
+                </Stack>
+                {/* Location */}
+                <TextField
+                  label="Tên địa điểm diễn ra ưu đãi:"
+                  margin="normal"
+                  name="location.name"
+                  value={formik.values.location.name}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.errors.location?.name && formik.touched.location?.name}
+                  helperText={formik.errors.location?.name}
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  className={classes.infoLocation}
+                />
+                <TextField
+                  label="Số điện thoai"
+                  name="location.phoneNum"
+                  value={formik.values.location.phoneNum}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.errors.location?.phoneNum && formik.touched.location?.phoneNum}
+                  helperText={formik.errors.location?.phoneNum}
+                  margin="normal"
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  className={classes.infoLocation}
+                />
+                <Stack direction="row" spacing={1} justifyContent="flex-start" alignItems="center">
+                  <TextField
+                    label="Số nhà"
+                    name="location.addressNum"
+                    value={formik.values.location.addressNum}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.location?.addressNum && formik.touched.location?.addressNum}
+                    helperText={formik.errors.location?.addressNum}
+                    required
+                    className={classes.infoLocation}
+                    fullWidth
+                    sx={{ marginRight: '30px' }}
+                  />
+                  <FormControl fullWidth margin="normal" className={classes.infoLocation}>
+                    <InputLabel required id="province-label">
+                      Tỉnh/ Thành phố
+                    </InputLabel>
+                    <Select
+                      labelId="province-label"
+                      displayEmpty
+                      name="location.province"
+                      value={formik.values.location.province}
+                      onBlur={formik.handleBlur}
+                      error={formik.errors.location?.province && formik.touched.location?.province}
+                      helperText={formik.errors.location?.province}
+                      onChange={handleProvinceChange}
+                    >
+                      {ProvinceDisplay.map((province, index) => {
                         return (
-                          <MenuItem key={district.code} value={district.name}>
-                            <div style={{ paddingLeft: 10 }}>{district.name}</div>
+                          <MenuItem key={province.code} value={province.name}>
+                            <div style={{ paddingLeft: 10 }}>{province.name}</div>
                           </MenuItem>
                         );
                       })}
-                  </Select>
-                </FormControl>
+                    </Select>
+                  </FormControl>
+                  <FormControl fullWidth margin="normal" className={classes.infoLocation}>
+                    <InputLabel required id="district-label">
+                      Quận/ Huyện
+                    </InputLabel>
+                    <Select
+                      labelId="district-label"
+                      name="location.district"
+                      value={formik.values.location.district}
+                      onBlur={formik.handleBlur}
+                      error={formik.errors.location?.district && formik.touched.location?.district}
+                      helperText={formik.errors.location?.district}
+                      displayEmpty
+                      onChange={handleDistrictChange}
+                    >
+                      {DistrictDisplay.length > 0 &&
+                        DistrictDisplay.map((district, index) => {
+                          return (
+                            <MenuItem key={district.code} value={district.name}>
+                              <div style={{ paddingLeft: 10 }}>{district.name}</div>
+                            </MenuItem>
+                          );
+                        })}
+                    </Select>
+                  </FormControl>
+                  <FormControl fullWidth margin="normal" className={classes.infoLocation}>
+                    <InputLabel required id="ward-label">
+                      Phường/ Xã
+                    </InputLabel>
+                    <Select
+                      labelId="ward-label"
+                      name="location.ward"
+                      value={formik.values.location.ward}
+                      onBlur={formik.handleBlur}
+                      error={formik.errors.location?.ward && formik.touched.location?.ward}
+                      helperText={formik.errors.location?.ward}
+                      onChange={formik.handleChange}
+                    >
+                      {WardDisplay.length > 0 &&
+                        WardDisplay.map((ward, _index) => {
+                          return (
+                            <MenuItem key={ward.code} value={ward.name}>
+                              <div style={{ paddingLeft: 10 }}>{ward.name}</div>
+                            </MenuItem>
+                          );
+                        })}
+                    </Select>
+                  </FormControl>
+                </Stack>
                 <FormControl fullWidth margin="normal" className={classes.infoLocation}>
                   <InputLabel required id="ward-label">
-                    Phường/ Xã
+                    Loại địa điểm
                   </InputLabel>
                   <Select
-                    labelId="ward-label"
-                    name="location.ward"
-                    value={formik.values.location.ward}
+                    name="location.type"
+                    value={formik.values.location.type}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.location?.type && formik.touched.location?.type}
+                    helperText={formik.errors.location?.type}
                     onChange={formik.handleChange}
                   >
-                    {WardDisplay.length > 0 &&
-                      WardDisplay.map((ward, _index) => {
+                    {LocationTypeDisplay.length > 0 &&
+                      LocationTypeDisplay.map((type, _index) => {
                         return (
-                          <MenuItem key={ward.code} value={ward.name}>
-                            <div style={{ paddingLeft: 10 }}>{ward.name}</div>
+                          <MenuItem key={type} value={type}>
+                            <div style={{ paddingLeft: 10 }}>{type}</div>
                           </MenuItem>
                         );
                       })}
                   </Select>
                 </FormControl>
-              </Stack>
-              <FormControl fullWidth margin="normal" className={classes.infoLocation}>
-                <InputLabel required id="ward-label">
-                  Loại địa điểm
-                </InputLabel>
-                <Select name="location.type" value={formik.values.location.type} onChange={formik.handleChange}>
-                  {LocationTypeDisplay.length > 0 &&
-                    LocationTypeDisplay.map((type, _index) => {
-                      return (
-                        <MenuItem key={type} value={type}>
-                          <div style={{ paddingLeft: 10 }}>{type}</div>
-                        </MenuItem>
-                      );
-                    })}
-                </Select>
-              </FormControl>
-              <TextField
-                label="Thêm mô tả cho địa điểm"
-                margin="normal"
-                name="location.description"
-                value={formik.values.location.description}
-                onChange={formik.handleChange}
-                fullWidth
-                className={classes.infoLocation}
-              />
-              {/* Image */}
-              <IconButton color="primary" aria-label="upload picture" component="label">
-                <input hidden onChange={onFileInputChange} accept="image/*" type="file" />
-                <PhotoCamera />
-              </IconButton>
-              {fileUpload && (
-                <div>
-                  <img src={URL.createObjectURL(fileUpload)} alt="Thumb" height="400" />
-                </div>
-              )}
-            </form>
-          </Box>
-          <LoadingButton
-            className={classes.button}
-            sx={{ marginTop: '30px' }}
-            fullWidth
-            size="small"
-            type="submit"
-            variant="contained"
-            onClick={handleSubmit}
-          >
-            Tạo ưu đãi
-          </LoadingButton>
-        </Paper>
-      </Container>
+                <TextField
+                  label="Thêm mô tả cho địa điểm"
+                  margin="normal"
+                  name="location.description"
+                  value={formik.values.location.description}
+                  onBlur={formik.handleBlur}
+                  error={formik.errors.location?.description && formik.touched.location?.description}
+                  helperText={formik.errors.location?.description}
+                  onChange={formik.handleChange}
+                  fullWidth
+                  className={classes.infoLocation}
+                />
+                {/* Image */}
+                <IconButton color="primary" aria-label="upload picture" component="label">
+                  <input hidden onChange={onFileInputChange} accept="image/*" type="file" />
+                  <PhotoCamera />
+                </IconButton>
+                {fileUpload && (
+                  <div>
+                    <img src={URL.createObjectURL(fileUpload)} alt="Thumb" height="400" />
+                  </div>
+                )}
+              </form>
+            </Box>
+            <LoadingButton
+              className={classes.button}
+              sx={{ marginTop: '30px' }}
+              disabled={!formik.isValid}
+              fullWidth
+              size="small"
+              type="submit"
+              variant="contained"
+              onClick={handleSubmit}
+            >
+              Tạo ưu đãi
+            </LoadingButton>
+          </Paper>
+        </Container>
+      </Formik>
     </>
   );
 };
