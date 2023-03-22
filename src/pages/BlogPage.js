@@ -5,6 +5,7 @@ import { LoadingButton } from '@mui/lab';
 import { useNavigate } from 'react-router-dom';
 import { filter } from 'lodash';
 import { styled, alpha } from '@mui/material/styles';
+
 // @mui
 import {
   Grid,
@@ -16,11 +17,14 @@ import {
   OutlinedInput,
   InputAdornment,
   Paper,
+  Pagination,
+  Box,
 } from '@mui/material';
 // components
 import Iconify from '../components/iconify';
 import { BlogPostCard } from '../sections/@dashboard/blog';
 import tripApi from '../api/tripApi';
+import usePagination from '../components/paging/Pagination';
 
 // ----------------------------------------------------------------------
 
@@ -73,6 +77,12 @@ export default function BlogPage() {
   const [trips, setTrips] = useState([]);
   const [sort, setSort] = useState('desc');
   const [filterName, setFilterName] = useState('');
+  const [page, setPage] = useState(1);
+  const PER_PAGE = 19;
+
+  const handleChange = (event, value) => {
+    setPage(value);
+  };
 
   const filteredTrips = applySortFilter(trips, filterName);
   const isNotFound = !filteredTrips.length && !!filterName;
@@ -95,6 +105,14 @@ export default function BlogPage() {
     console.log(response);
   };
 
+  const count = Math.ceil(filteredTrips.length / PER_PAGE);
+  const _DATA = usePagination(filteredTrips, PER_PAGE);
+
+  const handleChangePage = (e, p) => {
+    setPage(p);
+    _DATA.jump(p);
+  };
+
   return (
     <>
       <Helmet>
@@ -106,6 +124,7 @@ export default function BlogPage() {
           <Typography variant="h4" gutterBottom>
             Tất cả chuyến đi
           </Typography>
+
           {currentUser.role !== 'ADMIN' ? (
             <LoadingButton
               sx={{
@@ -145,11 +164,35 @@ export default function BlogPage() {
             ))}
           </TextField>
         </Stack>
-
+        <Grid
+          container
+          spacing={2}
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          sx={{ paddingBottom: '20px' }}
+        >
+          <Grid item xs={3}>
+            <Pagination count={count} page={page} variant="outlined" shape="rounded" onChange={handleChangePage} />
+          </Grid>
+        </Grid>
         <Grid container spacing={3}>
-          {filteredTrips.map((post, index) => (
+          {_DATA.currentData().map((post, index) => (
             <BlogPostCard key={post.id} post={post} index={index} />
           ))}
+        </Grid>
+
+        <Grid
+          container
+          spacing={2}
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          sx={{ paddingTop: '20px' }}
+        >
+          <Grid item xs={3}>
+            <Pagination count={count} page={page} variant="outlined" shape="rounded" onChange={handleChangePage} />
+          </Grid>
         </Grid>
         {isNotFound && (
           <Paper

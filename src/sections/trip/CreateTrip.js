@@ -184,10 +184,10 @@ const DisplayingErrorMessagesSchema = Yup.object().shape({
   }),
   description: Yup.string().required('Vui lòng nhập mô tả cho chuyến đi của bạn'),
   deposit: Yup.number().min(1, 'Số tiền đặt cọc cho chuyến đi phải lớn hơn 0'),
-  minMember: Yup.number().min(1, 'Có ít nhất 1 thành viên'),
+  minMember: Yup.number().min(1, 'Phải có ít nhất 1 thành viên'),
   maxMember: Yup.number()
     .required('Bắt buộc')
-    .test('is-greater-than-min', 'Max price must be greater than min price', function (maxMember) {
+    .test('is-greater-than-min', 'Số thành viên phải lớn hơn số thành viên nhỏ nhất', function (maxMember) {
       const { minMember } = this.parent;
       return minMember === undefined || maxMember === undefined || maxMember > minMember;
     }),
@@ -975,6 +975,7 @@ const CreateTrip = () => {
                           helperText={formik.errors.description}
                           label="Mô tả về chuyến đi của bạn"
                           margin="normal"
+                          required
                           fullWidth
                         />
                         <Stack
@@ -1008,7 +1009,7 @@ const CreateTrip = () => {
                           <OutlinedInput
                             name="minMember"
                             defaultValue={2}
-                            value={formik.values.minMember > 0 ? formik.values.minMember : 1}
+                            value={formik.values.minMember}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             error={formik.errors.minMember && formik.touched.minMember}
@@ -1019,7 +1020,7 @@ const CreateTrip = () => {
                           />
                           <OutlinedInput
                             name="maxMember"
-                            value={formik.values.maxMember > 0 ? formik.values.maxMember : 2}
+                            value={formik.values.maxMember}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             error={formik.errors.maxMember && formik.touched.maxMember}
