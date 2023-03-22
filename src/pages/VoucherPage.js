@@ -10,7 +10,8 @@ import { filter } from 'lodash';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
 import Iconify from '../components/iconify';
-import { VoucherSort, VoucherList, VoucherCartWidget, VoucherFilterSidebar } from '../sections/@dashboard/voucher';
+import { VoucherSort, VoucherList, VoucherFilterSidebar } from '../sections/@dashboard/voucher';
+import LoadingSpinner from '../components/loading/LoadingSpinner';
 
 const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
   width: 240,
@@ -54,6 +55,7 @@ export default function VoucherPage() {
   const [size, setSize] = useState(200);
   const [totalPages, setTotalPages] = useState(0);
   const [filterName, setFilterName] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const filteredVouchers = applySortFilter(vouchers, filterName);
   const isNotFound = !filteredVouchers.length && !!filterName;
@@ -72,6 +74,7 @@ export default function VoucherPage() {
         });
         setVouchers(response.data.data);
         setTotalPages(response.data.totalPages);
+        setLoading(false);
       } catch (error) {
         console.error(error);
       }
@@ -91,7 +94,9 @@ export default function VoucherPage() {
   const handlePageChange = (event, value) => {
     setPage(value);
   };
-
+  if (loading) {
+    return <LoadingSpinner />;
+  }
   return (
     <>
       <Helmet>

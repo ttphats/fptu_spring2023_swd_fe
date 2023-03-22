@@ -26,6 +26,7 @@ import SvgColor from '../../components/svg-color';
 import Iconify from '../../components/iconify';
 import tripApi from '../../api/tripApi';
 import voucherApi from '../../api/voucherApi';
+import LoadingSpinner from '../../components/loading/LoadingSpinner';
 
 // ----------------------------------------------------------------------
 
@@ -67,11 +68,13 @@ export default function TripDetails({ trip }) {
   const [members, setMembers] = useState([]);
   const [vouchers, setVouchers] = useState([]);
   const [openConfirm, setOpenConfirm] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   async function getListVouchers() {
     if (trip.id) {
       const reps = await voucherApi.getVouchersByTripID(trip?.id);
       setVouchers(reps.data);
+      setLoading(false);
     }
   }
 
@@ -130,6 +133,11 @@ export default function TripDetails({ trip }) {
   const handleBack = () => {
     navigate('/');
   };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <>
       {successMsg && (

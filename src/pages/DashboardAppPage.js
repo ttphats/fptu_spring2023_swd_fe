@@ -22,6 +22,7 @@ import {
 } from '../sections/@dashboard/app';
 import adminApi from '../api/adminApi';
 import tripApi from '../api/tripApi';
+import LoadingSpinner from '../components/loading/LoadingSpinner';
 
 // ----------------------------------------------------------------------
 
@@ -33,7 +34,7 @@ export default function DashboardAppPage() {
   const [users, setUsers] = useState([]);
   const [trips, setTrips] = useState([]);
   const [vouchers, setVouchers] = useState([]);
-
+  const [loading, setLoading] = useState(true);
 
   async function fetchUser() {
     const users = await adminApi.getListUser();
@@ -47,7 +48,7 @@ export default function DashboardAppPage() {
 
   async function fetchVoucher() {
     const vouchers = await adminApi.getListVoucher();
-  console.log(vouchers)
+    console.log(vouchers);
     setVouchers(vouchers.data);
   }
 
@@ -55,6 +56,7 @@ export default function DashboardAppPage() {
     fetchUser();
     fetchTrip();
     fetchVoucher();
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -65,6 +67,10 @@ export default function DashboardAppPage() {
       navigate('/home');
     }
   }, [localStorage.getItem('access-token'), userInfo]);
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>
@@ -78,7 +84,12 @@ export default function DashboardAppPage() {
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Người dùng trong hệ thống" total={users?.length} color="info" icon={'emojione-monotone:motorcycle'} />
+            <AppWidgetSummary
+              title="Người dùng trong hệ thống"
+              total={users?.length}
+              color="info"
+              icon={'emojione-monotone:motorcycle'}
+            />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
             <AppWidgetSummary title="Chuyến đi" total={trips?.length} icon={'fluent:beach-16-filled'} />

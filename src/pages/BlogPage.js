@@ -20,11 +20,12 @@ import {
   Pagination,
   Box,
 } from '@mui/material';
+import usePagination from '../components/paging/Pagination';
 // components
 import Iconify from '../components/iconify';
 import { BlogPostCard } from '../sections/@dashboard/blog';
 import tripApi from '../api/tripApi';
-import usePagination from '../components/paging/Pagination';
+import LoadingSpinner from '../components/loading/LoadingSpinner';
 
 // ----------------------------------------------------------------------
 
@@ -78,6 +79,7 @@ export default function BlogPage() {
   const [sort, setSort] = useState('desc');
   const [filterName, setFilterName] = useState('');
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
   const PER_PAGE = 19;
 
   const handleChange = (event, value) => {
@@ -91,6 +93,7 @@ export default function BlogPage() {
       try {
         const response = await tripApi.getAllTrips(sort);
         setTrips(response.data);
+        setLoading(false);
       } catch (error) {
         console.log(error);
       }
@@ -112,6 +115,10 @@ export default function BlogPage() {
     setPage(p);
     _DATA.jump(p);
   };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>
