@@ -123,7 +123,7 @@ export default function LoginPage() {
 
             <Typography variant="body2" sx={{ mb: 5 }}>
               Bạn chưa có tài khoản? {''}
-              <Link href="/register" variant="subtitle2">
+              <Link href="/register" sx={{color: '#F39137'}} variant="subtitle2">
                 Đăng ký ngay
               </Link>
             </Typography>

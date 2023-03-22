@@ -24,6 +24,7 @@ import Chip from '@mui/material/Chip';
 import HomeIcon from '@mui/icons-material/Home';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import { LoadingButton } from '@mui/lab';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -45,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: theme.spacing(1),
   },
   button: {
-    background: 'linear-gradient(45deg, #6D17CB 30%, #2876F9 90%)',
+    background: 'linear-gradient(45deg, #F39137 30%, #FF7B54 90%)',
     border: 0,
     borderRadius: 3,
     boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
@@ -128,11 +129,15 @@ const VoucherDetailPage = () => {
   }
 
   return (
-    <Container className={classes.root} sx={{ margin: "0 auto" }}>
-      <div role="presentation" >
+    <Container className={classes.root} sx={{ margin: '0 auto' }}>
+      <div role="presentation">
         <Breadcrumbs aria-label="breadcrumb">
           <StyledBreadcrumb component="a" href="/" label="Trang chủ" icon={<HomeIcon fontSize="small" />} />
-          <StyledBreadcrumb component="a" href="/dashboard/voucher" label="Các ưu đãi" />
+          {currentUser.role === 'ADMIN' ? (
+            <StyledBreadcrumb component="a" href="/dashboard/voucher" label="Các ưu đãi" />
+          ) : (
+            <StyledBreadcrumb component="a" href="/home/voucher" label="Các ưu đãi" />
+          )}
           <StyledBreadcrumb component="a" href="#" label="Chi tiết ưu đãi" />
         </Breadcrumbs>
       </div>
@@ -200,22 +205,25 @@ const VoucherDetailPage = () => {
             </Grid>
           </Grid>
 
-          <Typography variant="body2" className={classes.section} >
-            <span className={classes.value}> *Chọn "Tạo chuyến đi ngay" để bắt đầu lên kế hoạch cho chuyến đi của bạn và sử dụng Ưu đãi. Ưu đãi khả dụng từ ngày &nbsp;
-              <span className={classes.label} >
+          <Typography variant="body2" className={classes.section}>
+            <span className={classes.value}>
+              {' '}
+              *Chọn "Tạo chuyến đi ngay" để bắt đầu lên kế hoạch cho chuyến đi của bạn và sử dụng Ưu đãi. Ưu đãi khả
+              dụng từ ngày &nbsp;
+              <span className={classes.label}>
                 {voucher?.startDate
                   ? dayjs.tz(voucher.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
                   : 'Không xác định'}
               </span>
               &nbsp; đến hết ngày &nbsp;
-              <span className={classes.label} >
-                {voucher?.endDate ? dayjs.tz(voucher.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : 'Không xác định'}
+              <span className={classes.label}>
+                {voucher?.endDate
+                  ? dayjs.tz(voucher.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                  : 'Không xác định'}
               </span>
               .
             </span>
           </Typography>
-
-          
         </Grid>
         <Grid item xs={6} md={4}>
           <Box
@@ -236,15 +244,15 @@ const VoucherDetailPage = () => {
               {voucher.price} Xu
             </Typography>
             {currentUser.role === 'ADMIN' ? (
-              <Button variant="contained" color="secondary" onClick={handleDeleteClick}>
+              <LoadingButton color="secondary" onClick={handleDeleteClick}>
                 Xoá ưu đãi
-              </Button>
+              </LoadingButton>
             ) : null}
             {currentUser.role === 'USER' ? (
               <Link to={`/trip`} state={voucher} style={{ textDecoration: 'none' }} variant="body2">
-                <Button variant="contained" className={classes.button}>
+                <LoadingButton variant="contained" className={classes.button}>
                   Tạo chuyến đi ngay
-                </Button>
+                </LoadingButton>
               </Link>
             ) : null}
           </Box>

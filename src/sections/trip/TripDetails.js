@@ -30,7 +30,7 @@ import voucherApi from '../../api/voucherApi';
 // ----------------------------------------------------------------------
 
 const StyledButton = styled(LoadingButton)(({ theme }) => ({
-  background: 'linear-gradient(45deg, #6D17CB 30%, #2876F9 90%)',
+  background: 'linear-gradient(45deg, #F39137 30%, #FF7B54 90%)',
   border: 0,
   borderRadius: 3,
   boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
@@ -158,7 +158,7 @@ export default function TripDetails({ trip }) {
         >
           <Grid container direction="column" spacing={2}>
             <Grid item>
-              <Typography gutterBottom variant="h3" component="div">
+              <Typography gutterBottom variant="h3" sx={{ color: '#FF7300' }} component="div">
                 {!trip?.name ? 'Đã bao lâu rồi chúng ta chưa có dịp đi chơi cùng nhau' : trip.name}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -183,8 +183,8 @@ export default function TripDetails({ trip }) {
             <Grid item xs={12} sx={{ marginTop: 5 }} sm container>
               <Grid item xs container direction="column" spacing={4}>
                 <Grid item xs>
-                <Box mt={2}>
-                    <Typography variant="h5" sx={{ color: '#2F58CD' }} gutterBottom>
+                  <Box mt={2}>
+                    <Typography variant="h5" sx={{ color: '#FF884B' }} gutterBottom>
                       <Icon icon="fluent:text-description-24-filled" />
                       &nbsp;Mô tả
                     </Typography>
@@ -193,7 +193,7 @@ export default function TripDetails({ trip }) {
                     </Typography>
                   </Box>
                   <Box mt={2}>
-                    <Typography variant="h5" sx={{ color: '#2F58CD' }} gutterBottom>
+                    <Typography variant="h5" sx={{ color: '#FF884B' }} gutterBottom>
                       <Icon icon="iconoir:maps-go-straight" vFlip />
                       &nbsp;Thông tin địa điểm xuất phát
                     </Typography>
@@ -215,11 +215,10 @@ export default function TripDetails({ trip }) {
                     </Typography>
                   </Box>
                   <Box mt={2}>
-                    <Typography variant="h5" sx={{ color: '#2F58CD' }} gutterBottom>
+                    <Typography variant="h5" sx={{ color: '#FF884B' }} gutterBottom>
                       <Icon icon="mdi:map-marker" />
                       &nbsp;Thông tin điểm đến
                     </Typography>
-                    S
                     <Typography variant="h6" gutterBottom>
                       Tên địa điểm đến:&nbsp; {trip?.endLocation.name ? trip.endLocation.name : ''}
                     </Typography>
@@ -296,8 +295,9 @@ export default function TripDetails({ trip }) {
             ))}
           </Paper>
           {/* Trip vouchers */}
-          <Typography variant="h6" gutterBottom>
-            Voucher của chuyến đi:
+          <Typography variant="h6" sx={{ color: '#FF7300' }} gutterBottom>
+            <Icon icon="fluent:gift-card-multiple-24-filled" />
+            &nbsp;Voucher của chuyến đi:
           </Typography>
           <Paper
             sx={{
@@ -353,7 +353,7 @@ export default function TripDetails({ trip }) {
             rows={{ xs: 4, sm: 8, md: 12 }}
           >
             <Grid item>
-              <Button onClick={handleBack}>
+              <Button onClick={handleBack} sx={{ color: '#FF884B' }}>
                 <Icon icon="ic:baseline-arrow-back-ios-new" />
                 Quay lại
               </Button>

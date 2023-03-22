@@ -111,7 +111,18 @@ export default function NavUser({ openNav, onCloseNav }) {
             </Typography>
           </Box>
 
-          <Button href="https://www.google.com/" target="_blank" variant="contained">
+          <Button
+            href="https://www.google.com/"
+            sx={{
+              backgroundColor: '#FF7300',
+              '&:hover': {
+                backgroundColor: '#F2C6A5',
+                boxShadow: 'none',
+              },
+            }}
+            target="_blank"
+            variant="contained"
+          >
             Nhấp vào đây
           </Button>
         </Stack>

@@ -32,6 +32,7 @@ const StyledVoucherImg = styled('img')({
   height: '100%',
   objectFit: 'cover',
   position: 'absolute',
+  borderRadius: 30,
 });
 
 VoucherCard.propTypes = {
@@ -58,12 +59,12 @@ export default function VoucherCard({ voucher }) {
       <>
         {currentUser.role === 'ADMIN' ? (
           <Link to={`/voucher/${id}`} style={{ textDecoration: 'none' }} variant="body2">
-            <Card sx={{ opacity: 0.5 }}>
+            <Card sx={{ opacity: 0.5, borderRadius: 5 }}>
               <Box
                 className={classes.imageContainer}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
-                sx={{ pt: '60%', position: 'relative' }}
+                sx={{ pt: '60%', position: 'relative', borderRadius: 5 }}
               >
                 <StyledVoucherImg
                   className={`${classes.image} ${isHovered ? classes.zoom : ''}`}
@@ -71,13 +72,11 @@ export default function VoucherCard({ voucher }) {
                   src={imageUrl}
                 />
               </Box>
-
-              <Stack spacing={2} sx={{ p: 3 }}>
-                <Typography variant="subtitle1" noWrap>
+              <Stack spacing={2} sx={{ p: 2 }}>
+                <Typography variant="subtitle1" sx={{ height: '40px' }}>
                   {name}
                 </Typography>
-
-                <Typography variant="body2" color="text.secondary" noWrap>
+                <Typography variant="body2" color="text.secondary" >
                   {description}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" noWrap>
@@ -96,10 +95,6 @@ export default function VoucherCard({ voucher }) {
                   <Typography variant="subtitle1">{locationName}</Typography>
                   <Typography variant="subtitle1">{price} Xu</Typography>
                 </Stack>
-
-                <CardActions>
-                  <LoadingButton disabled>Không còn khả dụng</LoadingButton>
-                </CardActions>
               </Stack>
             </Card>
           </Link>
@@ -109,18 +104,18 @@ export default function VoucherCard({ voucher }) {
 
   return (
     <Link to={`/voucher/${id}`} style={{ textDecoration: 'none' }} variant="body2">
-      <Card>
+      <Card sx={{ borderRadius: 5 }}>
         <Box
           className={classes.imageContainer}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          sx={{ pt: '60%', position: 'relative' }}
+          sx={{ pt: '60%', position: 'relative', borderRadius: 5, }}
         >
           <StyledVoucherImg className={`${classes.image} ${isHovered ? classes.zoom : ''}`} alt={name} src={imageUrl} />
         </Box>
 
         <Stack spacing={2} sx={{ p: 2 }}>
-          <Typography variant="subtitle1">{name}</Typography>
+          <Typography variant="subtitle1"  sx={{ height: '40px' }}>{name}</Typography>
 
           <Typography variant="body2" color="text.secondary" noWrap>
             {description}
