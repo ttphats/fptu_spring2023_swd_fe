@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Container, Typography, InputLabel, TextField } from '@material-ui/core';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -29,6 +30,8 @@ import UploadImage from './UploadImage';
 import userProfileApi from '../../api/userProfileApi';
 import tripApi from '../../api/tripApi';
 import UserTripCard from '../trip/UserTripCard';
+import vnpayApi from '../../api/vnpayApi';
+import LoadingSpinner from '../../components/loading/LoadingSpinner';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
 
 const UserProfile = () => {
   const classes = useStyles();
-
+  const navigate = useNavigate();
   const currentUser = useSelector((state) => state.user.current);
   const [email, setEmail] = useState('');
   const [fullname, setFullname] = useState('');
@@ -69,9 +72,46 @@ const UserProfile = () => {
   const [ward, setWard] = useState(currentUser?.address?.split(', ')[1] || '');
   const [open, setOpen] = useState(false);
   const [trips, setTrips] = useState([]);
+  const [vndAmount, setVndAmount] = useState();
+  const [pointAmount, setPointAmount] = useState('');
+  const [openPayment, setOpenPayment] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState(false);
+  const [openPaymentStatus, setOpenPaymentStatus] = useState(false);
+
   const { vertical, horizontal } = {
     vertical: 'top',
     horizontal: 'right',
+  };
+  const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const statusPaymentAfterRedirect = searchParams?.get('vnp_ResponseCode');
+
+  useEffect(() => {
+    if (statusPaymentAfterRedirect === '00') {
+      // Payment was successful
+      // const orderNumber = searchParams.get('vnp_TxnRef');
+      // const paymentAmount = searchParams.get('vnp_Amount');
+      // const paymentDate = searchParams.get('vnp_PayDate');
+      setPaymentStatus(true);
+      setOpenPaymentStatus(true);
+    }
+  }, [statusPaymentAfterRedirect]);
+
+  const handleVndAmountChange = (event) => {
+    const vndToPointsRatio = 1000;
+    const convertedVnd = Math.floor(event.target.value * vndToPointsRatio);
+    setPointAmount(event.target.value);
+    setVndAmount(convertedVnd);
+  };
+
+  const handlePayment = async () => {
+    const response = await vnpayApi.depositMoneyToAccount(vndAmount, 'http://localhost:3263/user-profile');
+    console.log(response);
+    if (response) {
+      window.location.href = response.data;
+      setLoading(false);
+    }
   };
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -97,6 +137,8 @@ const UserProfile = () => {
       });
       if (response) {
         setOpen(true);
+        setOpenDialog(false);
+        setLoading(false);
       }
     } catch (error) {
       console.log(error);
@@ -155,15 +197,29 @@ const UserProfile = () => {
   async function fetchTripsUserJoined() {
     const response = await tripApi.getAllTripsUserJoined(currentUser.id);
     setTrips(response.data);
+    setLoading(false);
   }
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
-
+    setOpenPayment(false);
     setOpen(false);
   };
+
+  const handleClosePaymentStatus = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setPaymentStatus(false);
+    setOpenPaymentStatus(false);
+    navigate('/user-profile');
+  };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>
@@ -185,10 +241,24 @@ const UserProfile = () => {
             {email}
           </Typography>
           <Stack direction="row">
-            <LoadingButton variant="outlined" onClick={handleClickOpenDialog}>
+            <LoadingButton
+              sx={{
+                color: '#FF7300',
+                borderColor: '#FF7300',
+                '&:hover': {
+                  backgroundColor: '#F2C6A5',
+                  boxShadow: 'none',
+                },
+              }}
+              variant="outlined"
+              onClick={handleClickOpenDialog}
+            >
               Cập nhật thông tin cá nhân
             </LoadingButton>
-            <Button sx={{ '&:hover': { backgroundColor: 'transparent' }, color: '#5D9C59' }}>
+            <Button
+              onClick={() => setOpenPayment(true)}
+              sx={{ '&:hover': { backgroundColor: 'transparent' }, color: '#3A98B9', fontSize: '16px' }}
+            >
               Số dư: {Intl.NumberFormat('en-US').format(currentUser?.balance)} &nbsp;{' '}
               <Icon icon="material-symbols:add-circle-outline" />
             </Button>
@@ -287,9 +357,9 @@ const UserProfile = () => {
             </DialogContent>
           </Dialog>
           <Stack sx={{ marginTop: 3 }}>
-            <Box component="h3" sx={{ color: 'primary.main' }}>
+            <Box component="h3" sx={{ color: '#FF7300' }}>
               <Icon icon="icon-park-outline:round-trip" />
-               &nbsp; Chuyến đi đã tham gia gần đây:
+              &nbsp; Chuyến đi đã tham gia gần đây:
             </Box>
             <Grid container spacing={3}>
               {trips.map((post, index) => (
@@ -299,6 +369,73 @@ const UserProfile = () => {
           </Stack>
         </Paper>
       </Container>
+      <Dialog open={openPayment} onClose={handleClose}>
+        <DialogTitle sx={{ color: '#FF7300' }}>
+          <Typography variant="h4" gutterBottom>
+            Nạp xu vào tài khoản{' '}
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            <Typography variant="h6" display="block" gutterBottom>
+              Nhập số xu muốn nạp:
+            </Typography>
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Số lượng xu"
+            type="number"
+            fullWidth
+            value={pointAmount}
+            onChange={handleVndAmountChange}
+          />
+          <DialogContentText>
+            Số tiền cần thanh toán: {vndAmount ? <Box sx={{ color: '#FF7300' }}>{Intl.NumberFormat('en-US').format(vndAmount)} VNĐ{' '}</Box> : ''} 
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} sx={{ color: '#FFBF9B' }}>
+            Huỷ
+          </Button>
+          <Button onClick={handlePayment} disabled={!pointAmount} sx={{ color: '#FF884B' }}>
+            Xác nhận thanh toán
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openPaymentStatus}
+        onClose={handleClosePaymentStatus}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            <Box sx={{ marginLeft: '90px', marginRight: '90px' }}>
+              <Icon icon="mdi:success-circle-outline" color="#63e963" width="168" height="168" />
+            </Box>
+            <Typography variant="h4" gutterBottom>
+              Thanh toán thành công
+            </Typography>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ display: 'flex', justifyContent: ' center' }}>
+          <LoadingButton
+            sx={{
+              backgroundColor: '#FF7300',
+              '&:hover': {
+                backgroundColor: '#F2C6A5',
+                boxShadow: 'none',
+              },
+            }}
+            variant="contained"
+            onClick={handleClosePaymentStatus}
+            autoFocus
+          >
+            Xác nhận
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
