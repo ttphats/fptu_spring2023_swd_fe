@@ -2,7 +2,7 @@ import axiosClient from './axiosClient';
 
 const voucherApi = {
   getVoucherByLocationType: (location) => {
-    const url = '/vouchers/search';
+    const url = '/vouchers';
     return axiosClient.get(`${url}?query=location_type=${location}&page=1&size=10`);
   },
   validateVoucher: (voucherIds) => {

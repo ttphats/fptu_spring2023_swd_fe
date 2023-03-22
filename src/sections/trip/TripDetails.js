@@ -183,10 +183,19 @@ export default function TripDetails({ trip }) {
             <Grid item xs={12} sx={{ marginTop: 5 }} sm container>
               <Grid item xs container direction="column" spacing={4}>
                 <Grid item xs>
+                <Box mt={2}>
+                    <Typography variant="h5" sx={{ color: '#2F58CD' }} gutterBottom>
+                      <Icon icon="fluent:text-description-24-filled" />
+                      &nbsp;Mô tả
+                    </Typography>
+                    <Typography variant="h6" gutterBottom>
+                      {trip?.description ? trip.description : ''}
+                    </Typography>
+                  </Box>
                   <Box mt={2}>
                     <Typography variant="h5" sx={{ color: '#2F58CD' }} gutterBottom>
                       <Icon icon="iconoir:maps-go-straight" vFlip />
-                      Thông tin địa điểm xuất phát
+                      &nbsp;Thông tin địa điểm xuất phát
                     </Typography>
                     <Typography variant="h6" gutterBottom>
                       Tên địa điểm xuất phát: {trip?.startLocation.name ? trip.startLocation.name : ''}
@@ -208,7 +217,7 @@ export default function TripDetails({ trip }) {
                   <Box mt={2}>
                     <Typography variant="h5" sx={{ color: '#2F58CD' }} gutterBottom>
                       <Icon icon="mdi:map-marker" />
-                      Thông tin điểm đến
+                      &nbsp;Thông tin điểm đến
                     </Typography>
                     S
                     <Typography variant="h6" gutterBottom>

@@ -155,7 +155,7 @@ const DisplayingErrorMessagesSchema = Yup.object().shape({
       .max(30, 'Tối đa 30 ký tự')
       .required('Vui lòng không được để trống!'),
     phoneNum: Yup.string()
-      .matches(/^\+?\d{10,12}$/, 'Số định thoại phải từ 10 đến 12 số')
+      .matches(/^\+?\d{10,12}$/, 'Số điện thoại phải từ 10 đến 12 số')
       .required('Vui lòng điền số điện thoại'),
     addressNum: Yup.string().required('Bắt buộc'),
     province: Yup.string().required('Bắt buộc'),
@@ -169,7 +169,7 @@ const DisplayingErrorMessagesSchema = Yup.object().shape({
       .max(30, 'Tối đa 30 ký tự')
       .required('Vui lòng không được để trống!'),
     phoneNum: Yup.string()
-      .matches(/^\+?\d{10,12}$/, 'Số định thoại phải từ 10 đến 12 số')
+      .matches(/^\+?\d{10,12}$/, 'Số điện thoại phải từ 10 đến 12 số')
       .required('Vui lòng điền số điện thoại'),
     addressNum: Yup.string().required('Bắt buộc'),
     province: Yup.string().required('Bắt buộc'),
