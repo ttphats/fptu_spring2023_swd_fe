@@ -132,7 +132,7 @@ const VoucherDetailPage = () => {
       <div role="presentation" >
         <Breadcrumbs aria-label="breadcrumb">
           <StyledBreadcrumb component="a" href="/" label="Trang chủ" icon={<HomeIcon fontSize="small" />} />
-          <StyledBreadcrumb component="a" href="/dashboard/voucher" label="Các ưu đãi" />
+          {currentUser.role === 'ADMIN' ? <StyledBreadcrumb component="a" href="/dashboard/voucher" label="Các ưu đãi" /> : <StyledBreadcrumb component="a" href="/home/voucher" label="Các ưu đãi" />}
           <StyledBreadcrumb component="a" href="#" label="Chi tiết ưu đãi" />
         </Breadcrumbs>
       </div>
