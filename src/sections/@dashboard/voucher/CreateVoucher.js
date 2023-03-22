@@ -133,7 +133,7 @@ const validationSchema = Yup.object().shape({
     type: Yup.string().required('Bắt buộc'),
     description: Yup.string().required('Bắt buộc'),
     phoneNum: Yup.string()
-      .matches(/^\+?\d{10,12}$/, 'Số định thoại phải từ 10 đến 12 số')
+      .matches(/^\+?\d{10,12}$/, 'Số điện thoại phải từ 10 đến 12 số')
       .required('Vui lòng điền số điện thoại'),
   }),
 });
