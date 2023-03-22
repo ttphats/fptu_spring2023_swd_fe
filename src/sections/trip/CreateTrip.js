@@ -66,6 +66,11 @@ const useStyles = makeStyles((theme) => ({
     minHeight: '100vh',
     background: '#f7f7f7',
   },
+  stepper: {
+    "& .Mui-active .MuiStepIcon-root": { color: "#F39137" },
+    "& .Mui-completed .MuiStepIcon-root": { color: "#F39137" },
+    "& .Mui-disabled .MuiStepIcon-root": { color: "#F39137" }
+  },
   formCreate: {
     display: 'flex',
     justifyContent: 'center',
@@ -80,7 +85,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
   },
   title: {
-    background: '-webkit-linear-gradient(45deg, #6D17CB 30%, #2876F9 90%)',
+    background: '-webkit-linear-gradient(45deg, #F39137 30%, #FF7B54 90%)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     fontWeight: 700,
@@ -93,7 +98,7 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 5,
   },
   button: {
-    background: 'linear-gradient(45deg, #6D17CB 30%, #2876F9 90%)',
+    background: 'linear-gradient(45deg, #F39137 30%, #FF7B54 90%)',
     border: 0,
     borderRadius: 3,
     boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
@@ -496,7 +501,7 @@ const CreateTrip = () => {
                 Tạo chuyến đi mới
               </Typography>
               <Box sx={{ minWidth: 800 }}>
-                <Stepper activeStep={activeStep} orientation="vertical">
+                <Stepper className={classes.stepper} activeStep={activeStep} orientation="vertical" sx={{color: '#FF884B'}}>
                   {/* Step 1 */}
                   <Step>
                     <StepLabel>Nhập tên cho chuyến đi của bạn</StepLabel>
@@ -589,7 +594,7 @@ const CreateTrip = () => {
                           >
                             Tiếp tục
                           </LoadingButton>
-                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px' }}>
+                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}>
                             Quay lại
                           </LoadingButton>
                         </div>
@@ -769,7 +774,7 @@ const CreateTrip = () => {
                           >
                             Tiếp tục
                           </LoadingButton>
-                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px' }}>
+                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}>
                             Quay lại
                           </LoadingButton>
                         </div>
@@ -949,7 +954,7 @@ const CreateTrip = () => {
                           >
                             Tiếp tục
                           </LoadingButton>
-                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px' }}>
+                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}>
                             Quay lại
                           </LoadingButton>
                         </div>
@@ -1041,7 +1046,7 @@ const CreateTrip = () => {
                           >
                             Tiếp tục
                           </LoadingButton>
-                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px' }}>
+                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}>
                             Quay lại
                           </LoadingButton>
                         </div>
@@ -1073,7 +1078,7 @@ const CreateTrip = () => {
                           >
                             Tiếp tục
                           </LoadingButton>
-                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px' }}>
+                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}>
                             Quay lại
                           </LoadingButton>
                         </div>
@@ -1203,7 +1208,7 @@ const CreateTrip = () => {
                           >
                             Tiếp tục
                           </LoadingButton>
-                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px' }}>
+                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}>
                             Quay lại
                           </LoadingButton>
                         </div>

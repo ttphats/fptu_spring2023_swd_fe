@@ -10,7 +10,7 @@ import { Box, Link } from '@mui/material';
 const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
   const currentUser = useSelector((state) => state.user.current);
   const logo = (
-    <Box ref={ref} component="img" src="/assets/logo.svg" sx={{ width: 70, height: 70, cursor: 'pointer', ...sx }} />
+    <Box ref={ref} component="img" src="/assets/logo.svg" sx={{ width: 192, height: 192, cursor: 'pointer', ...sx }} />
   );
 
   if (disabledLink) {

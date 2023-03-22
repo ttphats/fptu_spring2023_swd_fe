@@ -24,7 +24,6 @@ export default function LoginForm() {
   const [open, setOpen] = useState(false);
   const currentUser = useSelector((state) => state.user.current);
 
-
   const handleLogin = (e) => {
     e.preventDefault();
     console.log(email, password);
@@ -35,11 +34,11 @@ export default function LoginForm() {
       try {
         await dispatch(userLogin({ email, password }));
         const user = await unwrapResult(await dispatch(getMe()));
-        console.log('current user: ', user.role)
-        if(user.role === "ADMIN"){
+        console.log('current user: ', user.role);
+        if (user.role === 'ADMIN') {
           navigate('/dashboard');
         }
-        if(user.role === "USER"){
+        if (user.role === 'USER') {
           navigate('/home');
         }
         setEmail('');
@@ -47,7 +46,7 @@ export default function LoginForm() {
       } catch (error) {
         console.log(error.response);
         setIsLoginMessage({
-          message: "Đã xảy ra lỗi vui lòng kiểm tra lại thông tin đăng nhập",
+          message: 'Đã xảy ra lỗi vui lòng kiểm tra lại thông tin đăng nhập',
         });
         setSeverity('error');
         setOpen(true);
@@ -86,12 +85,25 @@ export default function LoginForm() {
             <Checkbox name="remember" label="Remember me" />
             <Typography>Ghi nhớ đăng nhập</Typography>
           </Stack>
-          <Link href="/forgotpassword" variant="subtitle2" underline="hover">
+          <Link href="/forgotpassword" sx={{color: '#F39137'}} variant="subtitle2" underline="hover">
             Quên mật khẩu?
           </Link>
         </Stack>
 
-        <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleLogin}>
+        <LoadingButton
+          sx={{
+            backgroundColor: '#F39137',
+            '&:hover': {
+              backgroundColor: '#F2C6A5',
+              boxShadow: 'none',
+            },
+          }}
+          fullWidth
+          size="large"
+          type="submit"
+          variant="contained"
+          onClick={handleLogin}
+        >
           Đăng nhập
         </LoadingButton>
       </form>

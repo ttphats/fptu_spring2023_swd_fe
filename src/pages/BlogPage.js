@@ -53,11 +53,13 @@ function applySortFilter(array, query) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   if (query) {
     return filter(array, (_trip) => {
-      if(_trip.name !== null){
-        console.log(_trip)
-       return _trip.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1 || 
-       _trip.startLocation.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
-       _trip.endLocation.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1;
+      if (_trip.name !== null) {
+        console.log(_trip);
+        return (
+          _trip.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+          _trip.startLocation.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+          _trip.endLocation.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1
+        );
       }
       return false;
     });
@@ -106,6 +108,13 @@ export default function BlogPage() {
           </Typography>
           {currentUser.role !== 'ADMIN' ? (
             <LoadingButton
+              sx={{
+                backgroundColor: '#FF7300',
+                '&:hover': {
+                  backgroundColor: '#F2C6A5',
+                  boxShadow: 'none',
+                },
+              }}
               onClick={() => navigate('/trip')}
               variant="contained"
               startIcon={<Iconify icon="eva:plus-fill" />}

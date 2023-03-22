@@ -12,7 +12,6 @@ import axios from 'axios';
 import Iconify from '../components/iconify';
 import { VoucherSort, VoucherList, VoucherCartWidget, VoucherFilterSidebar } from '../sections/@dashboard/voucher';
 
-
 const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
   width: 240,
   transition: theme.transitions.create(['box-shadow', 'width'], {
@@ -34,9 +33,11 @@ function applySortFilter(array, query) {
   if (query) {
     return filter(array, (_trip) => {
       if (_trip.name !== null) {
-        console.log(_trip)
-        return _trip.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
-          _trip.description?.toLowerCase().indexOf(query.toLowerCase()) !== -1;
+        console.log(_trip);
+        return (
+          _trip.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+          _trip.description?.toLowerCase().indexOf(query.toLowerCase()) !== -1
+        );
       }
       return false;
     });
@@ -113,6 +114,13 @@ export default function VoucherPage() {
           </Typography>
           {currentUser.role === 'ADMIN' ? (
             <LoadingButton
+              sx={{
+                backgroundColor: '#F39137',
+                '&:hover': {
+                  backgroundColor: '#F2C6A5',
+                  boxShadow: 'none',
+                },
+              }}
               onClick={() => navigate('/voucher/create')}
               variant="contained"
               startIcon={<Iconify icon="eva:plus-fill" />}
@@ -133,7 +141,7 @@ export default function VoucherPage() {
         </Stack>
         {Array.isArray(filteredVouchers) ? (
           <Container>
-            <VoucherList vouchers={filteredVouchers} /> 
+            <VoucherList vouchers={filteredVouchers} />
             <br />
             <Grid xs display="flex" justifyContent="center" alignItems="center">
               <Pagination color="primary" count={totalPages} page={page} onChange={handlePageChange} />
