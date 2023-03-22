@@ -13,7 +13,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  Paper,
   Container,
   TextField,
 } from '@material-ui/core';
@@ -25,6 +24,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { LoadingButton } from '@mui/lab';
+import LoadingSpinner from '../components/loading/LoadingSpinner';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -94,6 +94,7 @@ const VoucherDetailPage = () => {
   const navigate = useNavigate();
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const currentUser = useSelector((state) => state.user.current);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchVoucher = async () => {
@@ -105,6 +106,7 @@ const VoucherDetailPage = () => {
       };
       const response = await axios.get(`https://hqtbe.site/api/v1/vouchers/voucherId/${id}`, config);
       setVoucher(response.data.data);
+      setLoading(false);
     };
     fetchVoucher();
   }, [id]);
@@ -123,11 +125,9 @@ const VoucherDetailPage = () => {
     await axios.delete(`https://hqtbe.site/api/v1/vouchers/voucherId/${id}`, config);
     navigate('/dashboard/voucher');
   };
-
-  if (!voucher) {
-    return <Typography variant="h6">Loading...</Typography>;
+  if (loading) {
+    return <LoadingSpinner />;
   }
-
   return (
     <Container className={classes.root} sx={{ margin: '0 auto' }}>
       <div role="presentation">

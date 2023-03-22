@@ -83,7 +83,6 @@ export default function UserTripCard({ post, index }) {
   const latestPost = index === 1 || index === 2;
   //  const [members, setMembers] = useState([]);
   const [open, setOpen] = useState(false);
-  console.log(post);
 
   // useEffect(() => {
   //   async function fetchData() {
