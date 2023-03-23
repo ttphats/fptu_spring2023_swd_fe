@@ -6,13 +6,6 @@ import { Link } from 'react-router-dom';
 import { alpha, styled } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
 import { Box, Card, Grid, Avatar, Typography, CardContent } from '@mui/material';
-import TextField from '@mui/material/TextField';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-import Paper from '@mui/material/Paper';
-import ButtonBase from '@mui/material/ButtonBase';
 import { Icon } from '@iconify/react';
 import dayjs from 'dayjs';
 // utils
@@ -81,23 +74,10 @@ export default function UserTripCard({ post, index }) {
   const { title, view, comment, share, author, createdAt } = post;
   const latestPostLarge = index === 0;
   const latestPost = index === 1 || index === 2;
-  //  const [members, setMembers] = useState([]);
   const [open, setOpen] = useState(false);
 
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     try {
-  //       const getUser = await tripApi.getTripMembers(post.id);
-  //       setMembers(getUser.data);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  //   fetchData();
-  // }, [post.id]);
-
   return (
-    <Grid item xs={12} sm={6} md={3}>
+    <Grid item xs={12} sm={8} md={6}>
       <Link
         to={{
           pathname: `/trip/${post.id}`,
@@ -177,8 +157,13 @@ export default function UserTripCard({ post, index }) {
             <StyledTitle
               color="inherit"
               variant="subtitle2"
+              underline="hover"
             >
-              {post.endLocation.address ? post.endLocation.address : ''}
+              <Icon icon="ic:outline-location-on" />
+              {post.startLocation.name ? post.startLocation.name : ''}
+              &nbsp; &nbsp;
+              <Icon icon="mdi:location-radius-outline" />
+              {post.endLocation.name ? post.endLocation.name : ''}
             </StyledTitle>
 
             {post.currentMember === post.maxMember || post.currentMember > post.maxMember ? (
