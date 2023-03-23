@@ -49,12 +49,12 @@ export default function HomeLayout() {
       setFcmTokenNotify();
       fetchNotify();
       firebase.messaging().onMessage((data) => {
+        console.log('Push notification', data);
         new Notification(data.notification.title, {
           body: data.notification.body,
           image: data.notification.image,
         });
       });
-      console.log('Push notification');
       console.log(currentUser);
     }
   }, [localStorage.getItem('access-token')]);

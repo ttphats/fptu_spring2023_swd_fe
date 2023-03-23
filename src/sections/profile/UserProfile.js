@@ -391,7 +391,8 @@ const UserProfile = () => {
             onChange={handleVndAmountChange}
           />
           <DialogContentText>
-            Số tiền cần thanh toán: {vndAmount ? <Box sx={{ color: '#FF7300' }}>{Intl.NumberFormat('en-US').format(vndAmount)} VNĐ{' '}</Box> : ''} 
+            Số tiền cần thanh toán:{' '}
+            {vndAmount ? <Box sx={{ color: '#FF7300' }}>{Intl.NumberFormat('en-US').format(vndAmount)} VNĐ </Box> : ''}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
