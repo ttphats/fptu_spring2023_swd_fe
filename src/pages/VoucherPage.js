@@ -103,16 +103,6 @@ export default function VoucherPage() {
         <title> Cóc Phượt </title>
       </Helmet>
       <Container>
-        <StyledSearch
-          value={filterName}
-          onChange={(e) => setFilterName(e.target.value)}
-          placeholder="Tìm phiếu giảm giá..."
-          startAdornment={
-            <InputAdornment position="start">
-              <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
-            </InputAdornment>
-          }
-        />
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
             Tất cả phiếu giảm giá hiện có
@@ -134,6 +124,17 @@ export default function VoucherPage() {
             </LoadingButton>
           ) : null}
         </Stack>
+        <StyledSearch
+          value={filterName}
+          onChange={(e) => setFilterName(e.target.value)}
+          placeholder="Tìm phiếu giảm giá..."
+          startAdornment={
+            <InputAdornment position="start">
+              <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
+            </InputAdornment>
+          }
+        />
+
         <Stack direction="row" flexWrap="wrap-reverse" alignItems="center" justifyContent="flex-end" sx={{ mb: 5 }}>
           <Stack direction="row" spacing={1} flexShrink={0} sx={{ my: 1 }}>
             <VoucherFilterSidebar

@@ -15,6 +15,7 @@ import {
   DialogActions,
   Container,
   TextField,
+  Paper,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { emphasize, styled } from '@mui/material/styles';
@@ -129,6 +130,7 @@ const VoucherDetailPage = () => {
     return <LoadingSpinner />;
   }
   return (
+    
     <Container className={classes.root} sx={{ margin: '0 auto' }}>
       <div role="presentation">
         <Breadcrumbs aria-label="breadcrumb">
