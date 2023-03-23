@@ -25,7 +25,7 @@ const tripApi = {
   },
   getAllTripsUserJoined: (userId) => {
     const url = '/public/trips';
-    return axiosClient.get(`${url}?user:${userId}&page=1&limit=8&sort=postDate:desc`);
+    return axiosClient.get(`${url}?q=user:${userId}&page=1&limit=8&sort=postDate:desc`);
   },
   getTripMembers: (id) => {
     const url = '/public/trips';
