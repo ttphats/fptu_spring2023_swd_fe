@@ -125,7 +125,7 @@ const initialValues = {
     ward: '',
     district: '',
     province: '',
-    type: '',
+    type: [],
     description: '',
     phoneNum: '',
   },
@@ -135,7 +135,7 @@ const initialValues = {
     ward: '',
     district: '',
     province: '',
-    type: '',
+    type: [],
     description: '',
     phoneNum: '',
   },
@@ -363,7 +363,6 @@ const CreateTrip = () => {
       console.log(error);
     }
   };
-
   const handleStartProvinceChange = async (event, value) => {
     setStartWard('');
     setStartDistrict('');
@@ -470,8 +469,7 @@ const CreateTrip = () => {
     console.log(value.id);
   };
 
-  console.log('formik', formik);
-
+  console.log(formik.values.startLocation);
   return (
     <>
       <Helmet>
@@ -738,8 +736,8 @@ const CreateTrip = () => {
                             {startLocationTypeDisplay.length > 0 &&
                               startLocationTypeDisplay.map((type, _index) => {
                                 return (
-                                  <MenuItem key={type} value={type}>
-                                    <div style={{ paddingLeft: 10 }}>{type}</div>
+                                  <MenuItem key={type.key} value={type.value}>
+                                    <div style={{ paddingLeft: 10 }}>{type.value}</div>
                                   </MenuItem>
                                 );
                               })}
@@ -918,8 +916,8 @@ const CreateTrip = () => {
                             {endLocationTypeDisplay.length > 0 &&
                               endLocationTypeDisplay.map((type, _index) => {
                                 return (
-                                  <MenuItem key={type} value={type}>
-                                    <div style={{ paddingLeft: 10 }}>{type}</div>
+                                  <MenuItem key={type.key} value={type.value}>
+                                    <div style={{ paddingLeft: 10 }}>{type.value}</div>
                                   </MenuItem>
                                 );
                               })}
