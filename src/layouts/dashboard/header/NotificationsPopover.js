@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import { set, sub } from 'date-fns';
 import { noCase } from 'change-case';
 import { faker } from '@faker-js/faker';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 // @mui
 import {
   Box,
@@ -20,6 +21,10 @@ import {
   ListItemAvatar,
   ListItemButton,
 } from '@mui/material';
+// firebase
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import { fetchNotify, setFcmTokenNotify } from '../../../firebase-message';
 // utils
 import { fToNow } from '../../../utils/formatTime';
 // components
@@ -77,11 +82,22 @@ const NOTIFICATIONS = [
 ];
 
 export default function NotificationsPopover() {
-  const [notifications, setNotifications] = useState(NOTIFICATIONS);
-
-  const totalUnRead = notifications.filter((item) => item.isUnRead === true).length;
+  const [notifications, setNotifications] = useState([]);
+  const currentUser = useSelector((state) => state.user.current);
+  const loginInfo = useSelector((state) => state.auth.loginInfo);
 
   const [open, setOpen] = useState(null);
+
+  // Handle get message push notify
+  useEffect(() => {
+    fetchNotify();
+    firebase.messaging().onMessage((data) => {
+      if(data && data.notification){
+        setNotifications((prevMessages) => [...prevMessages, data.notification]);
+      }
+    });
+    console.log('notify: ', notifications);
+  }, []);
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -99,13 +115,15 @@ export default function NotificationsPopover() {
       }))
     );
   };
-
+  // if(notifications.length > 0) {
+  //   const totalUnRead = notifications?.filter((item) => item.isUnRead === true).length;
+  // }
   return (
     <>
       <IconButton color={open ? 'primary' : 'default'} onClick={handleOpen} sx={{ width: 40, height: 40 }}>
-        <Badge badgeContent={totalUnRead} color="error">
-          <Iconify icon="eva:bell-fill" />
-        </Badge>
+        {/* <Badge badgeContent={totalUnRead} color="error">
+        </Badge> */}
+        <Iconify icon="eva:bell-fill" />
       </IconButton>
 
       <Popover
@@ -125,18 +143,18 @@ export default function NotificationsPopover() {
         <Box sx={{ display: 'flex', alignItems: 'center', py: 2, px: 2.5 }}>
           <Box sx={{ flexGrow: 1 }}>
             <Typography variant="subtitle1">Thông báo</Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            {/* <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               Bạn có {totalUnRead} tin nhắn chưa đọc
-            </Typography>
+            </Typography> */}
           </Box>
-
+{/* 
           {totalUnRead > 0 && (
             <Tooltip title=" Mark all as read">
               <IconButton color="primary" onClick={handleMarkAllAsRead}>
                 <Iconify icon="eva:done-all-fill" />
               </IconButton>
             </Tooltip>
-          )}
+          )} */}
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
@@ -150,11 +168,11 @@ export default function NotificationsPopover() {
               </ListSubheader>
             }
           >
-            {notifications.slice(0, 2).map((notification) => (
-              <NotificationItem key={notification.id} notification={notification} />
-            ))}
+            {notifications.length > 0 ? notifications?.reverse().map((notification) => (
+              <NotificationItem key={notification.title} notification={notification} />
+            )): <></>}
           </List>
-
+{/* 
           <List
             disablePadding
             subheader={
@@ -163,10 +181,10 @@ export default function NotificationsPopover() {
               </ListSubheader>
             }
           >
-            {notifications.slice(2, 5).map((notification) => (
-              <NotificationItem key={notification.id} notification={notification} />
+            {notifications.reverse().slice(3, 5).map((notification) => (
+              <NotificationItem key={notification.messageId} notification={notification} />
             ))}
-          </List>
+          </List> */}
         </Scrollbar>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
@@ -189,14 +207,15 @@ NotificationItem.propTypes = {
     id: PropTypes.string,
     isUnRead: PropTypes.bool,
     title: PropTypes.string,
-    description: PropTypes.string,
+    body: PropTypes.string,
     type: PropTypes.string,
-    avatar: PropTypes.any,
+    image: PropTypes.any,
   }),
 };
 
 function NotificationItem({ notification }) {
-  const { avatar, title } = renderContent(notification);
+  const { image, body, title } = renderContent(notification);
+  const createdAt = new Date();
 
   return (
     <ListItemButton
@@ -210,7 +229,7 @@ function NotificationItem({ notification }) {
       }}
     >
       <ListItemAvatar>
-        <Avatar sx={{ bgcolor: 'background.neutral' }}>{avatar}</Avatar>
+        <Avatar sx={{ bgcolor: 'background.neutral' }}>{image}</Avatar>
       </ListItemAvatar>
       <ListItemText
         primary={title}
@@ -225,7 +244,7 @@ function NotificationItem({ notification }) {
             }}
           >
             <Iconify icon="eva:clock-outline" sx={{ mr: 0.5, width: 16, height: 16 }} />
-            {fToNow(notification.createdAt)}
+            {fToNow(createdAt)}
           </Typography>
         }
       />
@@ -240,37 +259,37 @@ function renderContent(notification) {
     <Typography variant="subtitle2">
       {notification.title}
       <Typography component="span" variant="body2" sx={{ color: 'text.secondary' }}>
-        &nbsp; {noCase(notification.description)}
+        &nbsp; {noCase(notification.body)}
       </Typography>
     </Typography>
   );
 
   if (notification.type === 'order_placed') {
     return {
-      avatar: <img alt={notification.title} src="/assets/icons/ic_notification_package.svg" />,
+      image: <img alt={notification.title} src="/assets/icons/ic_notification_package.svg" />,
       title,
     };
   }
   if (notification.type === 'order_shipped') {
     return {
-      avatar: <img alt={notification.title} src="/assets/icons/ic_notification_shipping.svg" />,
+      image: <img alt={notification.title} src="/assets/icons/ic_notification_shipping.svg" />,
       title,
     };
   }
   if (notification.type === 'mail') {
     return {
-      avatar: <img alt={notification.title} src="/assets/icons/ic_notification_mail.svg" />,
+      image: <img alt={notification.title} src="/assets/icons/ic_notification_mail.svg" />,
       title,
     };
   }
   if (notification.type === 'chat_message') {
     return {
-      avatar: <img alt={notification.title} src="/assets/icons/ic_notification_chat.svg" />,
+      image: <img alt={notification.title} src="/assets/icons/ic_notification_chat.svg" />,
       title,
     };
   }
   return {
-    avatar: notification.avatar ? <img alt={notification.title} src={notification.avatar} /> : null,
+    image: notification.image ? <img alt={notification.title} src={notification.image} /> : null,
     title,
   };
 }
