@@ -106,7 +106,7 @@ const UserProfile = () => {
   };
 
   const handlePayment = async () => {
-    const response = await vnpayApi.depositMoneyToAccount(vndAmount, 'http://localhost:3263/user-profile');
+    const response = await vnpayApi.depositMoneyToAccount(vndAmount, 'http://cocphuot.site/user-profile');
     console.log(response);
     if (response) {
       window.location.href = response.data;
