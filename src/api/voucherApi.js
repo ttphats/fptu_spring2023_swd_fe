@@ -11,7 +11,7 @@ const voucherApi = {
   },
   getVoucherByProvince: (province) => {
     const url = '/vouchers';
-    return axiosClient.get(`${url}?query=location_address=${province}&page=1&size=10`);
+    return axiosClient.get(`${url}?query=location_address:${province}&page=1&size=10`);
   },
   validateVoucher: (voucherIds) => {
     const url = '/vouchers/wish';

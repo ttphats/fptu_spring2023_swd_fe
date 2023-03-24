@@ -105,8 +105,13 @@ export default function TripDetails({ trip }) {
   async function getAllVouchers() {
     try {
       const province = trip?.endLocation.address.split(', ');
-      console.log(province[3]);
-      const response = await voucherApi.getVoucherByProvince(province[3]);
+      const provinceNoDau = province[3]
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'D');
+      const newProvice = provinceNoDau.toLowerCase().replaceAll(' ', '_');
+      const response = await voucherApi.getVoucherByProvince(newProvice);
       if (response) {
         setAllVoucherDisplay(response.data);
         setLoading(false);
@@ -516,11 +521,6 @@ export default function TripDetails({ trip }) {
                           {selected?.endDate ? dayjs.tz(selected.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : ''}
                         </Typography>
                       </Grid>
-                      <Grid item>
-                        <Typography sx={{ cursor: 'pointer' }} variant="body2">
-                          Số lượng còn lại: {selected?.quantity}
-                        </Typography>
-                      </Grid>
                     </Grid>
 
                     <Grid item>
@@ -618,7 +618,6 @@ export default function TripDetails({ trip }) {
                                     ? dayjs.tz(voucher.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
                                     : ''}
                                 </Typography>
-                                {console.log(voucher.location)}
                                 <Typography variant="body2" gutterBottom>
                                   Loại: {voucher?.location.type}
                                 </Typography>

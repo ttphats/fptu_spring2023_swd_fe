@@ -493,100 +493,146 @@ const UserProfile = () => {
           <>
             <List sx={{ pt: 0 }}>
               {transactions.map((transaction) => (
-                <ListItem key={transaction.id} disableGutters>
-                  <ListItemButton sx={{ boxShadow: 3 }} key={transaction.id}>
-                    <Grid container spacing={2}>
-                      {transaction?.type === 'TRIP_DEPOSIT' ? (
-                        <>
-                          <Grid sx={{ marginTop: 'auto', marginBottom: 'auto' }} item>
-                            <Icon icon="mdi:instant-deposit" color="red" width="42" height="42" />
-                          </Grid>
-                          <Grid item xs={12} sm container>
-                            <Grid item xs container direction="column" spacing={2}>
-                              <Grid item xs>
-                                <Typography gutterBottom variant="subtitle1" component="div">
-                                  Số tiền đã giao dịch: &nbsp;
-                                  {Intl.NumberFormat('en-US').format(transaction?.amount * 1000)} VNĐ
-                                </Typography>
+                <>
+                  {transaction?.type === 'TRIP_DEPOSIT' && transaction.refund === false && (
+                    <>
+                      <ListItem key={transaction.id} disableGutters>
+                        <ListItemButton sx={{ boxShadow: 3 }} key={transaction.id}>
+                          <Grid container spacing={2}>
+                            <Grid sx={{ marginTop: 'auto', marginBottom: 'auto' }} item>
+                              <Icon icon="mdi:instant-deposit" color="red" width="42" height="42" />
+                            </Grid>
+                            <Grid item xs={12} sm container>
+                              <Grid item xs container direction="column" spacing={2}>
+                                <Grid item xs>
+                                  <Typography variant="subtitle1" component="div">
+                                    {' '}
+                                    Loại giao dịch: Tạo / tham gia chuyến đi
+                                  </Typography>
+                                  <Typography gutterBottom variant="subtitle1" component="div">
+                                    Hình thức thanh toán: &nbsp;
+                                    {transaction?.moneyExchange?.provider}
+                                  </Typography>
+                                  <Typography variant="body2" gutterBottom>
+                                    Ngày giao dịch: &nbsp;
+                                    {transaction?.createDate
+                                      ? dayjs.tz(transaction.createDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                      : 'Không xác định'}
+                                  </Typography>
+                                  <Typography variant="body2" gutterBottom>
+                                    Ngày hoàn thành: &nbsp;
+                                    {transaction?.completeDate
+                                      ? dayjs.tz(transaction.completeDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                      : 'Không xác định'}
+                                  </Typography>
+                                </Grid>
+                              </Grid>
+                              <Grid sx={{ color: 'red' }} item>
                                 <Typography variant="subtitle1" component="div">
-                                  {' '}
-                                  Loại giao dịch: Tạo/ tham gia chuyến đi
-                                </Typography>
-                                <Typography gutterBottom variant="subtitle1" component="div">
-                                  Hình thức thanh toán: &nbsp;
-                                  {transaction?.moneyExchange?.provider}
-                                </Typography>
-                                <Typography variant="body2" gutterBottom>
-                                  Ngày giao dịch: &nbsp;
-                                  {transaction?.createDate
-                                    ? dayjs.tz(transaction.createDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
-                                    : 'Không xác định'}
-                                </Typography>
-                                <Typography variant="body2" gutterBottom>
-                                  Ngày hoàn thành: &nbsp;
-                                  {transaction?.completeDate
-                                    ? dayjs.tz(transaction.completeDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
-                                    : 'Không xác định'}
+                                  -{Intl.NumberFormat('en-US').format(transaction?.amount)} Xu
                                 </Typography>
                               </Grid>
                             </Grid>
-                            <Grid sx={{ color: 'red' }} item>
-                              <Typography variant="subtitle1" component="div">
-                                -{Intl.NumberFormat('en-US').format(transaction?.amount)} Xu
-                              </Typography>
+                          </Grid>
+                        </ListItemButton>
+                      </ListItem>
+                    </>
+                  )}
+
+                  {transaction?.type === 'TRIP_DEPOSIT' && transaction.refund === true && (
+                    <>
+                      <ListItem key={transaction.id} disableGutters>
+                        <ListItemButton sx={{ boxShadow: 3 }} key={transaction.id}>
+                          <Grid container spacing={2}>
+                            <Grid sx={{ marginTop: 'auto', marginBottom: 'auto' }} item>
+                              <Icon icon="mdi:instant-deposit" color="green" width="42" height="42" />
                             </Grid>
-                          </Grid>
-                        </>
-                      ) : (
-                        <></>
-                      )}
-                      {transaction?.type === 'WALLET_DEPOSIT' ? (
-                        <>
-                          <Grid sx={{ marginTop: 'auto', marginBottom: 'auto' }} item>
-                            <Icon icon="mdi:instant-deposit" color="green" width="42" height="42" />
-                          </Grid>
-                          <Grid item xs={12} sm container>
-                            <Grid item xs container direction="column" spacing={2}>
-                              <Grid item xs>
-                                <Typography gutterBottom variant="subtitle1" component="div">
-                                  Số tiền đã giao dịch: &nbsp;
-                                  {Intl.NumberFormat('en-US').format(transaction?.amount * 1000)} VNĐ
-                                </Typography>
+                            <Grid item xs={12} sm container>
+                              <Grid item xs container direction="column" spacing={2}>
+                                <Grid item xs>
+                                  <Typography variant="subtitle1" component="div">
+                                    {' '}
+                                    Loại giao dịch: Hoàn tiền tham gia chuyến đi
+                                  </Typography>
+                                  <Typography gutterBottom variant="subtitle1" component="div">
+                                    Hình thức thanh toán: &nbsp;
+                                    {transaction?.moneyExchange?.provider}
+                                  </Typography>
+                                  <Typography variant="body2" gutterBottom>
+                                    Ngày giao dịch: &nbsp;
+                                    {transaction?.createDate
+                                      ? dayjs.tz(transaction.createDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                      : 'Không xác định'}
+                                  </Typography>
+                                  <Typography variant="body2" gutterBottom>
+                                    Ngày hoàn thành: &nbsp;
+                                    {transaction?.completeDate
+                                      ? dayjs.tz(transaction.completeDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                      : 'Không xác định'}
+                                  </Typography>
+                                </Grid>
+                              </Grid>
+                              <Grid sx={{ color: 'green' }} item>
                                 <Typography variant="subtitle1" component="div">
-                                  {' '}
-                                  Loại giao dịch: Nạp tiền vào ví
-                                </Typography>
-                                <Typography gutterBottom variant="subtitle1" component="div">
-                                  Hình thức thanh toán: &nbsp;
-                                  {transaction?.moneyExchange?.provider}
-                                </Typography>
-                                <Typography variant="body2" gutterBottom>
-                                  Ngày giao dịch: &nbsp;
-                                  {transaction?.createDate
-                                    ? dayjs.tz(transaction.createDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
-                                    : 'Không xác định'}
-                                </Typography>
-                                <Typography variant="body2" gutterBottom>
-                                  Ngày hoàn thành: &nbsp;
-                                  {transaction?.completeDate
-                                    ? dayjs.tz(transaction.completeDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
-                                    : 'Không xác định'}
+                                  +{Intl.NumberFormat('en-US').format(transaction?.amount)} Xu
                                 </Typography>
                               </Grid>
                             </Grid>
-                            <Grid sx={{ color: 'green' }} item>
-                              <Typography variant="subtitle1" component="div">
-                                +{Intl.NumberFormat('en-US').format(transaction?.amount)} Xu
-                              </Typography>
+                          </Grid>
+                        </ListItemButton>
+                      </ListItem>
+                    </>
+                  )}
+
+                  {transaction?.type === 'WALLET_DEPOSIT' && (
+                    <>
+                      <ListItem key={transaction.id} disableGutters>
+                        <ListItemButton sx={{ boxShadow: 3 }} key={transaction.id}>
+                          <Grid container spacing={2}>
+                            <Grid sx={{ marginTop: 'auto', marginBottom: 'auto' }} item>
+                              <Icon icon="mdi:instant-deposit" color="green" width="42" height="42" />
+                            </Grid>
+                            <Grid item xs={12} sm container>
+                              <Grid item xs container direction="column" spacing={2}>
+                                <Grid item xs>
+                                  <Typography gutterBottom variant="subtitle1" component="div">
+                                    Số tiền đã giao dịch: &nbsp;
+                                    {Intl.NumberFormat('en-US').format(transaction?.amount * 1000)} VNĐ
+                                  </Typography>
+                                  <Typography variant="subtitle1" component="div">
+                                    {' '}
+                                    Loại giao dịch: Nạp tiền vào ví
+                                  </Typography>
+                                  <Typography gutterBottom variant="subtitle1" component="div">
+                                    Hình thức thanh toán: &nbsp;
+                                    {transaction?.moneyExchange?.provider}
+                                  </Typography>
+                                  <Typography variant="body2" gutterBottom>
+                                    Ngày giao dịch: &nbsp;
+                                    {transaction?.createDate
+                                      ? dayjs.tz(transaction.createDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                      : 'Không xác định'}
+                                  </Typography>
+                                  <Typography variant="body2" gutterBottom>
+                                    Ngày hoàn thành: &nbsp;
+                                    {transaction?.completeDate
+                                      ? dayjs.tz(transaction.completeDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                      : 'Không xác định'}
+                                  </Typography>
+                                </Grid>
+                              </Grid>
+                              <Grid sx={{ color: 'green' }} item>
+                                <Typography variant="subtitle1" component="div">
+                                  +{Intl.NumberFormat('en-US').format(transaction?.amount)} Xu
+                                </Typography>
+                              </Grid>
                             </Grid>
                           </Grid>
-                        </>
-                      ) : (
-                        <></>
-                      )}
-                    </Grid>
-                  </ListItemButton>
-                </ListItem>
+                        </ListItemButton>
+                      </ListItem>
+                    </>
+                  )}
+                </>
               ))}
             </List>
           </>
