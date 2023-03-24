@@ -55,6 +55,18 @@ const useStyles = makeStyles((theme) => ({
     height: 48,
     padding: '0 30px',
   },
+  pageBackground: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    zIndex: -1,
+    width: "100%",
+    height: "100%",
+    backgroundImage: "url('path/to/your/background-image.jpg')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    opacity: 0.2,
+  },
 }));
 
 const primary = '#2196f3';
@@ -76,17 +88,6 @@ const StyledBreadcrumb = styled(Chip)(({ theme }) => {
     },
   };
 });
-
-function myFunction() {
-  const copyText = document.getElementById('copyText');
-
-  copyText.select();
-  copyText.setSelectionRange(0, 99999);
-
-  document.execCommand('copy');
-
-  alert(`Đã sao chép Mã ưu đãi: ${copyText.value}`);
-}
 
 const VoucherDetailPage = () => {
   const classes = useStyles();
@@ -130,7 +131,6 @@ const VoucherDetailPage = () => {
     return <LoadingSpinner />;
   }
   return (
-    
     <Container className={classes.root} sx={{ margin: '0 auto' }}>
       <div role="presentation">
         <Breadcrumbs aria-label="breadcrumb">
@@ -190,22 +190,6 @@ const VoucherDetailPage = () => {
               </Grid>
             </Grid>
           </Box>
-          <Grid container alignItems="center" className={classes.section} spacing={2}>
-            <Grid item xs={6} md={4}>
-              <TextField
-                id="copyText"
-                value={voucher.code}
-                type="text"
-                variant="outlined"
-                sx={{ marginRight: '16px' }}
-              />
-            </Grid>
-            <Grid item xs={6} md={8} sx={{ display: 'flex', alignItems: 'center' }}>
-              <Button variant="outlined" onClick={myFunction}>
-                Sao chép Mã Ưu đãi
-              </Button>
-            </Grid>
-          </Grid>
 
           <Typography variant="body2" className={classes.section}>
             <span className={classes.value}>
