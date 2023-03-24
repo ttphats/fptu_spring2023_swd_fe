@@ -514,13 +514,21 @@ const UserProfile = () => {
                                     {transaction?.moneyExchange?.provider}
                                   </Typography>
                                   <Typography variant="body2" gutterBottom>
-                                    Ngày giao dịch: &nbsp;
+                                    Ngày giao dịch:{' '}
+                                    {transaction?.createDate
+                                      ? dayjs.tz(transaction.createDate, 'Asia/Ho_Chi_Minh').format('HH:mm')
+                                      : 'Không xác định'}{' '}
+                                    &nbsp;
                                     {transaction?.createDate
                                       ? dayjs.tz(transaction.createDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
                                       : 'Không xác định'}
                                   </Typography>
                                   <Typography variant="body2" gutterBottom>
-                                    Ngày hoàn thành: &nbsp;
+                                    Ngày hoàn thành:{' '}
+                                    {transaction?.completeDate
+                                      ? dayjs.tz(transaction.completeDate, 'Asia/Ho_Chi_Minh').format('HH:mm')
+                                      : 'Không xác định'}{' '}
+                                    &nbsp;
                                     {transaction?.completeDate
                                       ? dayjs.tz(transaction.completeDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
                                       : 'Không xác định'}
@@ -559,13 +567,21 @@ const UserProfile = () => {
                                     {transaction?.moneyExchange?.provider}
                                   </Typography>
                                   <Typography variant="body2" gutterBottom>
-                                    Ngày giao dịch: &nbsp;
+                                    Ngày giao dịch:{' '}
+                                    {transaction?.createDate
+                                      ? dayjs.tz(transaction.createDate, 'Asia/Ho_Chi_Minh').format('HH:mm')
+                                      : 'Không xác định'}{' '}
+                                    &nbsp;
                                     {transaction?.createDate
                                       ? dayjs.tz(transaction.createDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
                                       : 'Không xác định'}
                                   </Typography>
                                   <Typography variant="body2" gutterBottom>
-                                    Ngày hoàn thành: &nbsp;
+                                    Ngày hoàn thành:{' '}
+                                    {transaction?.completeDate
+                                      ? dayjs.tz(transaction.completeDate, 'Asia/Ho_Chi_Minh').format('HH:mm')
+                                      : 'Không xác định'}{' '}
+                                    &nbsp;
                                     {transaction?.completeDate
                                       ? dayjs.tz(transaction.completeDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
                                       : 'Không xác định'}
@@ -608,13 +624,21 @@ const UserProfile = () => {
                                     {transaction?.moneyExchange?.provider}
                                   </Typography>
                                   <Typography variant="body2" gutterBottom>
-                                    Ngày giao dịch: &nbsp;
+                                    Ngày giao dịch:{' '}
+                                    {transaction?.createDate
+                                      ? dayjs.tz(transaction.createDate, 'Asia/Ho_Chi_Minh').format('HH:mm')
+                                      : 'Không xác định'}{' '}
+                                    &nbsp;
                                     {transaction?.createDate
                                       ? dayjs.tz(transaction.createDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
                                       : 'Không xác định'}
                                   </Typography>
                                   <Typography variant="body2" gutterBottom>
-                                    Ngày hoàn thành: &nbsp;
+                                    Ngày hoàn thành:{' '}
+                                    {transaction?.completeDate
+                                      ? dayjs.tz(transaction.completeDate, 'Asia/Ho_Chi_Minh').format('HH:mm')
+                                      : 'Không xác định'}{' '}
+                                    &nbsp;
                                     {transaction?.completeDate
                                       ? dayjs.tz(transaction.completeDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
                                       : 'Không xác định'}
