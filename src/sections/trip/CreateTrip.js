@@ -318,7 +318,7 @@ const CreateTrip = () => {
         if (response) {
           setOpenConfirm(false);
           setOpen(true);
-          navigate('/home/blog');
+          navigate('/user-profile');
         }
       } else {
         setMsg('Vui lòng không để trống thông tin');
@@ -326,8 +326,8 @@ const CreateTrip = () => {
       }
     } catch (error) {
       console.log(error);
-      if (error.response?.message) {
-        setMsg(error.response?.message);
+      if (error.response?.data.message) {
+        setMsg(error.response?.data.message);
       } else {
         setMsg('Thông tin chuyến đi chưa hợp lệ. Vui lòng kiểm tra lại');
       }
@@ -736,7 +736,7 @@ const CreateTrip = () => {
                             {startLocationTypeDisplay.length > 0 &&
                               startLocationTypeDisplay.map((type, _index) => {
                                 return (
-                                  <MenuItem key={type.key} value={type.value}>
+                                  <MenuItem key={type.key} value={type.key}>
                                     <div style={{ paddingLeft: 10 }}>{type.value}</div>
                                   </MenuItem>
                                 );
@@ -916,7 +916,7 @@ const CreateTrip = () => {
                             {endLocationTypeDisplay.length > 0 &&
                               endLocationTypeDisplay.map((type, _index) => {
                                 return (
-                                  <MenuItem key={type.key} value={type.value}>
+                                  <MenuItem key={type.key} value={type.key}>
                                     <div style={{ paddingLeft: 10 }}>{type.value}</div>
                                   </MenuItem>
                                 );
@@ -987,7 +987,7 @@ const CreateTrip = () => {
                             customInput={TextField}
                             name="deposit"
                             variant="outlined"
-                            value={formik.values.deposit > 0 ? formik.values.deposit : 1}
+                            value={formik.values.deposit}
                             onValueChange={(value, name) => formik.setFieldValue(name, value)}
                             onBlur={formik.handleBlur}
                             error={formik.errors.deposit && formik.touched.deposit}
