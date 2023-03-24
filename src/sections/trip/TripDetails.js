@@ -480,63 +480,132 @@ export default function TripDetails({ trip }) {
             &nbsp;Các mã giảm giá đã mua:
           </Typography>
           {isHost ? (
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <LoadingButton onClick={handleClickOpenDialog}>
-                <Icon icon="fluent:gift-card-add-24-filled" color="#FF7B54" width="50" height="50" />
-              </LoadingButton>
-            </Box>
+            <>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <LoadingButton onClick={handleClickOpenDialog}>
+                  <Icon icon="fluent:gift-card-add-24-filled" color="#FF7B54" width="50" height="50" />
+                </LoadingButton>
+              </Box>
+              <Paper
+                sx={{
+                  p: 2,
+                  margin: 'auto',
+                  maxWidth: 700,
+                  flexGrow: 1,
+                }}
+              >
+                {vouchersBought.length > 0 ? (
+                  vouchersBought?.map((selected) => (
+                    <Stack direction="row" spacing={2} key={selected.id}>
+                      <Grid
+                        key={selected.id}
+                        container
+                        spacing={2}
+                        sx={{ boxShadow: 3, marginBottom: 3, marginTop: 2 }}
+                      >
+                        <Grid item>
+                          <ButtonBase sx={{ width: 128, height: 128 }}>
+                            <Img alt="complex" src={selected?.imageUrl} />
+                          </ButtonBase>
+                        </Grid>
+                        <Grid item xs={12} sm container>
+                          <Grid item xs container direction="column" spacing={2}>
+                            <Grid item xs>
+                              <Typography gutterBottom variant="subtitle1" component="div">
+                                {selected?.name}
+                              </Typography>
+                              <Typography variant="body2" gutterBottom>
+                                {selected?.description}
+                              </Typography>
+                              <Typography variant="body2" gutterBottom>
+                                {selected?.startDate
+                                  ? dayjs.tz(selected.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                  : ''}{' '}
+                                -{' '}
+                                {selected?.endDate
+                                  ? dayjs.tz(selected.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                  : ''}
+                              </Typography>
+                              <Typography>Trạng thái: {selected?.tripVoucherStatus === 'IN_CART' ? 'Đã mua' : 'Đã sử dụng'}</Typography>
+                            </Grid>
+                          </Grid>
+
+                          <Grid item>
+                            <Typography variant="subtitle1" component="div">
+                              {Intl.NumberFormat('en-US').format(selected?.price)} Xu
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <img src={selected?.qrCodeUrl} alt="QRCode" />
+                        <Typography>{selected?.code}</Typography>
+                      </Box>
+                    </Stack>
+                  ))
+                ) : (
+                  <Typography sx={{ textAlign: 'center' }} variant="body1">
+                    Chưa có mã giảm giá nào được mua cho chuyến đi này
+                  </Typography>
+                )}
+              </Paper>
+            </>
           ) : (
-            <></>
-          )}
-          <Paper
-            sx={{
-              p: 2,
-              margin: 'auto',
-              maxWidth: 700,
-              flexGrow: 1,
-            }}
-          >
-            {vouchersBought.length > 0 ? (
-              vouchersBought?.map((selected) => (
-                <Grid key={selected.id} container spacing={2} sx={{ boxShadow: 3, marginBottom: 3, marginTop: 2 }}>
-                  <Grid item>
-                    <ButtonBase sx={{ width: 128, height: 128 }}>
-                      <Img alt="complex" src={selected?.imageUrl} />
-                    </ButtonBase>
-                  </Grid>
-                  <Grid item xs={12} sm container>
-                    <Grid item xs container direction="column" spacing={2}>
-                      <Grid item xs>
-                        <Typography gutterBottom variant="subtitle1" component="div">
-                          {selected?.name}
-                        </Typography>
-                        <Typography variant="body2" gutterBottom>
-                          {selected?.description}
-                        </Typography>
-                        <Typography variant="body2" gutterBottom>
-                          {selected?.startDate
-                            ? dayjs.tz(selected.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
-                            : ''}{' '}
-                          -{' '}
-                          {selected?.endDate ? dayjs.tz(selected.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : ''}
-                        </Typography>
+            <>
+              <Paper
+                sx={{
+                  p: 2,
+                  margin: 'auto',
+                  maxWidth: 700,
+                  flexGrow: 1,
+                }}
+              >
+                {vouchersBought.length > 0 ? (
+                  vouchersBought?.map((selected) => (
+                    <Grid key={selected.id} container spacing={2} sx={{ boxShadow: 3, marginBottom: 3, marginTop: 2 }}>
+                      <Grid item>
+                        <ButtonBase sx={{ width: 128, height: 128 }}>
+                          <Img alt="complex" src={selected?.imageUrl} />
+                        </ButtonBase>
+                      </Grid>
+                      <Grid item xs={12} sm container>
+                        <Grid item xs container direction="column" spacing={2}>
+                          <Grid item xs>
+                            <Typography gutterBottom variant="subtitle1" component="div">
+                              {selected?.name}
+                            </Typography>
+                            <Typography variant="body2" gutterBottom>
+                              {selected?.description}
+                            </Typography>
+                            <Typography variant="body2" gutterBottom>
+                              {selected?.startDate
+                                ? dayjs.tz(selected.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                : ''}{' '}
+                              -{' '}
+                              {selected?.endDate
+                                ? dayjs.tz(selected.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                : ''}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+
+                        <Grid item>
+                          <Typography variant="subtitle1" component="div">
+                            {Intl.NumberFormat('en-US').format(selected?.price)} Xu
+                          </Typography>
+                        </Grid>
                       </Grid>
                     </Grid>
+                  ))
+                ) : (
+                  <Typography sx={{ textAlign: 'center' }} variant="body1">
+                    Chưa có mã giảm giá nào được mua cho chuyến đi này
+                  </Typography>
+                )}
+              </Paper>
+            </>
+          )}
 
-                    <Grid item>
-                      <Typography variant="subtitle1" component="div">
-                        {Intl.NumberFormat('en-US').format(selected?.price)} Xu
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              ))
-            ) : (
-              <Typography sx={{ textAlign: 'center' }} variant="body1">
-                Chưa có mã giảm giá nào được mua cho chuyến đi này
-              </Typography>
-            )}
-          </Paper>
           <Grid
             container
             justifyContent="center"
