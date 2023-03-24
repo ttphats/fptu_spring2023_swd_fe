@@ -117,13 +117,13 @@ const validationSchema = Yup.object().shape({
   description: Yup.string().required('Vui lòng nhập mô tả cho phiếu giảm giá'),
   code: Yup.string().required('Bắt buộc'),
   start_date: Yup.date()
-  .required()
-  .typeError("Please select a valid date")
-  .nullable(),
+    .required()
+    .typeError("Please select a valid date")
+    .nullable(),
   end_date: Yup.date()
-  .required()
-  .typeError("Please select a valid date")
-  .nullable().min(Yup.ref('start_date'), 'Ngày kết thúc phải sau ngày bắt đầu'),
+    .required()
+    .typeError("Please select a valid date")
+    .nullable().min(Yup.ref('start_date'), 'Ngày kết thúc phải sau ngày bắt đầu'),
   location: Yup.object().shape({
     name: Yup.string().required('Bắt buộc'),
     addressNum: Yup.string().required('Bắt buộc'),
@@ -168,51 +168,51 @@ const CreateVoucher = () => {
 
     console.log('date', values.start_date)
 
-   if((values.start_date !== null && values.end_date !== null) || !formik.isValid){
-    const payload = {
-      nameVoucher: values.nameVoucher,
-      priceVoucher: values.priceVoucher,
-      quantity: values.quantity,
-      description: values.description,
-      code: values.code,
-      start_date: values.start_date,
-      end_date: values.end_date,
-      location: {
-        name: values.location.name,
-        addressNum: values.location.addressNum,
-        ward: values.location.ward,
-        district: values.location.district,
-        province: values.location.province,
-        type: values.location.type,
-        description: values.location.description,
-        phoneNum: values.location.phoneNum,
-      },
-    };
+    if ((values.start_date !== null && values.end_date !== null) || !formik.isValid) {
+      const payload = {
+        nameVoucher: values.nameVoucher,
+        priceVoucher: values.priceVoucher,
+        quantity: values.quantity,
+        description: values.description,
+        code: values.code,
+        start_date: values.start_date,
+        end_date: values.end_date,
+        location: {
+          name: values.location.name,
+          addressNum: values.location.addressNum,
+          ward: values.location.ward,
+          district: values.location.district,
+          province: values.location.province,
+          type: values.location.type,
+          description: values.location.description,
+          phoneNum: values.location.phoneNum,
+        },
+      };
 
-    console.log(payload);
+      console.log(payload);
 
-    const json = JSON.stringify(payload);
-    const blob = new Blob([json], {
-      type: 'application/json',
-    });
-    formData.append('createVoucherRequestForm', blob);
-    if (fileUpload) {
-      formData.append('image', fileUpload);
+      const json = JSON.stringify(payload);
+      const blob = new Blob([json], {
+        type: 'application/json',
+      });
+      formData.append('createVoucherRequestForm', blob);
+      if (fileUpload) {
+        formData.append('image', fileUpload);
+      } else {
+        formData.append('image', null);
+      }
+
+      try {
+        const response = await tripApi.createVoucher(formData);
+        console.log('Tạo ưu đãi mới thành công!', response.data);
+        navigate('/dashboard/voucher');
+      } catch (error) {
+        console.error('Đã có lỗi xảy ra:', error);
+      }
     } else {
-      formData.append('image', null);
-    }
-
-    try {
-      const response = await tripApi.createVoucher(formData);
-      console.log('Tạo ưu đãi mới thành công!', response.data);
-      navigate('/dashboard/voucher');
-    } catch (error) {
-      console.error('Đã có lỗi xảy ra:', error);
-    }
-   } else {
       setMsg('Vui lòng không để trống thông tin!');
       setOpen(true);
-   }
+    }
   };
 
   const formik = useFormik({
@@ -383,44 +383,44 @@ const CreateVoucher = () => {
                   spacing={3}
                 >
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DatePicker
-                        className={classes.customInput}
-                        label="Ngày bắt đầu áp dụng"
-                        value={formik.values.start_date}
-                        onBlur={formik.handleBlur}
-                        error={formik.errors.start_date}
-                        helperText={formik.touched.start_date && Boolean(formik.errors.start_date)}
-                        touched={formik.touched.start_date}
-                        name="start_date"
-                        disablePast
-                        format="DD/MM/YYYY"
-                        onChange={(value) => {
+                    <DatePicker
+                      className={classes.customInput}
+                      label="Ngày bắt đầu áp dụng"
+                      value={formik.values.start_date}
+                      onBlur={formik.handleBlur}
+                      error={formik.errors.start_date}
+                      helperText={formik.touched.start_date && Boolean(formik.errors.start_date)}
+                      touched={formik.touched.start_date}
+                      name="start_date"
+                      disablePast
+                      format="DD/MM/YYYY"
+                      onChange={(value) => {
+                        formik.setFieldValue('end_date', null);
+                        formik.setFieldValue('start_date', dayjs(value));
+                      }}
+                    />
+                    <DatePicker
+                      disablePast
+                      label="Ngày hết hạn"
+                      className={classes.customInput}
+                      value={formik.values.end_date}
+                      onBlur={formik.handleBlur}
+                      error={formik.touched.end_date && Boolean(formik.errors.end_date)}
+                      helperText={formik.touched.end_date && formik.errors.end_date}
+                      touched={formik.touched.end_date}
+                      name="end_date"
+                      format="DD/MM/YYYY"
+                      onChange={(value) => {
+                        if (dayjs(value) >= formik.values.start_date) {
+                          formik.setFieldValue('end_date', dayjs(value));
+                        } else {
                           formik.setFieldValue('end_date', null);
-                          formik.setFieldValue('start_date', dayjs(value));
-                        }}
-                      />
-                      <DatePicker
-                        disablePast
-                        label="Ngày hết hạn"
-                        className={classes.customInput}
-                        value={formik.values.end_date}
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.end_date && Boolean(formik.errors.end_date)}
-                        helperText={formik.touched.end_date && formik.errors.end_date}
-                        touched={formik.touched.end_date}
-                        name="end_date"
-                        format="DD/MM/YYYY"
-                        onChange={(value) => {
-                          if (dayjs(value) >= formik.values.start_date) {
-                            formik.setFieldValue('end_date', dayjs(value));
-                          } else {
-                            formik.setFieldValue('end_date', null);
-                            setMsg('Ngày hết hạn phải bằng hoặc sau ngày phát hành');
-                            setOpen(true);
-                          }
-                        }}
-                        renderInput={(params) => <TextField size="small" {...params} sx={{ width: '100%' }} />}
-                      />
+                          setMsg('Ngày hết hạn phải bằng hoặc sau ngày phát hành');
+                          setOpen(true);
+                        }
+                      }}
+                      renderInput={(params) => <TextField size="small" {...params} sx={{ width: '100%' }} />}
+                    />
                   </LocalizationProvider>
                 </Stack>
                 {/* Location */}
@@ -548,16 +548,16 @@ const CreateVoucher = () => {
                   <Select
                     name="location.type"
                     value={formik.values.location.type}
+                    onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     error={formik.errors.location?.type && formik.touched.location?.type}
                     helperText={formik.errors.location?.type}
-                    onChange={formik.handleChange}
                   >
                     {LocationTypeDisplay.length > 0 &&
                       LocationTypeDisplay.map((type, _index) => {
                         return (
-                          <MenuItem key={type} value={type}>
-                            <div style={{ paddingLeft: 10 }}>{type}</div>
+                          <MenuItem key={type.key} value={type.key}>
+                            <div style={{ paddingLeft: 10 }}>{type.value}</div>
                           </MenuItem>
                         );
                       })}
