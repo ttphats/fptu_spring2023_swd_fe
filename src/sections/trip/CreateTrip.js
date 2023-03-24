@@ -1,9 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useFormik, Form, Formik, FormikConfig, FormikValues, ErrorMessage, Field } from 'formik';
+import { useFormik, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import CurrencyInput from 'react-currency-input-field';
-import { Container, Typography, InputLabel, TextField, FormHelperText, DialogContent, DialogActions } from '@material-ui/core';
+import {
+  Container,
+  Typography,
+  InputLabel,
+  TextField,
+  DialogContent,
+  DialogActions,
+} from '@material-ui/core';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import OutlinedInput from '@mui/material/OutlinedInput';
@@ -67,9 +74,9 @@ const useStyles = makeStyles((theme) => ({
     background: '#f7f7f7',
   },
   stepper: {
-    "& .Mui-active .MuiStepIcon-root": { color: "#F39137" },
-    "& .Mui-completed .MuiStepIcon-root": { color: "#F39137" },
-    "& .Mui-disabled .MuiStepIcon-root": { color: "#F39137" }
+    '& .Mui-active .MuiStepIcon-root': { color: '#F39137' },
+    '& .Mui-completed .MuiStepIcon-root': { color: '#F39137' },
+    '& .Mui-disabled .MuiStepIcon-root': { color: '#F39137' },
   },
   formCreate: {
     display: 'flex',
@@ -159,9 +166,7 @@ const DisplayingErrorMessagesSchema = Yup.object().shape({
       .min(5, 'Nhập ít nhất 5 ký tự')
       .max(30, 'Tối đa 30 ký tự')
       .required('Vui lòng không được để trống!'),
-    phoneNum: Yup.string()
-      .matches(/^\+?\d{10,12}$/, 'Số điện thoại phải từ 10 đến 12 số')
-      .required('Vui lòng điền số điện thoại'),
+    phoneNum: Yup.string().matches(/^\+?\d{10,12}$/, 'Số điện thoại phải từ 10 đến 12 số'),
     addressNum: Yup.string().required('Bắt buộc'),
     province: Yup.string().required('Bắt buộc'),
     district: Yup.string().required('Bắt buộc'),
@@ -173,9 +178,7 @@ const DisplayingErrorMessagesSchema = Yup.object().shape({
       .min(5, 'Nhập ít nhất 5 ký tự')
       .max(30, 'Tối đa 30 ký tự')
       .required('Vui lòng không được để trống!'),
-    phoneNum: Yup.string()
-      .matches(/^\+?\d{10,12}$/, 'Số điện thoại phải từ 10 đến 12 số')
-      .required('Vui lòng điền số điện thoại'),
+    phoneNum: Yup.string().matches(/^\+?\d{10,12}$/, 'Số điện thoại phải từ 10 đến 12 số'),
     addressNum: Yup.string().required('Bắt buộc'),
     province: Yup.string().required('Bắt buộc'),
     district: Yup.string().required('Bắt buộc'),
@@ -448,18 +451,25 @@ const CreateTrip = () => {
   };
 
   // Fetch voucher
-  async function getVoucherByLocationType() {
-    const response = await voucherApi.getVoucherByLocationType(formik.values.endLocation.type);
+  async function getVoucherByProvince() {
+    const province = formik.values.endLocation.province;
+    const provinceNoDau = province
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/Đ/g, 'D');
+    const newProvice = provinceNoDau.toLowerCase().replaceAll(' ', '_');
+    const response = await voucherApi.getVoucherByProvince(newProvice);
     setVouchers(response.data);
     console.log(response.data);
   }
 
   useEffect(() => {
-    console.log(formik.values.endLocation.type);
-    if (formik.values.endLocation.type) {
-      getVoucherByLocationType();
+    console.log(formik.values.endLocation.province);
+    if (formik.values.endLocation.province) {
+      getVoucherByProvince();
     }
-  }, [formik.values.endLocation.type]);
+  }, [formik.values.endLocation.province]);
 
   const handleListItemClick = (value) => {
     setOpenDialog(false);
@@ -499,7 +509,12 @@ const CreateTrip = () => {
                 Tạo chuyến đi mới
               </Typography>
               <Box sx={{ minWidth: 800 }}>
-                <Stepper className={classes.stepper} activeStep={activeStep} orientation="vertical" sx={{color: '#FF884B'}}>
+                <Stepper
+                  className={classes.stepper}
+                  activeStep={activeStep}
+                  orientation="vertical"
+                  sx={{ color: '#FF884B' }}
+                >
                   {/* Step 1 */}
                   <Step>
                     <StepLabel>Nhập tên cho chuyến đi của bạn</StepLabel>
@@ -592,7 +607,10 @@ const CreateTrip = () => {
                           >
                             Tiếp tục
                           </LoadingButton>
-                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}>
+                          <LoadingButton
+                            onClick={handleBack}
+                            sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}
+                          >
                             Quay lại
                           </LoadingButton>
                         </div>
@@ -630,7 +648,6 @@ const CreateTrip = () => {
                           helperText={formik.errors.startLocation?.phoneNum}
                           margin="normal"
                           fullWidth
-                          required
                           InputLabelProps={{
                             shrink: true,
                           }}
@@ -772,7 +789,10 @@ const CreateTrip = () => {
                           >
                             Tiếp tục
                           </LoadingButton>
-                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}>
+                          <LoadingButton
+                            onClick={handleBack}
+                            sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}
+                          >
                             Quay lại
                           </LoadingButton>
                         </div>
@@ -810,7 +830,6 @@ const CreateTrip = () => {
                           helperText={formik.errors.endLocation?.phoneNum}
                           margin="normal"
                           fullWidth
-                          required
                           InputLabelProps={{
                             shrink: true,
                           }}
@@ -952,7 +971,10 @@ const CreateTrip = () => {
                           >
                             Tiếp tục
                           </LoadingButton>
-                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}>
+                          <LoadingButton
+                            onClick={handleBack}
+                            sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}
+                          >
                             Quay lại
                           </LoadingButton>
                         </div>
@@ -1045,7 +1067,10 @@ const CreateTrip = () => {
                           >
                             Tiếp tục
                           </LoadingButton>
-                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}>
+                          <LoadingButton
+                            onClick={handleBack}
+                            sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}
+                          >
                             Quay lại
                           </LoadingButton>
                         </div>
@@ -1077,7 +1102,10 @@ const CreateTrip = () => {
                           >
                             Tiếp tục
                           </LoadingButton>
-                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}>
+                          <LoadingButton
+                            onClick={handleBack}
+                            sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}
+                          >
                             Quay lại
                           </LoadingButton>
                         </div>
@@ -1207,7 +1235,10 @@ const CreateTrip = () => {
                           >
                             Tiếp tục
                           </LoadingButton>
-                          <LoadingButton onClick={handleBack} sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}>
+                          <LoadingButton
+                            onClick={handleBack}
+                            sx={{ mt: 1, mr: 1, marginTop: '30px', color: '#FF884B' }}
+                          >
                             Quay lại
                           </LoadingButton>
                         </div>
@@ -1230,7 +1261,7 @@ const CreateTrip = () => {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
               >
-                <DialogTitle id="alert-dialog-title">{"Xác nhận thanh toán tiền đặt cọc để tạo chuyến đi"}</DialogTitle>
+                <DialogTitle id="alert-dialog-title">{'Xác nhận thanh toán tiền đặt cọc để tạo chuyến đi'}</DialogTitle>
                 <DialogContent>
                   <DialogContentText id="alert-dialog-description">
                     Cần <strong>{formik.values.deposit} Xu</strong> để tạo chuyến đi này
