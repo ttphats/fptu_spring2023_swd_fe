@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { faker } from '@faker-js/faker';
 import { useSelector } from 'react-redux';
+import dayjs from 'dayjs';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import { Grid, Container, Typography } from '@mui/material';
@@ -34,7 +35,17 @@ export default function DashboardAppPage() {
   const [users, setUsers] = useState([]);
   const [trips, setTrips] = useState([]);
   const [vouchers, setVouchers] = useState([]);
+  const [vouchersInactive, setVouchersInactive] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [postDates, setPostDates] = useState([]);
+  const [tripsCompleted, setTripsCompleted] = useState([]);
+  const [tripsUpComing, setTripsUpComing] = useState([]);
+  const [tripsInProgress, setTripsInProgress] = useState([]);
+  const [upcomingTripsLength, setUpcomingTripsLength] = useState([]);
+  const [inprogressTripsLength, setInProgressTripsLength] = useState([]);
+  const [completedTripsLength, setCompletedTripsLength] = useState([]);
+  const [topProvinces, setTopProvinces] = useState([]);
+  const [topProvincesValue, setTopProvincesValue] = useState([]);
 
   async function fetchUser() {
     const users = await adminApi.getListUser();
@@ -48,16 +59,124 @@ export default function DashboardAppPage() {
 
   async function fetchVoucher() {
     const vouchers = await adminApi.getListVoucher();
-    console.log(vouchers);
-    setVouchers(vouchers.data);
+    setVouchers(vouchers?.data);
+  }
+
+  async function fetchDestination() {
+    const destinations = await adminApi.getDestinations();
+    setTopProvinces(Object.keys(destinations?.data));
+    setTopProvincesValue(Object.values(destinations?.data));
   }
 
   useEffect(() => {
     fetchUser();
     fetchTrip();
     fetchVoucher();
+    fetchDestination();
     setLoading(false);
   }, []);
+
+  useEffect(() => {
+    trips?.map((trip, _index) => {
+      if (trip.status === 'UPCOMING') {
+        setTripsUpComing((prev) => [...prev, trip]);
+      }
+      if (trip.status === 'IN_PROGRESS') {
+        setTripsInProgress((prev) => [...prev, trip]);
+      }
+      if (trip.status === 'COMPLETED') {
+        setTripsCompleted((prev) => [...prev, trip]);
+      }
+      return _index;
+    });
+    const grouped = groupBy(trips, (trip) => dayjs.tz(trip.postDate, 'Asia/Ho_Chi_Minh').format('MM/DD/YYYY'));
+    const keys = [...grouped.keys()];
+    setPostDates(keys.reverse());
+    if (vouchers) {
+      vouchers.map((voucher, _index) => {
+        if (voucher.status === 'INACTIVE') {
+          setVouchersInactive((prev) => [...prev, voucher]);
+        }
+        return _index;
+      });
+    }
+  }, [trips]);
+
+  useEffect(() => {
+    const groupedTripsUpComing = groupBy(tripsUpComing, (trip) =>
+      dayjs.tz(trip.postDate, 'Asia/Ho_Chi_Minh').format('MM/DD/YYYY')
+    );
+    const keysTripsUpComing = [...groupedTripsUpComing];
+    const upcomings = keysTripsUpComing.reverse();
+    postDates.some((postdate) => {
+      const reps = upcomings.some((trip) => {
+        if (trip[0] === postdate) {
+          setUpcomingTripsLength((prev) => [...prev, trip[1].length]);
+          return true;
+        }
+        return false;
+      });
+
+      if (!reps) {
+        setUpcomingTripsLength((prev) => [...prev, 0]);
+      }
+      return false;
+    });
+
+    const groupedTripsInProgress = groupBy(tripsInProgress, (trip) =>
+      dayjs.tz(trip.postDate, 'Asia/Ho_Chi_Minh').format('MM/DD/YYYY')
+    );
+    const keysTripsInProgress = [...groupedTripsInProgress];
+    const inprogress = keysTripsInProgress.reverse();
+    postDates.some((postdate) => {
+      const reps = inprogress.some((trip) => {
+        if (trip[0] === postdate) {
+          setInProgressTripsLength((prev) => [...prev, trip[1].length]);
+          return true;
+        }
+        return false;
+      });
+
+      if (!reps) {
+        setInProgressTripsLength((prev) => [...prev, 0]);
+      }
+      return false;
+    });
+
+    const groupedTripsCompleted = groupBy(tripsCompleted, (trip) =>
+      dayjs.tz(trip.postDate, 'Asia/Ho_Chi_Minh').format('MM/DD/YYYY')
+    );
+    const keysTripsCompleted = [...groupedTripsCompleted];
+    const completeds = keysTripsCompleted.reverse();
+    postDates.some((postdate) => {
+      const reps = completeds.some((trip) => {
+        if (trip[0] === postdate) {
+          setCompletedTripsLength((prev) => [...prev, trip[1].length]);
+          return true;
+        }
+        return false;
+      });
+
+      if (!reps) {
+        setCompletedTripsLength((prev) => [...prev, 0]);
+      }
+      return false;
+    });
+  }, [tripsUpComing, tripsInProgress, tripsCompleted]);
+
+  function groupBy(list, keyGetter) {
+    const map = new Map();
+    list.forEach((item) => {
+      const key = keyGetter(item);
+      const collection = map.get(key);
+      if (!collection) {
+        map.set(key, [item]);
+      } else {
+        collection.push(item);
+      }
+    });
+    return map;
+  }
 
   useEffect(() => {
     if (localStorage.getItem('access-token')) {
@@ -71,7 +190,6 @@ export default function DashboardAppPage() {
   if (loading) {
     return <LoadingSpinner />;
   }
-
   return (
     <>
       <Helmet>
@@ -102,69 +220,66 @@ export default function DashboardAppPage() {
               icon={'fluent:gift-card-money-20-filled'}
             />
           </Grid>
-
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Báo cáo lỗi" total={234} color="error" icon={'ant-design:bug-filled'} />
+            <AppWidgetSummary
+              title="Mã giảm giá vô hiệu hoá"
+              total={vouchersInactive.length}
+              color="error"
+              icon={'ant-design:bug-filled'}
+            />
           </Grid>
-
           <Grid item xs={12} md={6} lg={8}>
-            <AppWebsiteVisits
-              title="Lượt truy cập trang"
-              subheader="(+43%) so với tháng trước"
-              chartLabels={[
-                '01/01/2003',
-                '02/01/2003',
-                '03/01/2003',
-                '04/01/2003',
-                '05/01/2003',
-                '06/01/2003',
-                '07/01/2003',
-                '08/01/2003',
-                '09/01/2003',
-                '10/01/2003',
-                '11/01/2003',
-              ]}
-              chartData={[
-                {
-                  name: 'Team A',
-                  type: 'column',
-                  fill: 'solid',
-                  data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30],
-                },
-                {
-                  name: 'Team B',
-                  type: 'area',
-                  fill: 'gradient',
-                  data: [44, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43],
-                },
-                {
-                  name: 'Team C',
-                  type: 'line',
-                  fill: 'solid',
-                  data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39],
-                },
-              ]}
-            />
+            {completedTripsLength && inprogressTripsLength && upcomingTripsLength ? (
+              <AppWebsiteVisits
+                title="Trạng thái các chuyến đi"
+                chartLabels={postDates}
+                chartData={[
+                  {
+                    name: 'Thành công',
+                    type: 'column',
+                    fill: 'solid',
+                    data: [...completedTripsLength],
+                  },
+                  {
+                    name: 'Đang diễn ra',
+                    type: 'area',
+                    fill: 'gradient',
+                    data: [...inprogressTripsLength],
+                  },
+                  {
+                    name: 'Sắp diễn ra',
+                    type: 'line',
+                    fill: 'solid',
+                    data: [...upcomingTripsLength],
+                  },
+                ]}
+              />
+            ) : (
+              <>Loading...</>
+            )}
           </Grid>
-
           <Grid item xs={12} md={6} lg={4}>
-            <AppCurrentVisits
-              title="Lượt truy cập hiện tại"
-              chartData={[
-                { label: 'America', value: 4344 },
-                { label: 'Asia', value: 5435 },
-                { label: 'Europe', value: 1443 },
-                { label: 'Africa', value: 4443 },
-              ]}
-              chartColors={[
-                theme.palette.primary.main,
-                theme.palette.info.main,
-                theme.palette.warning.main,
-                theme.palette.error.main,
-              ]}
-            />
+            {topProvinces && topProvincesValue ? (
+              <AppCurrentVisits
+                title="Các điểm đến thu hút nhất"
+                chartData={[
+                  { label: `${topProvinces[0]}`, value: topProvincesValue[0] },
+                  { label: `${topProvinces[1]}`, value: topProvincesValue[1] },
+                  { label: `${topProvinces[2]}`, value: topProvincesValue[2] },
+                  { label: `${topProvinces[3]}`, value: topProvincesValue[3] },
+                  { label: `${topProvinces[4]}`, value: topProvincesValue[4] },
+                ]}
+                chartColors={[
+                  theme.palette.primary.main,
+                  theme.palette.info.main,
+                  theme.palette.warning.main,
+                  theme.palette.error.main,
+                ]}
+              />
+            ) : (
+              <>Loading...</>
+            )}
           </Grid>
-
           <Grid item xs={12} md={6} lg={8}>
             <AppConversionRates
               title="Tỷ lệ chuyển đổi"
@@ -183,7 +298,6 @@ export default function DashboardAppPage() {
               ]}
             />
           </Grid>
-
           <Grid item xs={12} md={6} lg={4}>
             <AppCurrentSubject
               title="Tỷ lệ người dùng"
@@ -196,7 +310,6 @@ export default function DashboardAppPage() {
               chartColors={[...Array(6)].map(() => theme.palette.text.secondary)}
             />
           </Grid>
-
           <Grid item xs={12} md={6} lg={8}>
             <AppNewsUpdate
               title="Tin tức mới"
@@ -209,7 +322,6 @@ export default function DashboardAppPage() {
               }))}
             />
           </Grid>
-
           <Grid item xs={12} md={6} lg={4}>
             <AppOrderTimeline
               title="Lịch trình báo cáo"
@@ -227,7 +339,6 @@ export default function DashboardAppPage() {
               }))}
             />
           </Grid>
-
           <Grid item xs={12} md={6} lg={4}>
             <AppTrafficBySite
               title="Lượt truy cập mạng xã hội"
@@ -255,7 +366,6 @@ export default function DashboardAppPage() {
               ]}
             />
           </Grid>
-
           <Grid item xs={12} md={6} lg={8}>
             <AppTasks
               title="Công việc cần làm"
