@@ -12,6 +12,10 @@ const userProfileApi = {
   updateUserProfile: (data) => {
     const url = '/users/profile';
     return axiosClient.put(url, JSON.stringify(data))
+  },
+  getAllTransactionsHistory: () => {
+    const url = '/users/trasactions';
+    return axiosClient.get(`${url}?page=1&limit=20`)
   }
 };
 

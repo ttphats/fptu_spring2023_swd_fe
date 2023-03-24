@@ -15,7 +15,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Box, Stack } from '@mui/system';
-import { Button, Grid } from '@mui/material';
+import { Button, Grid, List, ListItem, ListItemAvatar, ListItemButton, Avatar } from '@mui/material';
 import { Icon } from '@iconify/react';
 // date
 import dayjs from 'dayjs';
@@ -77,6 +77,7 @@ const UserProfile = () => {
   const [openPayment, setOpenPayment] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(false);
   const [openPaymentStatus, setOpenPaymentStatus] = useState(false);
+  const [transactions, setTransactions] = useState([]);
 
   const { vertical, horizontal } = {
     vertical: 'top',
@@ -114,6 +115,7 @@ const UserProfile = () => {
     }
   };
 
+  const [openDialogTransaction, setOpenDialogTransaction] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleClickOpenDialog = () => {
@@ -122,6 +124,14 @@ const UserProfile = () => {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
+  };
+
+  const handleClickOpenDialogTransaction = () => {
+    setOpenDialogTransaction(true);
+  };
+
+  const handleCloseDialogTransaction = () => {
+    setOpenDialogTransaction(false);
   };
 
   const handleSubmit = async (e) => {
@@ -181,6 +191,12 @@ const UserProfile = () => {
     setDistrict(event.target.value);
   };
 
+  async function fetchTransactions() {
+    const response = await userProfileApi.getAllTransactionsHistory();
+    console.log(response.data);
+    setTransactions(response.data);
+  }
+
   useEffect(() => {
     if (currentUser) {
       setFullname(currentUser.fullname || '');
@@ -191,6 +207,7 @@ const UserProfile = () => {
       setAddressNum(currentUser?.address?.split(', ')[0] || '');
       fetchAddress();
       fetchTripsUserJoined();
+      fetchTransactions();
     }
   }, [currentUser]);
 
@@ -248,20 +265,49 @@ const UserProfile = () => {
                 '&:hover': {
                   backgroundColor: '#F2C6A5',
                   boxShadow: 'none',
+                  borderColor: '#FF7300',
                 },
               }}
+              startIcon={<Icon icon="material-symbols:edit-outline" />}
               variant="outlined"
               onClick={handleClickOpenDialog}
             >
               Cập nhật thông tin cá nhân
             </LoadingButton>
-            <Button
+            <LoadingButton
+              sx={{
+                color: '#FF7300',
+                borderColor: '#FF7300',
+                '&:hover': {
+                  backgroundColor: '#F2C6A5',
+                  boxShadow: 'none',
+                  borderColor: '#FF7300',
+                },
+                marginLeft: '5px',
+              }}
+              startIcon={<Icon icon="material-symbols:history-edu-outline" />}
+              variant="outlined"
+              onClick={handleClickOpenDialogTransaction}
+            >
+              Lịch sử giao dịch
+            </LoadingButton>
+            <LoadingButton
+              sx={{
+                color: '#3A98B9',
+                borderColor: '#3A98B9',
+                '&:hover': {
+                  backgroundColor: '#BAD7E9',
+                  boxShadow: 'none',
+                  borderColor: '#3A98B9',
+                },
+                marginLeft: '5px',
+              }}
+              endIcon={<Icon icon="material-symbols:add-circle-outline" />}
+              variant="outlined"
               onClick={() => setOpenPayment(true)}
-              sx={{ '&:hover': { backgroundColor: 'transparent' }, color: '#3A98B9', fontSize: '16px' }}
             >
               Số dư: {Intl.NumberFormat('en-US').format(currentUser?.balance)} &nbsp;{' '}
-              <Icon icon="material-symbols:add-circle-outline" />
-            </Button>
+            </LoadingButton>
           </Stack>
           <Dialog open={openDialog} onClose={handleCloseDialog}>
             <DialogTitle>Cập nhật thông tin cá nhân</DialogTitle>
@@ -436,6 +482,117 @@ const UserProfile = () => {
             Xác nhận
           </LoadingButton>
         </DialogActions>
+      </Dialog>
+      {/* Dialog Transaction */}
+      <Dialog sx={{ minWidth: '500px' }} onClose={handleCloseDialogTransaction} open={openDialogTransaction}>
+        <DialogTitle style={{ fontWeight: 700 }}>
+          {' '}
+          <Icon icon="material-symbols:history-edu-outline" /> Lịch sử giao dịch
+        </DialogTitle>
+        {transactions.length > 0 ? (
+          <>
+            <List sx={{ pt: 0 }}>
+              {transactions.map((transaction) => (
+                <ListItem key={transaction.id} disableGutters>
+                  <ListItemButton sx={{ boxShadow: 3 }} key={transaction.id}>
+                    <Grid container spacing={2}>
+                      {transaction?.type === 'TRIP_DEPOSIT' ? (
+                        <>
+                          <Grid sx={{ marginTop: 'auto', marginBottom: 'auto' }} item>
+                            <Icon icon="mdi:instant-deposit" color="red" width="42" height="42" />
+                          </Grid>
+                          <Grid item xs={12} sm container>
+                            <Grid item xs container direction="column" spacing={2}>
+                              <Grid item xs>
+                                <Typography gutterBottom variant="subtitle1" component="div">
+                                  Số tiền đã giao dịch: &nbsp;
+                                  {Intl.NumberFormat('en-US').format(transaction?.amount * 1000)} VNĐ
+                                </Typography>
+                                <Typography variant="subtitle1" component="div">
+                                  {' '}
+                                  Loại giao dịch: Tạo/ tham gia chuyến đi
+                                </Typography>
+                                <Typography gutterBottom variant="subtitle1" component="div">
+                                  Hình thức thanh toán: &nbsp;
+                                  {transaction?.moneyExchange?.provider}
+                                </Typography>
+                                <Typography variant="body2" gutterBottom>
+                                  Ngày giao dịch: &nbsp;
+                                  {transaction?.createDate
+                                    ? dayjs.tz(transaction.createDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                    : 'Không xác định'}
+                                </Typography>
+                                <Typography variant="body2" gutterBottom>
+                                  Ngày hoàn thành: &nbsp;
+                                  {transaction?.completeDate
+                                    ? dayjs.tz(transaction.completeDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                    : 'Không xác định'}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                            <Grid sx={{ color: 'red' }} item>
+                              <Typography variant="subtitle1" component="div">
+                                -{Intl.NumberFormat('en-US').format(transaction?.amount)} Xu
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        </>
+                      ) : (
+                        <></>
+                      )}
+                      {transaction?.type === 'WALLET_DEPOSIT' ? (
+                        <>
+                          <Grid sx={{ marginTop: 'auto', marginBottom: 'auto' }} item>
+                            <Icon icon="mdi:instant-deposit" color="green" width="42" height="42" />
+                          </Grid>
+                          <Grid item xs={12} sm container>
+                            <Grid item xs container direction="column" spacing={2}>
+                              <Grid item xs>
+                                <Typography gutterBottom variant="subtitle1" component="div">
+                                  Số tiền đã giao dịch: &nbsp;
+                                  {Intl.NumberFormat('en-US').format(transaction?.amount * 1000)} VNĐ
+                                </Typography>
+                                <Typography variant="subtitle1" component="div">
+                                  {' '}
+                                  Loại giao dịch: Nạp tiền vào ví
+                                </Typography>
+                                <Typography gutterBottom variant="subtitle1" component="div">
+                                  Hình thức thanh toán: &nbsp;
+                                  {transaction?.moneyExchange?.provider}
+                                </Typography>
+                                <Typography variant="body2" gutterBottom>
+                                  Ngày giao dịch: &nbsp;
+                                  {transaction?.createDate
+                                    ? dayjs.tz(transaction.createDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                    : 'Không xác định'}
+                                </Typography>
+                                <Typography variant="body2" gutterBottom>
+                                  Ngày hoàn thành: &nbsp;
+                                  {transaction?.completeDate
+                                    ? dayjs.tz(transaction.completeDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                    : 'Không xác định'}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                            <Grid sx={{ color: 'green' }} item>
+                              <Typography variant="subtitle1" component="div">
+                                +{Intl.NumberFormat('en-US').format(transaction?.amount)} Xu
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        </>
+                      ) : (
+                        <></>
+                      )}
+                    </Grid>
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          </>
+        ) : (
+          <DialogContent> Hiện chưa có giao dịch nào</DialogContent>
+        )}
       </Dialog>
     </>
   );
