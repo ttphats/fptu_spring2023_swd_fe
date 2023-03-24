@@ -15,6 +15,11 @@ import {
   DialogTitle,
   DialogContent,
   Dialog,
+  ListItemButton,
+  ListItem,
+  List,
+  Stack,
+  Checkbox,
 } from '@mui/material';
 import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
@@ -66,17 +71,94 @@ export default function TripDetails({ trip }) {
   const [errorMsg, setErrorMsg] = useState(null);
   const [disable, setDisable] = useState(false);
   const [members, setMembers] = useState([]);
+  const [isHost, setIsHost] = useState();
   const [vouchers, setVouchers] = useState([]);
+  const [allVoucherDisplay, setAllVoucherDisplay] = useState([]);
+  const [vouchersBought, setVouchersBought] = useState([]);
+  const [voucherIds, setVouchersId] = useState([]);
+  const [vouchersSelected, setVoucherSelected] = useState([]);
   const [openConfirm, setOpenConfirm] = useState(false);
+  const [openConfirmVoucher, setOpenConfirmVoucher] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [disableVoucher, setDisableVoucher] = useState(true);
+
+  let totalPriceVoucher = 0;
 
   async function getListVouchers() {
     if (trip.id) {
       const reps = await voucherApi.getVouchersByTripID(trip?.id);
-      setVouchers(reps.data);
+
+      reps?.data.map((voucher, _index) => {
+        if (voucher.tripVoucherStatus === 'IN_CART') {
+          setVouchersBought((prev) => [...prev, voucher]);
+        }
+        if (voucher.tripVoucherStatus === 'WISH') {
+          setVouchers((prev) => [...prev, voucher]);
+        }
+        return _index;
+      });
       setLoading(false);
     }
   }
+
+  async function getAllVouchers() {
+    try {
+      const province = trip?.endLocation.address.split(', ');
+      console.log(province[3]);
+      const response = await voucherApi.getVoucherByProvince(province[3]);
+      if (response) {
+        setAllVoucherDisplay(response.data);
+        setLoading(false);
+      }
+    } catch (error) {
+      setErrorMsg(error?.response?.data.message);
+      setOpenSnackBar(true);
+    }
+  }
+
+  const handleCheckboxClick = (event, voucher) => {
+    const selectedIndex = vouchersSelected.indexOf(voucher);
+    let newSelected = [];
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(vouchersSelected, voucher);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(vouchersSelected.slice(1));
+    } else if (selectedIndex === vouchersSelected.length - 1) {
+      newSelected = newSelected.concat(vouchersSelected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        vouchersSelected.slice(0, selectedIndex),
+        vouchersSelected.slice(selectedIndex + 1)
+      );
+    }
+    setVoucherSelected(newSelected);
+  };
+
+  const handleBuyVoucher = async () => {
+    try {
+      const response = await voucherApi.addVouchersToTrip(trip.id, voucherIds);
+      setLoading(false);
+      console.log(response);
+      if (response) {
+        setOpenConfirmVoucher(false);
+        setOpenDialog(false);
+      }
+    } catch (error) {
+      console.log(error.response.data.message);
+      setErrorMsg(error.response.data.message);
+      setOpenSnackBar(true);
+    }
+  };
+
+  const handleClickOpenDialog = () => {
+    setVoucherSelected([]);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
 
   const handleClickOpenConfirm = () => {
     setOpenConfirm(true);
@@ -86,8 +168,21 @@ export default function TripDetails({ trip }) {
     setOpenConfirm(false);
   };
 
+  const handleClickOpenConfirmVoucher = (vouchersSelected) => {
+    vouchersSelected.map((voucher, _index) => {
+      setVouchersId((prev) => [...prev, voucher.id]);
+      return _index;
+    });
+    setOpenConfirmVoucher(true);
+  };
+
+  const handleCloseConfirmVoucher = () => {
+    setOpenConfirmVoucher(false);
+  };
+
   useEffect(() => {
     getListVouchers();
+    getAllVouchers();
   }, [trip]);
 
   useEffect(() => {
@@ -95,10 +190,14 @@ export default function TripDetails({ trip }) {
       try {
         if (trip.id) {
           const getUser = await tripApi.getTripMembers(trip?.id);
+          console.log(getUser.data);
           setMembers(getUser.data);
           getUser.data.map((mem, _index) => {
             if (mem.user.id === currentUser.id) {
               setDisable(true);
+            }
+            if (mem.user.id === currentUser.id && mem.role === 'HOST') {
+              setIsHost(true);
             }
             return _index;
           });
@@ -109,6 +208,14 @@ export default function TripDetails({ trip }) {
     }
     handleDisabled();
   }, [trip]);
+
+  useEffect(() => {
+    if (vouchersSelected && vouchersSelected.length > 0) {
+      setDisableVoucher(false);
+    } else {
+      setDisableVoucher(true);
+    }
+  }, [vouchersSelected]);
 
   const handleJoinTrip = async () => {
     setDisable(true);
@@ -134,9 +241,18 @@ export default function TripDetails({ trip }) {
     navigate('/');
   };
 
+  if (vouchersSelected) {
+    vouchersSelected.map((voucher) => {
+      totalPriceVoucher += voucher.price;
+      return totalPriceVoucher;
+    });
+  }
+
   if (loading) {
     return <LoadingSpinner />;
   }
+
+  console.log('voucher ', vouchers);
 
   return (
     <>
@@ -305,7 +421,7 @@ export default function TripDetails({ trip }) {
           {/* Trip vouchers */}
           <Typography variant="h6" sx={{ color: '#FF7300' }} gutterBottom>
             <Icon icon="fluent:gift-card-multiple-24-filled" />
-            &nbsp;Voucher của chuyến đi:
+            &nbsp;Các mã giảm giá mong muốn cho chuyến đi:
           </Typography>
           <Paper
             sx={{
@@ -344,6 +460,7 @@ export default function TripDetails({ trip }) {
                       </Typography>
                     </Grid>
                   </Grid>
+
                   <Grid item>
                     <Typography variant="subtitle1" component="div">
                       {Intl.NumberFormat('en-US').format(selected?.price)} Xu
@@ -352,6 +469,73 @@ export default function TripDetails({ trip }) {
                 </Grid>
               </Grid>
             ))}
+          </Paper>
+          <Typography variant="h6" sx={{ color: '#FF7300' }} gutterBottom>
+            <Icon icon="fluent:gift-card-money-24-filled" />
+            &nbsp;Các mã giảm giá đã mua:
+          </Typography>
+          {isHost ? (
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <LoadingButton onClick={handleClickOpenDialog}>
+                <Icon icon="fluent:gift-card-add-24-filled" color="#FF7B54" width="50" height="50" />
+              </LoadingButton>
+            </Box>
+          ) : (
+            <></>
+          )}
+          <Paper
+            sx={{
+              p: 2,
+              margin: 'auto',
+              maxWidth: 700,
+              flexGrow: 1,
+            }}
+          >
+            {vouchersBought.length > 0 ? (
+              vouchersBought?.map((selected) => (
+                <Grid key={selected.id} container spacing={2} sx={{ boxShadow: 3, marginBottom: 3, marginTop: 2 }}>
+                  <Grid item>
+                    <ButtonBase sx={{ width: 128, height: 128 }}>
+                      <Img alt="complex" src={selected?.imageUrl} />
+                    </ButtonBase>
+                  </Grid>
+                  <Grid item xs={12} sm container>
+                    <Grid item xs container direction="column" spacing={2}>
+                      <Grid item xs>
+                        <Typography gutterBottom variant="subtitle1" component="div">
+                          {selected?.name}
+                        </Typography>
+                        <Typography variant="body2" gutterBottom>
+                          {selected?.description}
+                        </Typography>
+                        <Typography variant="body2" gutterBottom>
+                          {selected?.startDate
+                            ? dayjs.tz(selected.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                            : ''}{' '}
+                          -{' '}
+                          {selected?.endDate ? dayjs.tz(selected.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY') : ''}
+                        </Typography>
+                      </Grid>
+                      <Grid item>
+                        <Typography sx={{ cursor: 'pointer' }} variant="body2">
+                          Số lượng còn lại: {selected?.quantity}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+
+                    <Grid item>
+                      <Typography variant="subtitle1" component="div">
+                        {Intl.NumberFormat('en-US').format(selected?.price)} Xu
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              ))
+            ) : (
+              <Typography sx={{ textAlign: 'center' }} variant="body1">
+                Chưa có mã giảm giá nào được mua cho chuyến đi này
+              </Typography>
+            )}
           </Paper>
           <Grid
             container
@@ -377,6 +561,7 @@ export default function TripDetails({ trip }) {
             )}
           </Grid>
           <Dialog
+            sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}
             open={openConfirm}
             onClose={handleCloseConfirm}
             aria-labelledby="alert-dialog-title"
@@ -393,6 +578,116 @@ export default function TripDetails({ trip }) {
             <DialogActions>
               <LoadingButton onClick={handleCloseConfirm}>Huỷ</LoadingButton>
               <LoadingButton onClick={handleJoinTrip} autoFocus>
+                Xác nhận
+              </LoadingButton>
+            </DialogActions>
+          </Dialog>
+          <Dialog onClose={handleCloseDialog} open={openDialog}>
+            <DialogTitle>Chọn ưu đãi cho chuyến đi của bạn</DialogTitle>
+            {allVoucherDisplay.length > 0 ? (
+              <>
+                <List sx={{ pt: 0 }}>
+                  {allVoucherDisplay.map((voucher) => (
+                    <ListItem key={voucher.id} disableGutters>
+                      {/* onClick={() => handleListItemClick(voucher)} */}
+                      <ListItemButton sx={{ boxShadow: 3 }} key={voucher.id}>
+                        <Grid container spacing={2}>
+                          <Grid item>
+                            <Checkbox onChange={(event) => handleCheckboxClick(event, voucher)} />
+                          </Grid>
+                          <Grid item>
+                            <ButtonBase sx={{ width: 128, height: 128 }}>
+                              <Img alt="complex" src={voucher.imageUrl} />
+                            </ButtonBase>
+                          </Grid>
+                          <Grid item xs={12} sm container>
+                            <Grid item xs container direction="column" spacing={2}>
+                              <Grid item xs>
+                                <Typography gutterBottom variant="subtitle1" component="div">
+                                  {voucher?.name}
+                                </Typography>
+                                <Typography variant="body2" gutterBottom>
+                                  {voucher?.description}
+                                </Typography>
+                                <Typography variant="body2" gutterBottom>
+                                  {voucher?.startDate
+                                    ? dayjs.tz(voucher.startDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                    : ''}{' '}
+                                  -{' '}
+                                  {voucher?.endDate
+                                    ? dayjs.tz(voucher.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                    : ''}
+                                </Typography>
+                                {console.log(voucher.location)}
+                                <Typography variant="body2" gutterBottom>
+                                  Loại: {voucher?.location.type}
+                                </Typography>
+                              </Grid>
+                              <Grid item>
+                                <Typography sx={{ cursor: 'pointer' }} variant="body2">
+                                  Số lượng còn lại: {voucher.quantity}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                            <Grid item>
+                              <Typography variant="subtitle1" component="div">
+                                {Intl.NumberFormat('en-US').format(voucher?.price)} Xu
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+                <DialogActions
+                  style={{
+                    display: 'flex',
+                    height: '10vh',
+                    justifyContent: 'space-between',
+                    position: 'fixed',
+                    bottom: 0,
+                    background: '#ffffff',
+                    minWidth: '600px',
+                  }}
+                >
+                  Tổng thanh toán ({vouchersSelected.length} Mã giảm giá) :{' '}
+                  <Typography sx={{ color: '#FF7300', fontWeight: 700 }}>{totalPriceVoucher} Xu</Typography>
+                  <LoadingButton
+                    disabled={disableVoucher}
+                    sx={{
+                      backgroundColor: '#FF7300',
+                      '&:hover': {
+                        backgroundColor: '#F2C6A5',
+                        boxShadow: 'none',
+                      },
+                    }}
+                    onClick={() => handleClickOpenConfirmVoucher(vouchersSelected)}
+                    variant="contained"
+                  >
+                    Mua ngay
+                  </LoadingButton>
+                </DialogActions>
+              </>
+            ) : (
+              <DialogContent> Hiện chưa có mã giảm giá nào cho điểm đến này</DialogContent>
+            )}
+          </Dialog>
+          <Dialog
+            open={openConfirmVoucher}
+            onClose={handleCloseConfirmVoucher}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">{'Xác nhận thanh toán tiền mã giảm giá'}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Cần <strong style={{ color: '#ff7300' }}>{totalPriceVoucher} Xu</strong> để mua
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <LoadingButton onClick={handleCloseConfirmVoucher}>Huỷ</LoadingButton>
+              <LoadingButton sx={{ color: '#FF7300' }} onClick={handleBuyVoucher} autoFocus>
                 Xác nhận
               </LoadingButton>
             </DialogActions>
