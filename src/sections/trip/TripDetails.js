@@ -326,6 +326,15 @@ export default function TripDetails({ trip }) {
                   </Box>
                   <Box mt={2}>
                     <Typography variant="h5" sx={{ color: '#FF884B' }} gutterBottom>
+                      <Icon icon="ph:money-fill" />
+                      &nbsp;Số dư của chuyến đi:
+                    </Typography>
+                    <Typography variant="h6" gutterBottom>
+                      {trip?.balance ? trip.balance : 0} Xu
+                    </Typography>
+                  </Box>
+                  <Box mt={2}>
+                    <Typography variant="h5" sx={{ color: '#FF884B' }} gutterBottom>
                       <Icon icon="iconoir:maps-go-straight" vFlip />
                       &nbsp;Thông tin địa điểm xuất phát
                     </Typography>
@@ -464,7 +473,7 @@ export default function TripDetails({ trip }) {
                     </Grid>
                     <Grid item>
                       <Typography sx={{ cursor: 'pointer' }} variant="body2">
-                        Số lượng còn lại: {selected?.quantity}
+                        Trạng thái: {selected?.status === 'ACTIVE' ? 'Khả dụng' : 'Không khả dụng'}
                       </Typography>
                     </Grid>
                   </Grid>

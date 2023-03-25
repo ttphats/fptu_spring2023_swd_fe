@@ -76,7 +76,7 @@ export default function VoucherCard({ voucher }) {
                 <Typography variant="subtitle1" sx={{ height: '40px' }}>
                   {name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" >
+                <Typography variant="body2" color="text.secondary">
                   {description}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" noWrap>
@@ -90,6 +90,9 @@ export default function VoucherCard({ voucher }) {
                 </Typography>
                 <Typography variant="body2" color="text.secondary" noWrap>
                   Số lượng còn lại: {quantity}
+                </Typography>
+                <Typography variant="body2">
+                  Trạng thái: {status === 'ACTIVE' ? 'Khả dụng' : 'Không khả dụng'}
                 </Typography>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                   <Typography variant="subtitle1">{locationName}</Typography>
@@ -109,13 +112,15 @@ export default function VoucherCard({ voucher }) {
           className={classes.imageContainer}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          sx={{ pt: '60%', position: 'relative', borderRadius: 5, }}
+          sx={{ pt: '60%', position: 'relative', borderRadius: 5 }}
         >
           <StyledVoucherImg className={`${classes.image} ${isHovered ? classes.zoom : ''}`} alt={name} src={imageUrl} />
         </Box>
 
         <Stack spacing={2} sx={{ p: 2 }}>
-          <Typography variant="subtitle1"  sx={{ height: '40px' }}>{name}</Typography>
+          <Typography variant="subtitle1" sx={{ height: '40px' }}>
+            {name}
+          </Typography>
 
           <Typography variant="body2" color="text.secondary" noWrap>
             {description}
@@ -129,6 +134,7 @@ export default function VoucherCard({ voucher }) {
           <Typography variant="body2" color="text.secondary" noWrap>
             Số lượng còn lại: {quantity}
           </Typography>
+          <Typography variant="body2">Trạng thái: {status === 'ACTIVE' ? 'Khả dụng' : 'Không khả dụng'}</Typography>
           <Stack direction="row" alignItems="center" justifyContent="space-between">
             <Typography variant="subtitle1">{locationName}</Typography>
             <Typography variant="subtitle1">{price} Xu</Typography>

@@ -3,14 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import CurrencyInput from 'react-currency-input-field';
-import {
-  Container,
-  Typography,
-  InputLabel,
-  TextField,
-  DialogContent,
-  DialogActions,
-} from '@material-ui/core';
+import { Container, Typography, InputLabel, TextField, DialogContent, DialogActions } from '@material-ui/core';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import OutlinedInput from '@mui/material/OutlinedInput';
@@ -223,6 +216,7 @@ const CreateTrip = () => {
   const [endDistrict, setEndDistrict] = useState();
   const [endWard, setEndWard] = useState();
   const [vouchers, setVouchers] = useState([]);
+  const [vouchersActive, setVouchersActive] = useState([]);
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [msg, setMsg] = useState(null);
@@ -271,8 +265,8 @@ const CreateTrip = () => {
         if (adjustedDate) {
           formik.setFieldValue('startDate', adjustedDate);
         }
-        const reps = await voucherApi.validateVoucher({ voucherIDs: selectedVoucherId });
-        const createTripVouchers = reps.data;
+        // const reps = await voucherApi.validateVoucher({ voucherIDs: selectedVoucherId });
+        // const createTripVouchers = reps.data;
 
         const form = {
           name: formik.values.name,
@@ -302,7 +296,7 @@ const CreateTrip = () => {
           deposit: formik.values.deposit,
           maxMember: formik.values.maxMember,
           minMember: formik.values.minMember,
-          voucherIds: createTripVouchers,
+          voucherIds: selectedVoucherId,
         };
         const json = JSON.stringify(form);
         const blob = new Blob([json], {
@@ -471,12 +465,25 @@ const CreateTrip = () => {
     }
   }, [formik.values.endLocation.province]);
 
-  const handleListItemClick = (value) => {
-    setOpenDialog(false);
-    setIsShowed(true);
-    setSelectedValue([...selectedValue, value]);
-    setSelectedVoucherId([...selectedVoucherId, value.id]);
-    console.log(value.id);
+  const handleListItemClick = async (value) => {
+    try {
+      const reps = await voucherApi.validateVoucher({ voucherIDs: [value.id] });
+      if (reps) {
+        console.log(value.id);
+        setOpenDialog(false);
+        setIsShowed(true);
+        setSelectedValue([...selectedValue, reps.data]);
+        setSelectedVoucherId([...selectedVoucherId, reps.data.id]);
+      } 
+    } catch (error) {
+      console.log(error)
+      if (error.response?.data.message) {
+        setMsg(error.response?.data.message);
+      } else {
+        setMsg('Voucher không thể sử dụng vui lòng chọn voucher khác');
+      }
+      setOpen(true);
+    }
   };
 
   console.log(formik.values.startLocation);
@@ -1163,6 +1170,11 @@ const CreateTrip = () => {
                                         <Grid item>
                                           <Typography sx={{ cursor: 'pointer' }} variant="body2">
                                             Số lượng còn lại: {voucher.quantity}
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item>
+                                          <Typography sx={{ cursor: 'pointer' }} variant="body2">
+                                            Trạng thái: {voucher.status === 'ACTIVE' ? 'Khả dụng' : 'Không khả dụng'}
                                           </Typography>
                                         </Grid>
                                       </Grid>
