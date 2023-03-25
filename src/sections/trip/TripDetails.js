@@ -207,6 +207,9 @@ export default function TripDetails({ trip }) {
             return _index;
           });
         }
+        if (currentUser.role === 'ADMIN') {
+          setDisable(true);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -526,7 +529,9 @@ export default function TripDetails({ trip }) {
                                   ? dayjs.tz(selected.endDate, 'Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
                                   : ''}
                               </Typography>
-                              <Typography>Trạng thái: {selected?.tripVoucherStatus === 'IN_CART' ? 'Đã mua' : 'Đã sử dụng'}</Typography>
+                              <Typography>
+                                Trạng thái: {selected?.tripVoucherStatus === 'IN_CART' ? 'Đã mua' : 'Đã sử dụng'}
+                              </Typography>
                             </Grid>
                           </Grid>
 
