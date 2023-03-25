@@ -46,6 +46,15 @@ export default function DashboardAppPage() {
   const [completedTripsLength, setCompletedTripsLength] = useState([]);
   const [topProvinces, setTopProvinces] = useState([]);
   const [topProvincesValue, setTopProvincesValue] = useState([]);
+  const [voucherQuantity, setVoucherQuantity] = useState();
+
+  useEffect(() => {
+    fetchUser();
+    fetchTrip();
+    fetchVoucher();
+    fetchDestination();
+    setLoading(false);
+  }, []);
 
   async function fetchUser() {
     const users = await adminApi.getListUser();
@@ -69,14 +78,6 @@ export default function DashboardAppPage() {
   }
 
   useEffect(() => {
-    fetchUser();
-    fetchTrip();
-    fetchVoucher();
-    fetchDestination();
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
     trips?.map((trip, _index) => {
       if (trip.status === 'UPCOMING') {
         setTripsUpComing((prev) => [...prev, trip]);
@@ -93,12 +94,15 @@ export default function DashboardAppPage() {
     const keys = [...grouped.keys()];
     setPostDates(keys.reverse());
     if (vouchers) {
+      let quantity = 0;
       vouchers.map((voucher, _index) => {
         if (voucher.status === 'INACTIVE') {
           setVouchersInactive((prev) => [...prev, voucher]);
         }
+        quantity += voucher.quantity;
         return _index;
       });
+      setVoucherQuantity(quantity);
     }
   }, [trips]);
 
@@ -190,6 +194,7 @@ export default function DashboardAppPage() {
   if (loading) {
     return <LoadingSpinner />;
   }
+
   return (
     <>
       <Helmet>
@@ -215,7 +220,7 @@ export default function DashboardAppPage() {
           <Grid item xs={12} sm={6} md={3}>
             <AppWidgetSummary
               title="Phiếu giảm giá hiện có"
-              total={vouchers?.length}
+              total={voucherQuantity}
               color="warning"
               icon={'fluent:gift-card-money-20-filled'}
             />
@@ -229,7 +234,7 @@ export default function DashboardAppPage() {
             />
           </Grid>
           <Grid item xs={12} md={6} lg={8}>
-            {completedTripsLength && inprogressTripsLength && upcomingTripsLength ? (
+            {completedTripsLength && inprogressTripsLength && upcomingTripsLength && (
               <AppWebsiteVisits
                 title="Trạng thái các chuyến đi"
                 chartLabels={postDates}
@@ -254,12 +259,10 @@ export default function DashboardAppPage() {
                   },
                 ]}
               />
-            ) : (
-              <>Loading...</>
             )}
           </Grid>
-          <Grid item xs={12} md={6} lg={4}>
-            {topProvinces && topProvincesValue ? (
+          {topProvinces.length > 0 && topProvincesValue.length > 0 && (
+            <Grid item xs={12} md={6} lg={4}>
               <AppCurrentVisits
                 title="Các điểm đến thu hút nhất"
                 chartData={[
@@ -267,7 +270,6 @@ export default function DashboardAppPage() {
                   { label: `${topProvinces[1]}`, value: topProvincesValue[1] },
                   { label: `${topProvinces[2]}`, value: topProvincesValue[2] },
                   { label: `${topProvinces[3]}`, value: topProvincesValue[3] },
-                  { label: `${topProvinces[4]}`, value: topProvincesValue[4] },
                 ]}
                 chartColors={[
                   theme.palette.primary.main,
@@ -276,10 +278,8 @@ export default function DashboardAppPage() {
                   theme.palette.error.main,
                 ]}
               />
-            ) : (
-              <>Loading...</>
-            )}
-          </Grid>
+            </Grid>
+          )}
           <Grid item xs={12} md={6} lg={8}>
             <AppConversionRates
               title="Tỷ lệ chuyển đổi"
