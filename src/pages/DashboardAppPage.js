@@ -53,6 +53,7 @@ export default function DashboardAppPage() {
     fetchTrip();
     fetchVoucher();
     fetchDestination();
+    fetchVoucherInSystem();
     fetchVoucherIsUsed();
     setLoading(false);
   }, []);
@@ -65,6 +66,11 @@ export default function DashboardAppPage() {
   async function fetchVoucherIsUsed() {
     const quantity = await adminApi.getVouchersIsUsed();
     setVoucherIsUsed(quantity.data);
+  }
+
+  async function fetchVoucherInSystem() {
+    const quantity = await adminApi.getVouchersIsUsed();
+    setVoucherQuantity(quantity.data);
   }
 
   async function fetchTrip() {
@@ -215,7 +221,7 @@ export default function DashboardAppPage() {
           <Grid item xs={12} sm={6} md={3}>
             <AppWidgetSummary
               title="Phiếu giảm giá hiện có"
-              total={20}
+              total={voucherQuantity}
               color="warning"
               icon={'fluent:gift-card-money-20-filled'}
             />

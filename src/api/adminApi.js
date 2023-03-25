@@ -13,6 +13,10 @@ const adminApi = {
         const url = '/trips/countDestination';
         return axiosClient.get(url);
     },
+    getVouchersIsSystem: () => {
+        const url = '/vouchers/countVoucherInSystem';
+        return axiosClient.get(url);
+    },
     getVouchersIsUsed: () => {
         const url = '/vouchers/rateVoucherIsUsedInSystem';
         return axiosClient.get(url);
