@@ -69,7 +69,7 @@ export default function DashboardAppPage() {
   }
 
   async function fetchVoucherInSystem() {
-    const quantity = await adminApi.getVouchersIsUsed();
+    const quantity = await adminApi.getVouchersIsSystem();
     setVoucherQuantity(quantity.data);
   }
 

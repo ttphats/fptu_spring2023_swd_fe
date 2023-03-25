@@ -150,7 +150,7 @@ const initialValues = {
 const DisplayingErrorMessagesSchema = Yup.object().shape({
   name: Yup.string()
     .min(5, 'Nhập ít nhất 5 ký tự')
-    .max(30, 'Tối đa 30 ký tự')
+    .max(50, 'Tối đa 50 ký tự')
     .required('Vui lòng không được để trống tên của chuyến đi!'),
   startDate: Yup.date().required().typeError('Please select a valid date').nullable(),
   endDate: Yup.date().nullable().required(),
@@ -265,6 +265,7 @@ const CreateTrip = () => {
         if (adjustedDate) {
           formik.setFieldValue('startDate', adjustedDate);
         }
+
         // const reps = await voucherApi.validateVoucher({ voucherIDs: selectedVoucherId });
         // const createTripVouchers = reps.data;
 
@@ -465,18 +466,14 @@ const CreateTrip = () => {
     }
   }, [formik.values.endLocation.province]);
 
-  const handleListItemClick = async (value) => {
+  const handleListItemClick = (value) => {
     try {
-      const reps = await voucherApi.validateVoucher({ voucherIDs: [value.id] });
-      if (reps) {
-        console.log(value.id);
         setOpenDialog(false);
         setIsShowed(true);
-        setSelectedValue([...selectedValue, reps.data]);
-        setSelectedVoucherId([...selectedVoucherId, reps.data.id]);
-      } 
+        setSelectedValue([...selectedValue, value]);
+        setSelectedVoucherId([...selectedVoucherId, value.id]);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       if (error.response?.data.message) {
         setMsg(error.response?.data.message);
       } else {
@@ -486,7 +483,7 @@ const CreateTrip = () => {
     }
   };
 
-  console.log(formik.values.startLocation);
+  console.log(selectedValue);
   return (
     <>
       <Helmet>
