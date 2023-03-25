@@ -67,7 +67,7 @@ export default function VoucherPage() {
           navigate('/login');
           return;
         }
-        const response = await axios.get(`https://hqtbe.site/api/v1/vouchers?page=1&size=20&startDate:asc`, {
+        const response = await axios.get(`https://hqtbe.site/api/v1/vouchers?page=1&size=100&startDate:asc`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('access-token')}`,
           },
