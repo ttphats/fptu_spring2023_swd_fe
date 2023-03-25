@@ -35,7 +35,6 @@ export default function DashboardAppPage() {
   const [users, setUsers] = useState([]);
   const [trips, setTrips] = useState([]);
   const [vouchers, setVouchers] = useState([]);
-  const [vouchersInactive, setVouchersInactive] = useState([]);
   const [loading, setLoading] = useState(true);
   const [postDates, setPostDates] = useState([]);
   const [tripsCompleted, setTripsCompleted] = useState([]);
@@ -47,18 +46,25 @@ export default function DashboardAppPage() {
   const [topProvinces, setTopProvinces] = useState([]);
   const [topProvincesValue, setTopProvincesValue] = useState([]);
   const [voucherQuantity, setVoucherQuantity] = useState();
+  const [vouchersIsUsed, setVoucherIsUsed] = useState();
 
   useEffect(() => {
     fetchUser();
     fetchTrip();
     fetchVoucher();
     fetchDestination();
+    fetchVoucherIsUsed();
     setLoading(false);
   }, []);
 
   async function fetchUser() {
     const users = await adminApi.getListUser();
     setUsers(users.data);
+  }
+
+  async function fetchVoucherIsUsed() {
+    const quantity = await adminApi.getVouchersIsUsed();
+    setVoucherIsUsed(quantity.data);
   }
 
   async function fetchTrip() {
@@ -93,17 +99,6 @@ export default function DashboardAppPage() {
     const grouped = groupBy(trips, (trip) => dayjs.tz(trip.postDate, 'Asia/Ho_Chi_Minh').format('MM/DD/YYYY'));
     const keys = [...grouped.keys()];
     setPostDates(keys.reverse());
-    if (vouchers) {
-      let quantity = 0;
-      vouchers.map((voucher, _index) => {
-        if (voucher.status === 'INACTIVE') {
-          setVouchersInactive((prev) => [...prev, voucher]);
-        }
-        quantity += voucher.quantity;
-        return _index;
-      });
-      setVoucherQuantity(quantity);
-    }
   }, [trips]);
 
   useEffect(() => {
@@ -220,15 +215,15 @@ export default function DashboardAppPage() {
           <Grid item xs={12} sm={6} md={3}>
             <AppWidgetSummary
               title="Phiếu giảm giá hiện có"
-              total={voucherQuantity}
+              total={20}
               color="warning"
               icon={'fluent:gift-card-money-20-filled'}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
             <AppWidgetSummary
-              title="Mã giảm giá vô hiệu hoá"
-              total={vouchersInactive.length}
+              title="Mã giảm giá đã được sử dụng"
+              total={vouchersIsUsed}
               color="error"
               icon={'ant-design:bug-filled'}
             />
