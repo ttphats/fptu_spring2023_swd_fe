@@ -326,12 +326,11 @@ const CreateTrip = () => {
       console.log(error);
       if (error.response?.data.message) {
         setMsg(error.response?.data.message);
+        setOpen(true);
       } else {
         setMsg('Thông tin chuyến đi chưa hợp lệ. Vui lòng kiểm tra lại');
+        setOpen(true);
       }
-      setMsg('Đã có lỗi xảy ra vui lòng kiểm tra lại thông tin đã nhập');
-      setOpen(true);
-      console.log(error);
     }
   };
 
@@ -468,10 +467,10 @@ const CreateTrip = () => {
 
   const handleListItemClick = (value) => {
     try {
-        setOpenDialog(false);
-        setIsShowed(true);
-        setSelectedValue([...selectedValue, value]);
-        setSelectedVoucherId([...selectedVoucherId, value.id]);
+      setOpenDialog(false);
+      setIsShowed(true);
+      setSelectedValue([...selectedValue, value]);
+      setSelectedVoucherId([...selectedVoucherId, value.id]);
     } catch (error) {
       console.log(error);
       if (error.response?.data.message) {
@@ -588,7 +587,7 @@ const CreateTrip = () => {
                             touched={formik.touched.endDate}
                             format="DD/MM/YYYY"
                             onChange={(value) => {
-                              if (dayjs(value) >= formik.values.startDate) {
+                              if (dayjs(value) >= formik.values?.startDate) {
                                 formik.setFieldValue('endDate', dayjs(value));
                               } else {
                                 formik.setFieldValue('endDate', null);
